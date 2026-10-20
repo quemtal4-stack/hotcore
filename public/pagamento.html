@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Pagamento | Hot Dogueres</title>
+
+  <style>
+    :root {
+      --vermelho: #d71920;
+      --amarelo: #ffc928;
+      --preto: #171717;
+      --cinza: #f5f5f5;
+      --cinza-escuro: #555;
+      --branco: #ffffff;
+      --verde: #1f9d55;
+      --azul: #2563eb;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #fff7d6, #ffffff);
+      color: var(--preto);
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--vermelho);
+      color: var(--branco);
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 15px;
+      opacity: 0.95;
+    }
+
+    main {
+      width: 100%;
+      max-width: 950px;
+      margin: 40px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    .card {
+      background: var(--branco);
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .card h2,
+    .card h3 {
+      color: var(--vermelho);
+      margin-bottom: 15px;
+    }
+
+    .descricao {
+      color: var(--cinza-escuro);
+      font-size: 15px;
+      line-height: 1.5;
+      margin-bottom: 22px;
+    }
+
+    .linha {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 15px;
+    }
+
+    .linha span {
+      color: var(--cinza-escuro);
+    }
+
+    .linha strong {
+      text-align: right;
+    }
+
+    .linha.total {
+      border-bottom: none;
+      margin-top: 10px;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .pagamento-opcoes {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      opacity: 0.95;
+    }
+
+    .btn-pix {
+      background: var(--verde);
+      color: var(--branco);
+    }
+
+    .btn-cartao {
+      background: var(--azul);
+      color: var(--branco);
+    }
+
+    .btn-voltar {
+      background: var(--cinza);
+      color: var(--preto);
+      margin-top: 16px;
+    }
+
+    .pix-box {
+      display: none;
+      background: #e9fff2;
+      border: 1px solid #c5f3d6;
+      border-radius: 14px;
+      padding: 18px;
+      margin-top: 18px;
+    }
+
+    .pix-box h4 {
+      color: var(--verde);
+      margin-bottom: 10px;
+    }
+
+    .pix-codigo {
+      background: var(--branco);
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      word-break: break-all;
+      margin: 12px 0;
+      border: 1px dashed var(--verde);
+    }
+
+    .aviso {
+      background: #fff8d8;
+      border-left: 5px solid var(--amarelo);
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      color: #6b5200;
+      line-height: 1.5;
+      margin-top: 18px;
+    }
+
+    .erro {
+      background: #ffe8e8;
+      color: #a40000;
+      padding: 16px;
+      border-radius: 12px;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px 20px;
+      color: var(--cinza-escuro);
+      font-size: 14px;
+    }
+
+    @media (max-width: 800px) {
+      main {
+        grid-template-columns: 1fr;
+        margin: 25px auto;
+      }
+
+      header h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Hot Dogueres</h1>
+    <p>Pagamento do ingresso</p>
+  </header>
+
+  <main id="conteudo">
+    <section class="card">
+      <h2>Resumo da compra</h2>
+      <p class="descricao">
+        Confira os dados do pedido antes de finalizar o pagamento.
+      </p>
+
+      <div class="linha">
+        <span>Comprador</span>
+        <strong id="nomeComprador">-</strong>
+      </div>
+
+      <div class="linha">
+        <span>E-mail</span>
+        <strong id="emailComprador">-</strong>
+      </div>
+
+      <div class="linha">
+        <span>WhatsApp</span>
+        <strong id="whatsappComprador">-</strong>
+      </div>
+
+      <div class="linha">
+        <span>Ingresso</span>
+        <strong id="tipoIngresso">-</strong>
+      </div>
+
+      <div class="linha">
+        <span>Quantidade</span>
+        <strong id="quantidade">-</strong>
+      </div>
+
+      <div class="linha total">
+        <span>Total</span>
+        <strong id="total">-</strong>
+      </div>
+
+      <button class="btn btn-voltar" onclick="voltarCadastro()">
+        Voltar e editar cadastro
+      </button>
+    </section>
+
+    <section class="card">
+      <h3>Escolha a forma de pagamento</h3>
+
+      <p class="descricao">
+        Nesta primeira versão, vamos simular a etapa de pagamento.
+        Depois faremos a integração real com PIX e cartão.
+      </p>
+
+      <div class="pagamento-opcoes">
+        <button class="btn btn-pix" onclick="mostrarPix()">
+          Pagar com PIX
+        </button>
+
+        <button class="btn btn-cartao" onclick="pagarCartao()">
+          Pagar com cartão
+        </button>
+      </div>
+
+      <div id="pixBox" class="pix-box">
+        <h4>PIX gerado</h4>
+        <p>Copie o código abaixo para simular o pagamento:</p>
+
+        <div class="pix-codigo" id="codigoPix">
+          00020126580014BR.GOV.BCB.PIX0136HOTDOGUERES-FESTIVAL-CULTURAL520400005303986540520.005802BR5920HOT DOGUERES6007ARACAJU62070503***6304ABCD
+        </div>
+
+        <button class="btn btn-pix" onclick="confirmarPagamento()">
+          Simular pagamento aprovado
+        </button>
+      </div>
+
+      <div class="aviso">
+        Atenção: esta tela ainda é uma simulação. A integração real com banco, gateway de pagamento,
+        PIX automático e cartão será feita na próxima etapa.
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 Hot Dogueres. Todos os direitos reservados.
+ <footer>
+  © 2026 Hot Dogueres. Todos os direitos reservados.
+</footer>
+
+<script>
+  const pedidoSalvo = localStorage.getItem("pedidoHotDogueres");
+
+  function formatarMoeda(valor) {
+    return Number(valor).toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
+  }
+
+  function voltarCadastro() {
+    window.location.href = "/checkout.html";
+  }
+
+  function mostrarPix() {
+    document.getElementById("pixBox").style.display = "block";
+  }
+
+  function pagarCartao() {
+    alert("Pagamento com cartão será integrado na próxima etapa.");
+  }
+
+  function confirmarPagamento() {
+    const pedidoAtual = localStorage.getItem("pedidoHotDogueres");
+
+    if (!pedidoAtual) {
+      alert("Pedido não encontrado. Volte para o cadastro.");
+      window.location.href = "/checkout.html";
+      return;
+    }
+
+    try {
+      const pedido = JSON.parse(pedidoAtual);
+
+      pedido.statusPagamento = "aprovado";
+      pedido.pagoEm = new Date().toISOString();
+      pedido.codigoIngresso = "HDG-" + Date.now();
+
+      localStorage.setItem("pedidoHotDogueres", JSON.stringify(pedido));
+
+      window.location.href = "/confirmacao.html";
+    } catch (error) {
+      alert("Erro ao processar o pedido. Faça o cadastro novamente.");
+      localStorage.removeItem("pedidoHotDogueres");
+      window.location.href = "/checkout.html";
+    }
+  }
+
+  if (!pedidoSalvo) {
+    document.getElementById("conteudo").innerHTML = `
+      <section class="card erro">
+        <h2>Pedido não encontrado</h2>
+        <p>Não encontramos nenhum cadastro iniciado. Volte para a página de cadastro e preencha seus dados.</p>
+        <br>
+        <button class="btn btn-voltar" onclick="voltarCadastro()">Ir para cadastro</button>
+      </section>
+    `;
+  } else {
+    try {
+      const pedido = JSON.parse(pedidoSalvo);
+
+      document.getElementById("nomeComprador").textContent = pedido.nome || "-";
+      document.getElementById("emailComprador").textContent = pedido.email || "-";
+      document.getElementById("whatsappComprador").textContent = pedido.whatsapp || "-";
+      document.getElementById("tipoIngresso").textContent = pedido.tipoIngresso || "-";
+      document.getElementById("quantidade").textContent = pedido.quantidade || "-";
+      document.getElementById("total").textContent = formatarMoeda(pedido.total || 0);
+    } catch (error) {
+      localStorage.removeItem("pedidoHotDogueres");
+
+      document.getElementById("conteudo").innerHTML = `
+        <section class="card erro">
+          <h2>Pedido inválido</h2>
+          <p>Encontramos um pedido com dados inválidos. Volte para a página de cadastro e preencha novamente.</p>
+          <br>
+          <button class="btn btn-voltar" onclick="voltarCadastro()">Ir para cadastro</button>
+        </section>
+      `;
+    }
+  }
+</script>
+</body>
+</html>

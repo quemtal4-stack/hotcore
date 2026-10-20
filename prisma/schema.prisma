@@ -1,0 +1,564 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["multiSchema"]
+}
+
+
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["public"]
+}
+
+
+
+model usuarios {
+  id                      String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  auth_id                 String?                   @unique @db.Uuid
+  nome                    String
+  email                   String                    @unique
+  telefone                String?
+  cpf                     String?                   @unique
+  avatar_url              String?
+  tipo                    String?                   @default("comprador")
+  created_at              DateTime?                 @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime?                 @default(now()) @db.Timestamptz(6)
+  colecao_usuario         colecao_usuario[]
+  compras_ingressos       compras_ingressos[]
+  eventos                 eventos[]
+  membros_clube           membros_clube[]
+  pagamentos              pagamentos[]
+  pedidos_camisa          pedidos_camisa[]
+  pedidos_kit_alimentacao pedidos_kit_alimentacao[]
+  pedidos_livro           pedidos_livro[]
+  usuarios_colecao        usuarios_colecao[]
+  vendas                  vendas[]
+
+  @@schema("public")
+}
+
+model public_users {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email      String    @unique
+  name       String?
+  avatar_url String?
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@map("users")
+  @@schema("public")
+}
+
+model eventos {
+  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nome             String
+  descricao        String?
+  data_evento      DateTime           @db.Timestamptz(6)
+  local            String
+  endereco         String?
+  cidade           String?            @default("Aracaju")
+  estado           String?            @default("SE")
+  imagem_url       String?
+  capacidade       Int?               @default(0)
+  status           String?            @default("ativo")
+  organizador_id   String?            @db.Uuid
+  created_at       DateTime?          @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime?          @default(now()) @db.Timestamptz(6)
+  acao_solidaria   String?
+  total_ingressos  Int?
+  hora_evento      DateTime?          @db.Time(6)
+  camisas          camisas[]
+  colecao_usuario  colecao_usuario[]
+  usuarios         usuarios?          @relation(fields: [organizador_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  ingressos        ingressos[]
+  lotes            lotes[]
+  usuarios_colecao usuarios_colecao[]
+  vendas           vendas[]
+
+  @@index([data_evento], map: "idx_eventos_data")
+  @@schema("public")
+}
+
+model lotes {
+  id                      String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  evento_id               String?             @db.Uuid
+  numero_lote             Int
+  nome                    String              @db.VarChar(100)
+  preco                   Decimal             @db.Decimal(10, 2)
+  quantidade_total        Int
+  quantidade_vendida      Int?                @default(0)
+  is_especial             Boolean?            @default(false)
+  requer_colecao_completa Boolean?            @default(false)
+  status                  String?             @default("fechado") @db.VarChar(20)
+  ordem_abertura          Int?
+  created_at              DateTime?           @default(now()) @db.Timestamp(6)
+  kg_doacao               Decimal?            @default(1.00) @db.Decimal(5, 2)
+  compras_ingressos       compras_ingressos[]
+  ingressos               ingressos[]
+  eventos                 eventos?            @relation(fields: [evento_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+model modelos_ingresso {
+  id                      String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  evento_id               String?     @db.Uuid
+  numero                  Int
+  nome                    String      @db.VarChar(100)
+  descricao               String?
+  imagem_url              String?
+  preco                   Decimal     @db.Decimal(10, 2)
+  quantidade_total        Int
+  quantidade_vendida      Int?        @default(0)
+  tipo                    String?     @default("normal") @db.VarChar(20)
+  requer_colecao_completa Boolean?    @default(false)
+  ativo                   Boolean?    @default(true)
+  created_at              DateTime?   @default(now()) @db.Timestamp(6)
+  numero_modelo           Int?
+  ingressos               ingressos[]
+
+  @@index([evento_id], map: "idx_modelos_evento")
+  @@schema("public")
+}
+
+model ingressos {
+  id                 String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  evento_id          String?            @db.Uuid
+  nome               String
+  descricao          String?
+  preco              Decimal            @db.Decimal(10, 2)
+  quantidade_total   Int
+  quantidade_vendida Int?               @default(0)
+  status             String?            @default("disponivel")
+  created_at         DateTime?          @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime?          @default(now()) @db.Timestamptz(6)
+  lote_id            String?            @db.Uuid
+  modelo_id          String?            @db.Uuid
+  codigo             String?            @unique @db.VarChar(20)
+  nome_comprador     String?            @db.VarChar(255)
+  cpf_comprador      String?            @db.VarChar(14)
+  email_comprador    String?            @db.VarChar(255)
+  telefone_comprador String?            @db.VarChar(20)
+  preco_pago         Decimal?           @db.Decimal(10, 2)
+  qr_code_hash       String?
+  data_compra        DateTime?          @default(now()) @db.Timestamp(6)
+  data_pagamento     DateTime?          @db.Timestamp(6)
+  data_uso           DateTime?          @db.Timestamp(6)
+  compra_ingresso_id String?            @db.Uuid
+  usuario_id         String?            @db.Uuid
+  modelo_numero      Int?
+  eventos            eventos?           @relation(fields: [evento_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  lotes              lotes?             @relation(fields: [lote_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  modelos_ingresso   modelos_ingresso?  @relation(fields: [modelo_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pagamentos         pagamentos[]
+  usuarios_colecao   usuarios_colecao[]
+
+  @@index([evento_id], map: "idx_ingressos_evento")
+  @@schema("public")
+}
+
+model compras_ingressos {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuario_id     String    @db.Uuid
+  lote_id        String    @db.Uuid
+  quantidade     Int       @default(1)
+  valor_unitario Decimal   @db.Decimal(10, 2)
+  valor_total    Decimal   @db.Decimal(10, 2)
+  status         String    @default("pendente")
+  payment_id     String?
+  payment_method String?
+  created_at     DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime? @default(now()) @db.Timestamptz(6)
+  evento_id      String?   @db.Uuid
+  modelo_numero  Int?
+  modelo_id      String?   @db.Uuid
+  lotes          lotes     @relation(fields: [lote_id], references: [id], onUpdate: NoAction)
+  usuarios       usuarios  @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([lote_id], map: "idx_compras_ingressos_lote")
+  @@index([status], map: "idx_compras_ingressos_status")
+  @@index([usuario_id], map: "idx_compras_ingressos_usuario")
+  @@schema("public")
+}
+
+model colecao_usuario {
+  id                         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuario_id                 String?   @db.Uuid
+  evento_id                  String?   @db.Uuid
+  tem_modelo_1               Boolean?  @default(false)
+  tem_modelo_2               Boolean?  @default(false)
+  tem_modelo_3               Boolean?  @default(false)
+  tem_modelo_4               Boolean?  @default(false)
+  tem_modelo_5               Boolean?  @default(false)
+  tem_modelo_6               Boolean?  @default(false)
+  total_modelos              Int?      @default(0)
+  colecao_completa           Boolean?  @default(false)
+  acesso_area_vip            Boolean?  @default(false)
+  ingresso_especial_liberado Boolean?  @default(false)
+  created_at                 DateTime? @default(now()) @db.Timestamp(6)
+  updated_at                 DateTime? @default(now()) @db.Timestamp(6)
+  expor_publico              Boolean?  @default(false)
+  nome_eternizado            String?   @db.VarChar(100)
+  qtd_modelo_1               Int?      @default(0)
+  qtd_modelo_2               Int?      @default(0)
+  qtd_modelo_3               Int?      @default(0)
+  qtd_modelo_4               Int?      @default(0)
+  qtd_modelo_5               Int?      @default(0)
+  qtd_modelo_6               Int?      @default(0)
+  total_unidades             Int?      @default(0)
+  eventos                    eventos?  @relation(fields: [evento_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuarios                   usuarios? @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([usuario_id, evento_id])
+  @@schema("public")
+}
+
+model usuario_colecao {
+  id               String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  usuario_id       String?   @db.Uuid
+  evento_id        String?   @db.Uuid
+  tem_modelo_1     Boolean?  @default(false)
+  tem_modelo_2     Boolean?  @default(false)
+  tem_modelo_3     Boolean?  @default(false)
+  tem_modelo_4     Boolean?  @default(false)
+  tem_modelo_5     Boolean?  @default(false)
+  total_ingressos  Int?      @default(0)
+  colecao_completa Boolean?  @default(false)
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+  updated_at       DateTime? @default(now()) @db.Timestamp(6)
+
+  @@unique([usuario_id, evento_id])
+  @@index([usuario_id, evento_id], map: "idx_colecao_usuario_evento")
+  @@schema("public")
+}
+
+model usuarios_colecao {
+  id              String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuario_id      String?    @db.Uuid
+  compra_id       String?    @db.Uuid
+  evento_id       String?    @db.Uuid
+  ingresso_id     String?    @db.Uuid
+  codigo_ingresso String?    @unique
+  qr_code         String?
+  usado           Boolean?   @default(false)
+  data_uso        DateTime?  @db.Timestamptz(6)
+  created_at      DateTime?  @default(now()) @db.Timestamptz(6)
+  eventos         eventos?   @relation(fields: [evento_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  ingressos       ingressos? @relation(fields: [ingresso_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuarios        usuarios?  @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([usuario_id], map: "idx_colecao_usuario")
+  @@schema("public")
+}
+
+model pagamentos {
+  id                    String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ingresso_id           String?    @db.Uuid
+  usuario_id            String?    @db.Uuid
+  mp_payment_id         String?    @db.VarChar(100)
+  mp_preference_id      String?    @db.VarChar(100)
+  mp_external_reference String?    @db.VarChar(100)
+  valor                 Decimal    @db.Decimal(10, 2)
+  taxa_mp               Decimal?   @db.Decimal(10, 2)
+  valor_liquido         Decimal?   @db.Decimal(10, 2)
+  metodo_pagamento      String?    @db.VarChar(50)
+  status                String?    @default("pending") @db.VarChar(30)
+  status_detail         String?    @db.VarChar(100)
+  data_criacao          DateTime?  @default(now()) @db.Timestamp(6)
+  data_aprovacao        DateTime?  @db.Timestamp(6)
+  data_atualizacao      DateTime?  @db.Timestamp(6)
+  compra_ingresso_id    String?    @db.Uuid
+  evento_id             String?    @db.Uuid
+  ingressos             ingressos? @relation(fields: [ingresso_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuarios              usuarios?  @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([mp_payment_id], map: "idx_pagamentos_mp_id")
+  @@index([status], map: "idx_pagamentos_status")
+  @@schema("public")
+}
+
+model camisas {
+  id            String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  evento_id     String?           @db.Uuid
+  nome          String            @db.VarChar(150)
+  descricao     String?
+  tecido        String            @db.VarChar(20)
+  preco         Decimal           @db.Decimal(10, 2)
+  imagem_url    String?
+  pre_venda_ini DateTime?         @db.Timestamptz(6)
+  pre_venda_fim DateTime?         @db.Timestamptz(6)
+  data_entrega  DateTime?         @db.Timestamptz(6)
+  ativo         Boolean?          @default(true)
+  created_at    DateTime?         @default(now()) @db.Timestamptz(6)
+  tamanhos      camisa_tamanhos[]
+  eventos       eventos?          @relation(fields: [evento_id], references: [id], onUpdate: NoAction)
+  pedidos       pedidos_camisa[]
+
+  @@index([evento_id], map: "idx_camisas_evento")
+  @@schema("public")
+}
+
+model camisa_tamanhos {
+  id                 String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  camisa_id          String  @db.Uuid
+  tamanho            String  @db.VarChar(10)
+  quantidade_total   Int     @default(0)
+  quantidade_vendida Int?    @default(0)
+  camisas            camisas @relation(fields: [camisa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([camisa_id, tamanho])
+  @@schema("public")
+}
+
+model pedidos_camisa {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuario_id     String    @db.Uuid
+  camisa_id      String    @db.Uuid
+  tamanho        String    @db.VarChar(10)
+  quantidade     Int       @default(1)
+  valor_unitario Decimal   @db.Decimal(10, 2)
+  valor_total    Decimal   @db.Decimal(10, 2)
+  status         String?   @default("pendente") @db.VarChar(20)
+  payment_id     String?
+  payment_method String?
+  created_at     DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime? @default(now()) @db.Timestamptz(6)
+  camisas        camisas   @relation(fields: [camisa_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuarios       usuarios  @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([usuario_id], map: "idx_pedidos_camisa_usuario")
+  @@index([status], map: "idx_pedidos_camisa_status")
+  @@schema("public")
+}
+
+model planos_clube {
+  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nome          String          @db.VarChar(100)
+  descricao     String?
+  preco         Decimal         @db.Decimal(10, 2)
+  ciclo         String          @db.VarChar(20)
+  beneficios    String?
+  ativo         Boolean?        @default(true)
+  created_at    DateTime?       @default(now()) @db.Timestamptz(6)
+  membros_clube membros_clube[]
+
+  @@schema("public")
+}
+
+model membros_clube {
+  id                    String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuario_id            String       @db.Uuid
+  plano_id              String       @db.Uuid
+  status                String?      @default("ativo") @db.VarChar(20)
+  data_inicio           DateTime?    @default(now()) @db.Timestamptz(6)
+  data_proxima_cobranca DateTime?    @db.Timestamptz(6)
+  data_cancelamento     DateTime?    @db.Timestamptz(6)
+  payment_id            String?
+  created_at            DateTime?    @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime?    @default(now()) @db.Timestamptz(6)
+  planos_clube          planos_clube @relation(fields: [plano_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuarios              usuarios     @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([usuario_id], map: "idx_membros_clube_usuario")
+  @@index([status], map: "idx_membros_clube_status")
+  @@schema("public")
+}
+
+model kits_alimentacao {
+  id                      String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nome                    String                    @db.VarChar(100)
+  descricao               String?
+  preco                   Decimal                   @db.Decimal(10, 2)
+  kg_doacao               Decimal?                  @default(0) @db.Decimal(5, 2)
+  categoria               String?                   @db.VarChar(20)
+  imagem_url              String?
+  ativo                   Boolean?                  @default(true)
+  created_at              DateTime?                 @default(now()) @db.Timestamptz(6)
+  pedidos_kit_alimentacao pedidos_kit_alimentacao[]
+
+  @@schema("public")
+}
+
+model pedidos_kit_alimentacao {
+  id               String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuario_id       String           @db.Uuid
+  kit_id           String           @db.Uuid
+  quantidade       Int              @default(1)
+  valor_unitario   Decimal          @db.Decimal(10, 2)
+  valor_total      Decimal          @db.Decimal(10, 2)
+  status           String?          @default("pendente") @db.VarChar(20)
+  payment_id       String?
+  payment_method   String?
+  created_at       DateTime?        @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime?        @default(now()) @db.Timestamptz(6)
+  kits_alimentacao kits_alimentacao @relation(fields: [kit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuarios         usuarios         @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([usuario_id], map: "idx_pedidos_kit_usuario")
+  @@index([status], map: "idx_pedidos_kit_status")
+  @@schema("public")
+}
+
+model livros {
+  id               String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nome             String          @db.VarChar(150)
+  numero_edicao    Int
+  descricao        String?
+  inclui_box       Boolean?        @default(false)
+  preco_nao_membro Decimal         @db.Decimal(10, 2)
+  preco_membro     Decimal         @db.Decimal(10, 2)
+  imagem_url       String?
+  ativo            Boolean?        @default(true)
+  created_at       DateTime?       @default(now()) @db.Timestamptz(6)
+  categoria        CategoriaLivro  @default(JORNADA_HOT_DOGUERES)
+  data_lancamento  DateTime?       @db.Timestamptz(6)
+  disponivel       Boolean         @default(true)
+  updated_at       DateTime?       @default(now()) @db.Timestamptz(6)
+  pedidos_livro    pedidos_livro[]
+
+  @@schema("public")
+}
+
+model pedidos_livro {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuario_id     String    @db.Uuid
+  livro_id       String    @db.Uuid
+  quantidade     Int       @default(1)
+  era_membro     Boolean?  @default(false)
+  valor_unitario Decimal   @db.Decimal(10, 2)
+  valor_total    Decimal   @db.Decimal(10, 2)
+  status         String?   @default("pendente") @db.VarChar(20)
+  payment_id     String?
+  payment_method String?
+  created_at     DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime? @default(now()) @db.Timestamptz(6)
+  livros         livros    @relation(fields: [livro_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuarios       usuarios  @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([usuario_id], map: "idx_pedidos_livro_usuario")
+  @@schema("public")
+}
+
+model compras {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id        String    @db.Uuid
+  nome_item      String    @db.VarChar(255)
+  categoria      String?   @db.VarChar(100)
+  quantidade     Int?      @default(1)
+  valor_estimado Decimal?  @db.Decimal(10, 2)
+  prioridade     String?   @default("média") @db.VarChar(20)
+  status         String?   @default("pendente") @db.VarChar(20)
+  data_limite    DateTime? @db.Date
+  observacoes    String?
+  created_at     DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@schema("public")
+}
+
+model notificacoes {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuario_id String    @db.Uuid
+  evento_id  String?   @db.Uuid
+  tipo       String    @db.VarChar(50)
+  titulo     String    @db.VarChar(255)
+  mensagem   String?
+  lida       Boolean?  @default(false)
+  criado_em  DateTime? @default(now()) @db.Timestamp(6)
+
+  @@schema("public")
+}
+
+model vendas {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  evento_id       String?   @db.Uuid
+  compra_id       String?   @db.Uuid
+  vendedor_id     String?   @db.Uuid
+  valor_bruto     Decimal   @db.Decimal(10, 2)
+  taxa_plataforma Decimal?  @default(0) @db.Decimal(10, 2)
+  valor_liquido   Decimal   @db.Decimal(10, 2)
+  status          String?   @default("pendente")
+  created_at      DateTime? @default(now()) @db.Timestamptz(6)
+  eventos         eventos?  @relation(fields: [evento_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuarios        usuarios? @relation(fields: [vendedor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model clube_membros {
+  id                          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pessoa_id                   String    @db.Uuid
+  plano                       String
+  valor                       Decimal   @db.Decimal(10, 2)
+  periodicidade               String
+  status                      String    @default("iniciando")
+  mercado_pago_preapproval_id String?
+  mercado_pago_init_point     String?
+  external_reference          String?   @unique
+  created_at                  DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at                  DateTime? @default(now()) @db.Timestamptz(6)
+  pessoas                     pessoas   @relation(fields: [pessoa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([pessoa_id], map: "idx_clube_membros_pessoa_id")
+  @@index([plano], map: "idx_clube_membros_plano")
+  @@index([status], map: "idx_clube_membros_status")
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model pedidos {
+  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  external_reference    String    @unique
+  preference_id         String?
+  payment_id            String?
+  status                String    @default("aguardando_pagamento")
+  tipo                  String?
+  produto               String?
+  categoria             String?
+  tamanho               String?
+  nome_comprador        String?
+  email_comprador       String?
+  whatsapp              String?
+  quantidade            Int       @default(1)
+  valor_unitario        Decimal   @default(0) @db.Decimal
+  valor_frete           Decimal   @default(0) @db.Decimal
+  total_produtos        Decimal   @default(0) @db.Decimal
+  total_pedido          Decimal   @default(0) @db.Decimal
+  forma_entrega         String?   @default("retirada")
+  cep                   String?
+  servico_frete         String?
+  prazo_frete           String?
+  endereco_entrega      Json?
+  mercado_pago_metadata Json?
+  created_at            DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@index([created_at(sort: Desc)])
+  @@index([external_reference])
+  @@index([status])
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model pessoas {
+  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nome          String
+  email         String          @unique
+  whatsapp      String?
+  origem        String?         @default("site")
+  created_at    DateTime?       @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime?       @default(now()) @db.Timestamptz(6)
+  clube_membros clube_membros[]
+
+  @@schema("public")
+}
+
+enum CategoriaLivro {
+  JORNADA_HOT_DOGUERES
+  INFANTIL
+  INFANTO_JUVENIL
+
+  @@schema("public")
+}

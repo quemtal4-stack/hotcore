@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Cadastro | Hot Dogueres</title>
+
+  <style>
+    :root {
+      --vermelho: #d71920;
+      --amarelo: #ffc928;
+      --preto: #171717;
+      --cinza: #f5f5f5;
+      --cinza-escuro: #555;
+      --branco: #ffffff;
+      --verde: #1f9d55;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #fff7d6, #ffffff);
+      color: var(--preto);
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--vermelho);
+      color: var(--branco);
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 15px;
+      opacity: 0.95;
+    }
+
+    main {
+      width: 100%;
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 30px;
+    }
+
+    .card {
+      background: var(--branco);
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .card h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: var(--vermelho);
+    }
+
+    .card .descricao {
+      font-size: 15px;
+      color: var(--cinza-escuro);
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--vermelho);
+      box-shadow: 0 0 0 3px rgba(215, 25, 32, 0.12);
+    }
+
+    .termos {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--cinza-escuro);
+    }
+
+    .termos label {
+      font-weight: normal;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      line-height: 1.4;
+    }
+
+    .termos input {
+      width: auto;
+      margin-top: 3px;
+    }
+
+    .termos a {
+      color: var(--vermelho);
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 24px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--vermelho);
+      color: var(--branco);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      opacity: 0.95;
+    }
+
+    .resumo {
+      position: sticky;
+      top: 20px;
+    }
+
+    .resumo h3 {
+      font-size: 22px;
+      color: var(--vermelho);
+      margin-bottom: 18px;
+    }
+
+    .evento-box {
+      background: var(--cinza);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 20px;
+      border-left: 5px solid var(--amarelo);
+    }
+
+    .evento-box strong {
+      display: block;
+      font-size: 17px;
+      margin-bottom: 8px;
+    }
+
+    .evento-box span {
+      font-size: 14px;
+      color: var(--cinza-escuro);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .linha-resumo {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 15px;
+    }
+
+    .linha-resumo.total {
+      border-bottom: none;
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--preto);
+      margin-top: 8px;
+    }
+
+    .selo {
+      margin-top: 20px;
+      background: #e9fff2;
+      color: var(--verde);
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.4;
+      font-weight: bold;
+    }
+
+    .erro {
+      display: none;
+      background: #ffe8e8;
+      color: #a40000;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 18px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .sucesso {
+      display: none;
+      background: #e9fff2;
+      color: var(--verde);
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 18px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px 20px;
+      color: var(--cinza-escuro);
+      font-size: 14px;
+    }
+
+    @media (max-width: 850px) {
+      main {
+        grid-template-columns: 1fr;
+        margin: 25px auto;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .resumo {
+        position: static;
+      }
+
+      header h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Hot Dogueres</h1>
+    <p>Cadastro para o Festival Cultural Hot Dogueres</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Garanta seu ingresso</h2>
+
+      <p class="descricao">
+        Preencha seus dados para continuar para o pagamento e receber seu ingresso digital do
+        Festival Cultural Hot Dogueres.
+      </p>
+
+      <div id="mensagemErro" class="erro"></div>
+      <div id="mensagemSucesso" class="sucesso"></div>
+
+      <form id="formCheckout">
+        <div class="form-grid">
+          <div class="form-group full">
+            <label for="nome">Nome completo</label>
+            <input type="text" id="nome" name="nome" placeholder="Digite seu nome completo" required />
+          </div>
+
+          <div class="form-group">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" name="email" placeholder="seuemail@email.com" required />
+          </div>
+
+          <div class="form-group">
+            <label for="whatsapp">WhatsApp</label>
+            <input type="tel" id="whatsapp" name="whatsapp" placeholder="(79) 99999-9999" required />
+          </div>
+
+          <div class="form-group">
+            <label for="cpf">CPF</label>
+            <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" required />
+          </div>
+
+          <div class="form-group">
+            <label for="cidade">Cidade</label>
+            <input type="text" id="cidade" name="cidade" placeholder="Ex: Aracaju" required />
+          </div>
+
+          <div class="form-group">
+            <label for="estado">Estado</label>
+            <select id="estado" name="estado" required>
+              <option value="">Selecione</option>
+              <option value="SE">Sergipe</option>
+              <option value="BA">Bahia</option>
+              <option value="AL">Alagoas</option>
+              <option value="PE">Pernambuco</option>
+              <option value="PB">Paraíba</option>
+              <option value="RN">Rio Grande do Norte</option>
+              <option value="CE">Ceará</option>
+              <option value="MA">Maranhão</option>
+              <option value="PI">Piauí</option>
+              <option value="SP">São Paulo</option>
+              <option value="RJ">Rio de Janeiro</option>
+              <option value="MG">Minas Gerais</option>
+              <option value="Outro">Outro</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="tipoIngresso">Tipo de ingresso</label>
+            <select id="tipoIngresso" name="tipoIngresso" required>
+              <option value="social" data-preco="20">Ingresso Social - R$ 20,00</option>
+              <option value="inteira" data-preco="40">Ingresso Inteira - R$ 40,00</option>
+              <option value="vip" data-preco="80">Ingresso VIP - R$ 80,00</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="quantidade">Quantidade</label>
+            <select id="quantidade" name="quantidade" required>
+              <option value="1">1 ingresso</option>
+              <option value="2">2 ingressos</option>
+              <option value="3">3 ingressos</option>
+              <option value="4">4 ingressos</option>
+              <option value="5">5 ingressos</option>
+            </select>
+          </div>
+
+          <div class="form-group full">
+            <label for="cupom">Cupom de desconto</label>
+            <input type="text" id="cupom" name="cupom" placeholder="Se tiver, digite aqui" />
+          </div>
+        </div>
+
+        <div class="termos">
+          <label>
+            <input type="checkbox" id="aceiteTermos" required />
+            <span>
+              Aceito os <a href="#" target="_blank">Termos de Uso</a> do evento.
+            </span>
+          </label>
+
+          <label>
+            <input type="checkbox" id="aceitePrivacidade" required />
+            <span>
+              Aceito a <a href="#" target="_blank">Política de Privacidade</a>.
+            </span>
+          </label>
+
+          <label>
+            <input type="checkbox" id="aceiteContato" />
+            <span>
+              Autorizo receber informações sobre o evento pelo WhatsApp e e-mail.
+            </span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+          Continuar para pagamento
+        </button>
+      </form>
+    </section>
+
+    <aside class="card resumo">
+      <h3>Resumo do pedido</h3>
+
+      <div class="evento-box">
+        <strong>Festival Cultural Hot Dogueres</strong>
+        <span>Evento cultural, social e gastronômico</span>
+        <span>Local: Aracaju/SE</span>
+        <span>Data: a definir</span>
+      </div>
+
+      <div class="linha-resumo">
+        <span>Tipo de ingresso</span>
+        <strong id="resumoTipo">Ingresso Social</strong>
+      </div>
+
+      <div class="linha-resumo">
+        <span>Valor unitário</span>
+        <strong id="resumoPreco">R$ 20,00</strong>
+      </div>
+
+      <div class="linha-resumo">
+        <span>Quantidade</span>
+        <strong id="resumoQuantidade">1</strong>
+      </div>
+
+      <div class="linha-resumo total">
+        <span>Total</span>
+        <strong id="resumoTotal">R$ 20,00</strong>
+      </div>
+
+      <div class="selo">
+        Compra segura. Seus dados serão usados apenas para identificação do ingresso,
+        confirmação da compra e comunicação sobre o evento.
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    © 2026 Hot Dogueres. Todos os direitos reservados.
+  </footer>
+
+  <script>
+    const form = document.getElementById("formCheckout");
+    const tipoIngresso = document.getElementById("tipoIngresso");
+    const quantidade = document.getElementById("quantidade");
+    const cpf = document.getElementById("cpf");
+    const whatsapp = document.getElementById("whatsapp");
+
+    const resumoTipo = document.getElementById("resumoTipo");
+    const resumoPreco = document.getElementById("resumoPreco");
+    const resumoQuantidade = document.getElementById("resumoQuantidade");
+    const resumoTotal = document.getElementById("resumoTotal");
+
+    const mensagemErro = document.getElementById("mensagemErro");
+    const mensagemSucesso = document.getElementById("mensagemSucesso");
+
+    function formatarMoeda(valor) {
+      return valor.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+      });
+    }
+
+    function atualizarResumo() {
+      const optionSelecionada = tipoIngresso.options[tipoIngresso.selectedIndex];
+      const textoIngresso = optionSelecionada.text.split(" - ")[0];
+      const preco = Number(optionSelecionada.dataset.preco);
+      const qtd = Number(quantidade.value);
+      const total = preco * qtd;
+
+      resumoTipo.textContent = textoIngresso;
+      resumoPreco.textContent = formatarMoeda(preco);
+      resumoQuantidade.textContent = qtd;
+      resumoTotal.textContent = formatarMoeda(total);
+    }
+
+    function aplicarMascaraCPF(valor) {
+      return valor
+        .replace(/\D/g, "")
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d{1,2})$/, "$1-$2")
+        .slice(0, 14);
+    }
+
+    function aplicarMascaraWhatsApp(valor) {
+      return valor
+        .replace(/\D/g, "")
+        .replace(/^(\d{2})(\d)/g, "($1) $2")
+        .replace(/(\d{5})(\d{4})$/, "$1-$2")
+        .slice(0, 15);
+    }
+
+    function limparMensagens() {
+      mensagemErro.style.display = "none";
+      mensagemErro.textContent = "";
+
+      mensagemSucesso.style.display = "none";
+      mensagemSucesso.textContent = "";
+    }
+
+    tipoIngresso.addEventListener("change", atualizarResumo);
+    quantidade.addEventListener("change", atualizarResumo);
+
+    cpf.addEventListener("input", function () {
+      cpf.value = aplicarMascaraCPF(cpf.value);
+    });
+
+    whatsapp.addEventListener("input", function () {
+      whatsapp.value = aplicarMascaraWhatsApp(whatsapp.value);
+    });
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      limparMensagens();
+
+      const nome = document.getElementById("nome").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const whatsappValor = document.getElementById("whatsapp").value.trim();
+      const cpfValor = document.getElementById("cpf").value.trim();
+      const cidade = document.getElementById("cidade").value.trim();
+      const estado = document.getElementById("estado").value;
+      const aceiteTermos = document.getElementById("aceiteTermos").checked;
+      const aceitePrivacidade = document.getElementById("aceitePrivacidade").checked;
+
+      if (!nome || !email || !whatsappValor || !cpfValor || !cidade || !estado) {
+        mensagemErro.textContent = "Preencha todos os campos obrigatórios para continuar.";
+        mensagemErro.style.display = "block";
+        return;
+      }
+
+      if (!aceiteTermos || !aceitePrivacidade) {
+        mensagemErro.textContent = "Você precisa aceitar os Termos de Uso e a Política de Privacidade.";
+        mensagemErro.style.display = "block";
+        return;
+      }
+
+      const optionSelecionada = tipoIngresso.options[tipoIngresso.selectedIndex];
+      const preco = Number(optionSelecionada.dataset.preco);
+      const qtd = Number(quantidade.value);
+      const total = preco * qtd;
+
+      const pedido = {
+        nome,
+        email,
+        whatsapp: whatsappValor,
+        cpf: cpfValor,
+        cidade,
+        estado,
+        tipoIngresso: optionSelecionada.text.split(" - ")[0],
+        quantidade: qtd,
+        valorUnitario: preco,
+        total,
+        cupom: document.getElementById("cupom").value.trim(),
+        aceiteContato: document.getElementById("aceiteContato").checked,
+        criadoEm: new Date().toISOString()
+      };
+
+      localStorage.setItem("pedidoHotDogueres", JSON.stringify(pedido));
+
+      mensagemSucesso.textContent = "Cadastro realizado com sucesso. Redirecionando para o pagamento...";
+      mensagemSucesso.style.display = "block";
+
+      setTimeout(function () {
+        window.location.href = "pagamento.html";
+      }, 1500);
+    });
+
+    atualizarResumo();
+  </script>
+</body>
+</html>

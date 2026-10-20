@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Ingresso Confirmado | Hot Dogueres</title>
+
+  <style>
+    :root {
+      --vermelho: #d71920;
+      --amarelo: #ffc928;
+      --preto: #171717;
+      --cinza: #f5f5f5;
+      --cinza-escuro: #555;
+      --branco: #ffffff;
+      --verde: #1f9d55;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #fff7d6, #ffffff);
+      color: var(--preto);
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--vermelho);
+      color: var(--branco);
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 15px;
+      opacity: 0.95;
+    }
+
+    main {
+      width: 100%;
+      max-width: 850px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .card {
+      background: var(--branco);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+      text-align: center;
+    }
+
+    .icone-sucesso {
+      width: 85px;
+      height: 85px;
+      border-radius: 50%;
+      background: var(--verde);
+      color: var(--branco);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 46px;
+      font-weight: bold;
+      margin: 0 auto 20px;
+    }
+
+    h2 {
+      color: var(--verde);
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+
+    .descricao {
+      color: var(--cinza-escuro);
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 28px;
+    }
+
+    .ingresso-box {
+      border: 2px dashed var(--vermelho);
+      border-radius: 18px;
+      padding: 24px;
+      margin: 25px 0;
+      background: #fffdf4;
+      text-align: left;
+    }
+
+    .ingresso-topo {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .ingresso-topo strong {
+      display: block;
+      color: var(--vermelho);
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+
+    .ingresso-topo span {
+      color: var(--cinza-escuro);
+      font-size: 14px;
+    }
+
+    .linha {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 15px;
+    }
+
+    .linha span {
+      color: var(--cinza-escuro);
+    }
+
+    .linha strong {
+      text-align: right;
+    }
+
+    .codigo {
+      background: var(--preto);
+      color: var(--branco);
+      padding: 16px;
+      border-radius: 12px;
+      text-align: center;
+      margin-top: 22px;
+      font-size: 20px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .qrcode-fake {
+      width: 150px;
+      height: 150px;
+      margin: 22px auto 0;
+      background:
+        linear-gradient(90deg, #111 10px, transparent 10px) 0 0 / 20px 20px,
+        linear-gradient(#111 10px, transparent 10px) 0 0 / 20px 20px,
+        #fff;
+      border: 8px solid #fff;
+      outline: 2px solid #ddd;
+    }
+
+    .aviso {
+      background: #e9fff2;
+      color: var(--verde);
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      font-weight: bold;
+      margin-top: 22px;
+    }
+
+    .botoes {
+      display: flex;
+      gap: 14px;
+      margin-top: 25px;
+    }
+
+    .btn {
+      flex: 1;
+      border: none;
+      border-radius: 12px;
+      padding: 15px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      opacity: 0.95;
+    }
+
+    .btn-primary {
+      background: var(--vermelho);
+      color: var(--branco);
+    }
+
+    .btn-secondary {
+      background: var(--amarelo);
+      color: var(--preto);
+    }
+
+    .erro {
+      background: #ffe8e8;
+      color: #a40000;
+      padding: 18px;
+      border-radius: 14px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px 20px;
+      color: var(--cinza-escuro);
+      font-size: 14px;
+    }
+
+    @media print {
+      header,
+      footer,
+      .botoes,
+      .aviso {
+        display: none;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      main {
+        margin: 0;
+        max-width: 100%;
+      }
+
+      .card {
+        box-shadow: none;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .botoes {
+        flex-direction: column;
+      }
+
+      .linha {
+        flex-direction: column;
+      }
+
+      .linha strong {
+        text-align: left;
+      }
+
+      h2 {
+        font-size: 25px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Hot Dogueres</h1>
+    <p>Confirmação do ingresso</p>
+  </header>
+
+  <main id="conteudo">
+    <section class="card">
+      <div class="icone-sucesso">✓</div>
+
+      <h2>Pagamento aprovado!</h2>
+
+      <p class="descricao">
+        Seu ingresso foi confirmado com sucesso. Guarde esta página ou imprima o comprovante.
+      </p>
+
+      <div class="ingresso-box" id="areaIngresso">
+        <div class="ingresso-topo">
+          <strong>Festival Cultural Hot Dogueres</strong>
+          <span>Ingresso digital oficial</span>
+        </div>
+
+        <div class="linha">
+          <span>Nome</span>
+          <strong id="nomeComprador">-</strong>
+        </div>
+
+        <div class="linha">
+          <span>E-mail</span>
+          <strong id="emailComprador">-</strong>
+        </div>
+
+        <div class="linha">
+          <span>WhatsApp</span>
+          <strong id="whatsappComprador">-</strong>
+        </div>
+
+        <div class="linha">
+          <span>Tipo de ingresso</span>
+          <strong id="tipoIngresso">-</strong>
+        </div>
+
+        <div class="linha">
+          <span>Quantidade</span>
+          <strong id="quantidade">-</strong>
+        </div>
+
+        <div class="linha">
+          <span>Valor pago</span>
+          <strong id="total">-</strong>
+        </div>
+
+        <div class="linha">
+          <span>Status</span>
+          <strong id="statusPagamento">-</strong>
+        </div>
+
+        <div class="codigo" id="codigoIngresso">
+          HDG-000000
+        </div>
+
+        <div class="qrcode-fake"></div>
+      </div>
+
+      <div class="aviso">
+        Apresente este ingresso na entrada do evento. Futuramente, este QR Code será validado automaticamente.
+      </div>
+
+      <div class="botoes">
+        <button class="btn btn-primary" onclick="window.print()">
+          Imprimir ingresso
+        </button>
+
+        <a href="index.html" class="btn btn-secondary">
+          Voltar para início
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 Hot Dogueres. Todos os direitos reservados.
+  </footer>
+
+  <script>
+    const pedidoSalvo = localStorage.getItem("pedidoHotDogueres");
+
+    function formatarMoeda(valor) {
+      return Number(valor).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+      });
+    }
+
+    function voltarPagamento() {
+      window.location.href = "pagamento.html";
+    }
+
+    if (!pedidoSalvo) {
+      document.getElementById("conteudo").innerHTML = `
+        <section class="erro">
+          <h2>Ingresso não encontrado</h2>
+          <p>Não encontramos nenhum pagamento aprovado. Volte para a etapa de pagamento.</p>
+          <br>
+          <button class="btn btn-primary" onclick="voltarPagamento()">Ir para pagamento</button>
+        </section>
+      `;
+    } else {
+      const pedido = JSON.parse(pedidoSalvo);
+
+      if (pedido.statusPagamento !== "aprovado") {
+        document.getElementById("conteudo").innerHTML = `
+          <section class="erro">
+            <h2>Pagamento ainda não aprovado</h2>
+            <p>Seu pedido existe, mas ainda não possui pagamento aprovado.</p>
+            <br>
+            <button class="btn btn-primary" onclick="voltarPagamento()">Ir para pagamento</button>
+          </section>
+        `;
+      } else {
+        document.getElementById("nomeComprador").textContent = pedido.nome;
+        document.getElementById("emailComprador").textContent = pedido.email;
+        document.getElementById("whatsappComprador").textContent = pedido.whatsapp;
+        document.getElementById("tipoIngresso").textContent = pedido.tipoIngresso;
+        document.getElementById("quantidade").textContent = pedido.quantidade;
+        document.getElementById("total").textContent = formatarMoeda(pedido.total);
+        document.getElementById("statusPagamento").textContent = "Aprovado";
+        document.getElementById("codigoIngresso").textContent = pedido.codigoIngresso || "HDG-" + Date.now();
+      }
+    }
+  </script>
+</body>
+</html>

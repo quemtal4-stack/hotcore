@@ -1,0 +1,9 @@
+﻿
+FullName                                                               
+--------                                                               
+C:\Projetos\hot-dogueres\hotcore\app\api                               
+C:\Projetos\hot-dogueres\hotcore\app\api\mercado-pago                  
+C:\Projetos\hot-dogueres\hotcore\app\api\mercado-pago\checkout         
+C:\Projetos\hot-dogueres\hotcore\app\api\mercado-pago\checkout\route.ts
+
+

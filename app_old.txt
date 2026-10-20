@@ -1,0 +1,11 @@
+﻿
+FullName                                                                   
+--------                                                                   
+C:\Projetos\hot-dogueres\hotcore\app_old\api                               
+C:\Projetos\hot-dogueres\hotcore\app_old\cadastro                          
+C:\Projetos\hot-dogueres\hotcore\app_old\api\mercado-pago                  
+C:\Projetos\hot-dogueres\hotcore\app_old\api\mercado-pago\checkout         
+C:\Projetos\hot-dogueres\hotcore\app_old\api\mercado-pago\checkout\route.ts
+C:\Projetos\hot-dogueres\hotcore\app_old\cadastro\page.tsx                 
+
+

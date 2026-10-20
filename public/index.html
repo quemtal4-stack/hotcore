@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Hot Dogueres | Festival Cultural</title>
+
+  <style>
+    :root {
+      --vermelho: #d71920;
+      --amarelo: #ffc928;
+      --preto: #171717;
+      --branco: #ffffff;
+      --cinza: #555;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #fff7d6, #ffffff);
+      color: var(--preto);
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--vermelho);
+      color: var(--branco);
+      padding: 24px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 34px;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      font-size: 16px;
+      opacity: 0.95;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 60px auto;
+      padding: 0 20px;
+      text-align: center;
+    }
+
+    .hero {
+      background: var(--branco);
+      border-radius: 24px;
+      padding: 45px 30px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .hero h2 {
+      color: var(--vermelho);
+      font-size: 36px;
+      margin-bottom: 16px;
+    }
+
+    .hero p {
+      color: var(--cinza);
+      font-size: 18px;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .info {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin: 30px 0;
+    }
+
+    .info-card {
+      background: #fff8d8;
+      border-radius: 16px;
+      padding: 18px;
+      font-weight: bold;
+    }
+
+    .btn {
+      display: inline-block;
+      background: var(--vermelho);
+      color: var(--branco);
+      padding: 16px 28px;
+      border-radius: 14px;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      opacity: 0.95;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px 20px;
+      color: var(--cinza);
+      font-size: 14px;
+    }
+
+    @media (max-width: 700px) {
+      .info {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h2 {
+        font-size: 28px;
+      }
+
+      header h1 {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Hot Dogueres</h1>
+    <p>Festival Cultural</p>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h2>Garanta seu ingresso</h2>
+
+      <p>
+        Participe do Festival Cultural Hot Dogueres, uma experiência com comida,
+        música, cultura e diversão.
+      </p>
+
+      <div class="info">
+        <div class="info-card">
+          Ingresso digital
+        </div>
+
+        <div class="info-card">
+          Pagamento via PIX
+        </div>
+
+        <div class="info-card">
+          Confirmação online
+        </div>
+      </div>
+
+      <a href="/checkout/ingressos" class="btn">
+        Garanta seu ingresso
+      </a>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 Hot Dogueres. Todos os direitos reservados.
+  </footer>
+</body>
+</html>
