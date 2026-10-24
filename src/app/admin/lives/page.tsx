@@ -1,65 +1,101 @@
-import AdminHeader from "../_components/AdminHeader";
-import { verificarAdmin } from "../_lib/auth";
+import { verificarAdmin } from "../lib/auth";
+import { AdminHeader } from "../_components/AdminHeader";
 
-const lives = [
+const indicadores = [
   {
-    titulo: "Live de apresentação do Clube de Membros",
-    data: "Em breve",
-    status: "Planejada",
+    titulo: "Famílias ajudadas",
+    valor: "Em breve",
   },
   {
-    titulo: "Bastidores Hot Dogueres",
-    data: "Em breve",
-    status: "Planejada",
+    titulo: "Cestas básicas destinadas",
+    valor: "Em breve",
   },
   {
-    titulo: "Evento online para membros",
-    data: "Em breve",
-    status: "Futuro",
+    titulo: "Animais de rua apoiados",
+    valor: "Em breve",
+  },
+  {
+    titulo: "Alimentos arrecadados",
+    valor: "Em breve",
   },
 ];
 
-export default async function AdminLivesPage() {
-  await verificarAdmin("/admin/lives");
+const acoes = [
+  {
+    titulo: "Campanha de alimentos",
+    status: "Planejamento",
+  },
+  {
+    titulo: "Apoio a animais de rua",
+    status: "Planejamento",
+  },
+  {
+    titulo: "Doação vinculada ao Plano Eternizado",
+    status: "Planejamento",
+  },
+];
+
+export default async function AdminImpactoSocialPage() {
+  const usuario = await verificarAdmin("/admin/impacto-social");
 
   return (
     <main className="min-h-screen bg-[#FFF8E7] px-4 py-8 text-gray-950 md:px-8">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-7xl space-y-8">
         <AdminHeader
-          titulo="Lives"
-          descricao="Área para organizar transmissões, bastidores, eventos online e conteúdos exclusivos para membros."
+          titulo="Impacto Social"
+          subtitulo="Acompanhe números, ações solidárias, famílias ajudadas, alimentos arrecadados e impacto do projeto."
+          usuario={usuario}
         />
 
-        <section className="grid gap-6 md:grid-cols-3">
-          {lives.map((live) => (
-            <article
-              key={live.titulo}
-              className="rounded-3xl bg-white p-6 shadow-xl"
+        <section className="grid gap-5 md:grid-cols-4">
+          {indicadores.map((indicador) => (
+            <div
+              key={indicador.titulo}
+              className="rounded-3xl bg-white p-6 text-center shadow-xl"
             >
-              <p className="rounded-full bg-purple-100 px-4 py-2 text-xs font-black text-purple-800">
-                {live.status}
+              <p className="text-sm font-black uppercase text-red-700">
+                {indicador.titulo}
               </p>
 
-              <h2 className="mt-5 text-2xl font-black text-gray-950">
-                {live.titulo}
-              </h2>
-
-              <p className="mt-4 text-sm font-bold text-gray-600">
-                Data: {live.data}
+              <p className="mt-4 text-3xl font-black text-gray-950">
+                {indicador.valor}
               </p>
-            </article>
+            </div>
           ))}
         </section>
 
-        <section className="mt-8 rounded-3xl border-4 border-purple-200 bg-purple-50 p-6 shadow-xl">
-          <h2 className="text-2xl font-black text-purple-900">
-            Área do Membro Online
+        <section className="rounded-3xl bg-white p-6 shadow-xl">
+          <h2 className="text-2xl font-black text-gray-950">
+            Ações solidárias
           </h2>
 
-          <p className="mt-3 text-sm font-bold leading-relaxed text-purple-900">
-            Essa área será importante para o futuro acesso online dos membros,
-            com transmissões, bastidores e conteúdos exclusivos quando houver
-            estrutura disponível.
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {acoes.map((acao) => (
+              <article
+                key={acao.titulo}
+                className="rounded-2xl border border-green-200 bg-green-50 p-5"
+              >
+                <h3 className="text-lg font-black text-green-900">
+                  {acao.titulo}
+                </h3>
+
+                <p className="mt-3 inline-block rounded-full bg-green-700 px-4 py-2 text-xs font-black text-white">
+                  {acao.status}
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-3xl border-4 border-green-200 bg-green-50 p-6 shadow-xl">
+          <h2 className="text-2xl font-black text-green-900">
+            Próximo passo
+          </h2>
+
+          <p className="mt-3 text-sm font-bold leading-relaxed text-green-900">
+            Depois vamos permitir cadastrar ações reais, fotos, datas,
+            quantidade de alimentos e atualizar automaticamente os números que
+            aparecem no site.
           </p>
         </section>
       </div>

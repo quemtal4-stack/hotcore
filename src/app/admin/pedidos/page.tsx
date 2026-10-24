@@ -1,5 +1,5 @@
 import AdminHeader from "../_components/AdminHeader";
-import { verificarAdmin } from "../_lib/auth";
+import { verificarAdmin } from "@/app/admin/lib/auth";
 
 const pedidos = [
   {

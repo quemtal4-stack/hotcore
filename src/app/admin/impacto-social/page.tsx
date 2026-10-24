@@ -1,5 +1,5 @@
-import AdminHeader from "../_components/AdminHeader";
-import { verificarAdmin } from "../_lib/auth";
+import { verificarAdmin } from "../lib/auth";
+import { AdminHeader } from "../_components/AdminHeader";
 
 const indicadores = [
   {
@@ -36,16 +36,16 @@ const acoes = [
 ];
 
 export default async function AdminImpactoSocialPage() {
-  await verificarAdmin("/admin/impacto-social");
+  const usuario = await verificarAdmin("/admin/impacto-social");
 
   return (
     <main className="min-h-screen bg-[#FFF8E7] px-4 py-8 text-gray-950 md:px-8">
-      <div className="mx-auto max-w-7xl">
-     <AdminHeader
-  titulo="Impacto Social"
-  subtitulo="Acompanhe números, ações solidárias, famílias ajudadas, alimentos arrecadados e impacto do projeto."
-/>
-
+      <div className="mx-auto max-w-7xl space-y-8">
+        <AdminHeader
+          titulo="Impacto Social"
+          subtitulo="Acompanhe números, ações solidárias, famílias ajudadas, alimentos arrecadados e impacto do projeto."
+          usuario={usuario}
+        />
 
         <section className="grid gap-5 md:grid-cols-4">
           {indicadores.map((indicador) => (
@@ -64,7 +64,7 @@ export default async function AdminImpactoSocialPage() {
           ))}
         </section>
 
-        <section className="mt-8 rounded-3xl bg-white p-6 shadow-xl">
+        <section className="rounded-3xl bg-white p-6 shadow-xl">
           <h2 className="text-2xl font-black text-gray-950">
             Ações solidárias
           </h2>
@@ -79,7 +79,7 @@ export default async function AdminImpactoSocialPage() {
                   {acao.titulo}
                 </h3>
 
-                <p className="mt-3 rounded-full bg-green-700 px-4 py-2 text-xs font-black text-white">
+                <p className="mt-3 inline-block rounded-full bg-green-700 px-4 py-2 text-xs font-black text-white">
                   {acao.status}
                 </p>
               </article>
@@ -87,7 +87,7 @@ export default async function AdminImpactoSocialPage() {
           </div>
         </section>
 
-        <section className="mt-8 rounded-3xl border-4 border-green-200 bg-green-50 p-6 shadow-xl">
+        <section className="rounded-3xl border-4 border-green-200 bg-green-50 p-6 shadow-xl">
           <h2 className="text-2xl font-black text-green-900">
             Próximo passo
           </h2>

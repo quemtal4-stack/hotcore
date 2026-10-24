@@ -2,8 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { produtos } from "@/data/produtos";
 import { gerarUrlCheckout } from "@/lib/checkout";
+import { verificarAdmin } from "@/app/admin/lib/auth";
 
-export default function TestesCompraAdminPage() {
+export default async function TestesCompraAdminPage() {
+  await verificarAdmin("/admin/teste-compra");
+
   const produtosTesteAdmin = produtos.map((produto) => ({
     ...produto,
     valor: 1,

@@ -1,6 +1,8 @@
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabaseServer";
 import Link from "next/link";
 import AdminHeader from "../_components/AdminHeader";
-import { verificarAdmin } from "../_lib/auth";
+
 
 const cards = [
   {
@@ -69,7 +71,13 @@ const indicadores = [
 ];
 
 export default async function AdminPainelPage() {
-  await verificarAdmin("/admin/painel");
+  const supabase = await createClient();
+const { data } = await supabase.auth.getUser();
+
+if (!data.user) {
+  redirect("/admin/login");
+}
+
 
   return (
     <main className="min-h-screen bg-[#FFF8E7] px-4 py-8 text-gray-950 md:px-8">
