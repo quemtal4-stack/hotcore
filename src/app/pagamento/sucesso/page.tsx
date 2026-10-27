@@ -2,24 +2,34 @@
 import Link from "next/link";
 
 type SearchParams = {
-  plano?: string;
-  nome?: string;
-  email?: string;
-  whatsapp?: string;
-  payment_id?: string;
-  collection_id?: string;
-  id?: string;
-  status?: string;
-  preference_id?: string;
-  merchant_order_id?: string;
+  plano?: string | string[];
+  nome?: string | string[];
+  email?: string | string[];
+  whatsapp?: string | string[];
+  payment_id?: string | string[];
+  collection_id?: string | string[];
+  id?: string | string[];
+  status?: string | string[];
+  preference_id?: string | string[];
+  merchant_order_id?: string | string[];
 };
 
 type PagamentoSucessoPageProps = {
-  searchParams?: SearchParams;
+  searchParams?: Promise<SearchParams>;
 };
 
-function obterPlano(plano?: string) {
-  if (plano === "fundador") {
+function pegarTexto(valor?: string | string[]) {
+  if (Array.isArray(valor)) {
+    return valor[0] || "";
+  }
+
+  return valor || "";
+}
+
+function obterPlano(plano?: string | string[]) {
+  const planoRecebido = pegarTexto(plano).toLowerCase();
+
+  if (planoRecebido === "fundador") {
     return {
       nome: "Fundador",
       valor: "R$ 39,90",
@@ -31,7 +41,7 @@ function obterPlano(plano?: string) {
     };
   }
 
-  if (plano === "anual" || plano === "eternizado") {
+  if (planoRecebido === "anual" || planoRecebido === "eternizado") {
     return {
       nome: "Anual",
       valor: "R$ 497,00",
@@ -54,24 +64,30 @@ function obterPlano(plano?: string) {
   };
 }
 
-function formatarCampo(valor?: string) {
-  return valor && valor.trim().length > 0 ? valor : "Não informado";
+function formatarCampo(valor?: string | string[]) {
+  const texto = pegarTexto(valor);
+
+  return texto.trim().length > 0 ? texto : "Não informado";
 }
 
-export default function PagamentoSucessoPage({
+export default async function PagamentoSucessoPage({
   searchParams,
 }: PagamentoSucessoPageProps) {
-  const plano = searchParams?.plano ?? "apoiador";
-  const nome = searchParams?.nome ?? "";
-  const email = searchParams?.email ?? "";
-  const whatsapp = searchParams?.whatsapp ?? "";
+  const params = searchParams ? await searchParams : {};
+
+  const plano = params.plano ?? "apoiador";
+  const nome = params.nome ?? "";
+  const email = params.email ?? "";
+  const whatsapp = params.whatsapp ?? "";
 
   const paymentId =
-    searchParams?.payment_id || searchParams?.collection_id || searchParams?.id;
+    pegarTexto(params.payment_id) ||
+    pegarTexto(params.collection_id) ||
+    pegarTexto(params.id);
 
-  const status = searchParams?.status || "approved";
-  const preferenceId = searchParams?.preference_id;
-  const merchantOrderId = searchParams?.merchant_order_id;
+  const status = pegarTexto(params.status) || "approved";
+  const preferenceId = pegarTexto(params.preference_id);
+  const merchantOrderId = pegarTexto(params.merchant_order_id);
 
   const dadosPlano = obterPlano(plano);
 

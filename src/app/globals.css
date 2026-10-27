@@ -474,41 +474,48 @@ body {
   top: 50%;
   left: 0;
   right: 0;
+  z-index: 9999;
   pointer-events: none;
-  z-index: 999;
 }
 
 .seta-nav {
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
-  width: 46px;
-  height: 46px;
+  width: 52px;
+  height: 52px;
   border-radius: 999px;
-  background: #b91c1c;
-  color: white;
+  background: #e63946;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 900;
+  line-height: 1;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
   pointer-events: auto;
-  transition: 0.2s ease;
+  transition: transform 0.2s ease, background 0.2s ease;
 }
 
 .seta-nav:hover {
-  background: #991b1b;
+  background: #c92f3b;
   transform: translateY(-50%) scale(1.08);
 }
 
+.seta-nav::before,
+.seta-nav::after {
+  content: none !important;
+  display: none !important;
+}
+
 .seta-esquerda {
-  left: 18px;
+  left: 24px;
 }
 
 .seta-direita {
-  right: 18px;
+  right: 24px;
 }
 
 /* Modal de ampliação do ingresso */
@@ -667,20 +674,6 @@ body {
     text-align: center;
   }
 
-  .seta-nav {
-    width: 40px;
-    height: 40px;
-    font-size: 24px;
-  }
-
-  .seta-esquerda {
-    left: 10px;
-  }
-
-  .seta-direita {
-    right: 10px;
-  }
-
   .ac-imagem-ingresso-hero {
     max-width: 340px;
     height: 440px;
@@ -693,114 +686,23 @@ body {
   .ac-modal-conteudo {
     width: 96vw;
   }
-.setas-navegacao {
-  position: fixed;
-  inset: auto 0 28px 0;
-  z-index: 999;
-  pointer-events: none;
-}
-
-.seta-nav {
-  position: fixed;
-  bottom: 28px;
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  background: #e63946;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  font-weight: 700;
-  text-decoration: none;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
-  transition: all 0.2s ease;
-  pointer-events: auto;
-}
-
-.seta-nav:hover {
-  background: #c92f3b;
-  transform: translateY(-3px);
-}
-
-.seta-esquerda {
-  left: 24px;
-}
-
-.seta-direita {
-  right: 24px;
-}
-
-@media (max-width: 640px) {
-  .seta-nav {
-    width: 48px;
-    height: 48px;
-    font-size: 28px;
-    bottom: 20px;
-  }
-
-  .seta-esquerda {
-    left: 16px;
-  }
-
-  .seta-direita {
-    right: 16px;
-  }
-}
-.setas-navegacao {
-  position: fixed;
-  top: 50%;
-  left: 0;
-  right: 0;
-  z-index: 9999;
-  pointer-events: none;
-}
-
-.seta-nav {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: #e63946;
-  color: #ffffff;
-  font-size: 32px;
-  font-weight: bold;
-  text-decoration: none;
-
-  pointer-events: auto;
-  transition: transform 0.2s ease, background 0.2s ease;
-}
-
-/* Remove qualquer seta, número ou efeito duplicado */
-
-.seta-nav::after {
-  content: none !important;
-  display: none !important;
-}
-
-.seta-esquerda {
-  left: 24px;
-}
-
-.seta-direita {
-  right: 24px;
-}
-
-.seta-nav:hover {
-  background: #c92f3b;
-  transform: translateY(-50%) scale(1.08);
-}
 
   .ac-modal-fechar {
     top: -10px;
     right: -6px;
+  }
+
+  .seta-nav {
+    width: 44px;
+    height: 44px;
+    font-size: 26px;
+  }
+
+  .seta-esquerda {
+    left: 12px;
+  }
+
+  .seta-direita {
+    right: 12px;
   }
 }

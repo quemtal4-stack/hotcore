@@ -9,10 +9,10 @@ export const metadata: Metadata = {
 };
 
 type PagamentoSearchParams = {
-  plano?: string;
-  nome?: string;
-  email?: string;
-  whatsapp?: string;
+  plano?: string | string[];
+  nome?: string | string[];
+  email?: string | string[];
+  whatsapp?: string | string[];
 };
 
 type Plano = {
@@ -44,6 +44,7 @@ const PLANOS: Record<string, Plano> = {
       "Apoio direto ao crescimento da Hot Dogueres",
     ],
   },
+
   fundador: {
     id: "fundador",
     nome: "Fundador",
@@ -59,6 +60,7 @@ const PLANOS: Record<string, Plano> = {
       "Presença mais forte na história da marca",
     ],
   },
+
   anual: {
     id: "anual",
     nome: "Anual",
@@ -74,18 +76,19 @@ const PLANOS: Record<string, Plano> = {
       "Mais estabilidade para o projeto continuar evoluindo",
     ],
   },
+
   eternizado: {
     id: "eternizado",
-    nome: "Anual",
+    nome: "Eternizado",
     valor: "R$ 497,00",
     recorrencia: "por ano",
     descricao:
-      "Plano anual para quem quer apoiar a Hot Dogueres por 12 meses e fortalecer a construção do projeto.",
-    destaque: "Apoio por 12 meses",
+      "Plano anual especial para quem quer eternizar sua participação na história da Hot Dogueres.",
+    destaque: "Participação eternizada",
     beneficios: [
       "Participação anual no Clube Hot Dogueres",
+      "Reconhecimento especial como membro eternizado",
       "Apoio antecipado ao crescimento da marca",
-      "Reconhecimento especial como apoiador anual",
       "Mais estabilidade para o projeto continuar evoluindo",
     ],
   },
@@ -100,25 +103,35 @@ function pegarTexto(valor?: string | string[]) {
 }
 
 function normalizarPlano(plano?: string | string[]) {
-  const planoRecebido = pegarTexto(plano).toLowerCase();
+  const planoRecebido = pegarTexto(plano).toLowerCase().trim();
 
   if (planoRecebido === "fundador") {
     return PLANOS.fundador;
   }
 
-  if (planoRecebido === "anual" || planoRecebido === "eternizado") {
+  if (planoRecebido === "anual") {
     return PLANOS.anual;
+  }
+
+  if (
+    planoRecebido === "eternizado" ||
+    planoRecebido === "eternizados"
+  ) {
+    return PLANOS.eternizado;
   }
 
   return PLANOS.apoiador;
 }
 
+type PagamentoClubePageProps = {
+  searchParams?: Promise<PagamentoSearchParams>;
+};
+
 export default async function PagamentoClubePage({
   searchParams,
-}: {
-  searchParams?: Promise<PagamentoSearchParams> | PagamentoSearchParams;
-}) {
-  const params = searchParams ? await searchParams : {};
+}: PagamentoClubePageProps) {
+  const params = (await searchParams) ?? {};
+
 
   const plano = normalizarPlano(params.plano);
   const nome = pegarTexto(params.nome);
@@ -134,7 +147,7 @@ WhatsApp: ${whatsapp || "Não informado"}
 Plano: ${plano.nome}
 Valor: ${plano.valor} ${plano.recorrencia}
 
-Quero finalizar meu pagamento.`
+Quero finalizar meu pagamento.`,
   );
 
   const linkWhatsApp = `https://wa.me/${WHATSAPP_HOT_DOGUERES}?text=${mensagemWhatsApp}`;
@@ -212,6 +225,7 @@ Quero finalizar meu pagamento.`
               <p className="text-xs font-black uppercase tracking-wide text-[#FFE99A]">
                 Plano
               </p>
+
               <p className="mt-2 text-2xl font-black">{plano.nome}</p>
             </div>
 
@@ -219,6 +233,7 @@ Quero finalizar meu pagamento.`
               <p className="text-xs font-black uppercase tracking-wide text-[#FFE99A]">
                 Valor
               </p>
+
               <p className="mt-2 text-2xl font-black">{plano.valor}</p>
             </div>
 
@@ -226,6 +241,7 @@ Quero finalizar meu pagamento.`
               <p className="text-xs font-black uppercase tracking-wide text-[#FFE99A]">
                 Recorrência
               </p>
+
               <p className="mt-2 text-lg font-black">{plano.recorrencia}</p>
             </div>
           </div>
@@ -258,6 +274,7 @@ Quero finalizar meu pagamento.`
                 <p className="text-xs font-black uppercase tracking-wide">
                   Total
                 </p>
+
                 <p className="text-2xl font-black">{plano.valor}</p>
               </div>
             </div>
@@ -318,6 +335,7 @@ Quero finalizar meu pagamento.`
                     <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-100 text-xs text-green-700">
                       ✓
                     </span>
+
                     {beneficio}
                   </li>
                 ))}
@@ -356,7 +374,11 @@ Quero finalizar meu pagamento.`
         <div className="grid gap-4 md:grid-cols-3">
           <div className="rounded-3xl bg-black/45 p-5">
             <p className="text-2xl">📲</p>
-            <h3 className="mt-3 text-lg font-black">1. Envie pelo WhatsApp</h3>
+
+            <h3 className="mt-3 text-lg font-black">
+              1. Envie pelo WhatsApp
+            </h3>
+
             <p className="mt-2 text-sm leading-relaxed text-white/75">
               Clique no botão verde para mandar seus dados já preenchidos.
             </p>
@@ -364,7 +386,9 @@ Quero finalizar meu pagamento.`
 
           <div className="rounded-3xl bg-black/45 p-5">
             <p className="text-2xl">💳</p>
+
             <h3 className="mt-3 text-lg font-black">2. Receba o PIX</h3>
+
             <p className="mt-2 text-sm leading-relaxed text-white/75">
               Você receberá a chave PIX ou QR Code para concluir o pagamento.
             </p>
@@ -372,7 +396,11 @@ Quero finalizar meu pagamento.`
 
           <div className="rounded-3xl bg-black/45 p-5">
             <p className="text-2xl">🌭</p>
-            <h3 className="mt-3 text-lg font-black">3. Entre para o clube</h3>
+
+            <h3 className="mt-3 text-lg font-black">
+              3. Entre para o clube
+            </h3>
+
             <p className="mt-2 text-sm leading-relaxed text-white/75">
               Após a confirmação, sua participação no clube será registrada.
             </p>
