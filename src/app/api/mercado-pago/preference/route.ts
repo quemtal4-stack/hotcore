@@ -5,6 +5,9 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const KG_ALIMENTOS_POR_CAMISA = 3;
+const INGRESSOS_SIMBOLICOS_POR_CAMISA = 3;
+
 function transformarErroEmTexto(error: unknown) {
   if (error instanceof Error) {
     return error.message;
@@ -20,7 +23,7 @@ function transformarErroEmTexto(error: unknown) {
 function numeroSeguro(valor: unknown, padrao = 0) {
   const numero = Number(valor);
 
-  if (Number.isNaN(numero)) {
+  if (!Number.isFinite(numero)) {
     return padrao;
   }
 
@@ -28,11 +31,15 @@ function numeroSeguro(valor: unknown, padrao = 0) {
 }
 
 function textoSeguro(valor: unknown, padrao = "") {
-  if (typeof valor !== "string") {
-    return padrao;
+  if (typeof valor === "string") {
+    return valor.trim();
   }
 
-  return valor.trim();
+  if (typeof valor === "number" && Number.isFinite(valor)) {
+    return String(valor);
+  }
+
+  return padrao;
 }
 
 function objetoSeguro(valor: unknown) {
@@ -52,14 +59,65 @@ function gerarItemId(texto: string) {
     .replace(/(^-|-$)/g, "");
 }
 
-function normalizarEmail(valor: unknown) {
-  return textoSeguro(String(valor || ""))
+function normalizarTexto(valor: unknown) {
+  return textoSeguro(valor)
     .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .trim();
 }
 
+function normalizarEmail(valor: unknown) {
+  return textoSeguro(valor).toLowerCase().trim();
+}
+
 function validarEmailProducao(email: string) {
+  const permitirEmailTeste =
+    process.env.MERCADO_PAGO_PERMITIR_EMAIL_TESTE === "true";
+
+  if (permitirEmailTeste) {
+    return true;
+  }
+
   return !(email.includes("test_user") || email.includes("testuser"));
+}
+
+function booleanoSeguro(valor: unknown) {
+  if (typeof valor === "boolean") {
+    return valor;
+  }
+
+  const texto = textoSeguro(valor).toLowerCase();
+
+  return (
+    texto === "true" ||
+    texto === "1" ||
+    texto === "sim" ||
+    texto === "yes"
+  );
+}
+
+function ehTipoCamisa(tipo: string, categoria: string | null) {
+  const tipoNormalizado = normalizarTexto(tipo);
+  const categoriaNormalizada = normalizarTexto(categoria);
+
+  return (
+    tipoNormalizado.includes("camisa") ||
+    categoriaNormalizada.includes("camisa")
+  );
+}
+
+function ehTipoRacao(tipo: string, categoria: string | null, produto: string) {
+  const texto = `${normalizarTexto(tipo)} ${normalizarTexto(
+    categoria,
+  )} ${normalizarTexto(produto)}`;
+
+  return (
+    texto.includes("racao") ||
+    texto.includes("ração") ||
+    texto.includes("pet") ||
+    texto.includes("animal")
+  );
 }
 
 export async function POST(request: Request) {
@@ -90,7 +148,9 @@ export async function POST(request: Request) {
     const modoTesteUmReal =
       process.env.MERCADO_PAGO_TESTE_VALOR_1_REAL === "true";
 
-    const tipo = textoSeguro(body.tipo, "ingresso");
+    const tipo = textoSeguro(body.tipo, "produto");
+
+    const categoria = textoSeguro(body.categoria) || null;
 
     const nomeComprador =
       textoSeguro(body.nomeComprador) ||
@@ -116,7 +176,7 @@ export async function POST(request: Request) {
         {
           error: "E-mail de teste não permitido em produção.",
           detalhe:
-            "Você está usando token APP_USR de produção. Use um e-mail real de comprador.",
+            "Se estiver usando comprador de teste do Mercado Pago, defina MERCADO_PAGO_PERMITIR_EMAIL_TESTE=true nas variáveis de ambiente.",
         },
         { status: 400 },
       );
@@ -170,10 +230,8 @@ export async function POST(request: Request) {
       null;
 
     const sextoIngresso =
-      body.sextoIngresso === true ||
-      body.sexto_ingresso === true ||
-      body.sextoIngresso === "true" ||
-      body.sexto_ingresso === "true";
+      booleanoSeguro(body.sextoIngresso) ||
+      booleanoSeguro(body.sexto_ingresso);
 
     const ehIngressoColecionavel =
       tipo === "ingresso" ||
@@ -189,13 +247,6 @@ export async function POST(request: Request) {
       );
     }
 
-    let valorUnitario = 0;
-    let titulo = "";
-    let descricao = "";
-    let itemId = "";
-    let kgAlimentos = ehIngressoColecionavel ? quantidade : 0;
-
-    const categoria = textoSeguro(body.categoria) || null;
     const tamanho = textoSeguro(body.tamanho) || null;
     const cep = textoSeguro(body.cep) || null;
 
@@ -243,41 +294,21 @@ export async function POST(request: Request) {
       valorFrete = 0;
     }
 
-    const totalRecebido = numeroSeguro(body.total || body.totalPedido, 0);
-    const valorRecebido = numeroSeguro(body.valor || body.price, 0);
-
-    titulo =
+    let titulo =
       textoSeguro(body.title) ||
       textoSeguro(body.titulo) ||
       textoSeguro(body.produto) ||
       "Produto Hot Dogueres";
 
-    descricao =
+    let descricao =
       textoSeguro(body.description) ||
       textoSeguro(body.descricao) ||
       `Pedido Loja Solidária Hot Dogueres - ${titulo}`;
 
-    itemId =
+    let itemId =
       textoSeguro(body.itemId) ||
       textoSeguro(body.id) ||
       `produto-hot-dogueres-${gerarItemId(titulo)}-${Date.now()}`;
-
-    const valorRecebidoEhTotal =
-      totalRecebido > 0 &&
-      valorRecebido > 0 &&
-      Math.abs(totalRecebido - valorRecebido) < 0.01;
-
-    if (totalRecebido > 0 && valorFrete > 0 && valorRecebidoEhTotal) {
-      valorUnitario = (totalRecebido - valorFrete) / quantidade;
-    } else if (totalRecebido > 0 && valorRecebido <= 0) {
-      valorUnitario = (totalRecebido - valorFrete) / quantidade;
-    } else if (valorRecebido > 0) {
-      valorUnitario = valorRecebido;
-    } else if (totalRecebido > 0) {
-      valorUnitario = totalRecebido / quantidade;
-    } else {
-      valorUnitario = 0;
-    }
 
     if (ehIngressoColecionavel) {
       titulo =
@@ -296,10 +327,7 @@ export async function POST(request: Request) {
         `ingresso-solidario-${anoColecao}-${gerarItemId(titulo)}-${Date.now()}`;
     }
 
-    const ehCamisa =
-      tipo === "camisa" ||
-      tipo === "camisa_pre_venda" ||
-      categoria === "camisa";
+    const ehCamisa = ehTipoCamisa(tipo, categoria);
 
     if (ehCamisa && !tamanho) {
       return NextResponse.json(
@@ -308,6 +336,39 @@ export async function POST(request: Request) {
         },
         { status: 400 },
       );
+    }
+
+    const produtoTexto = textoSeguro(body.produto) || titulo;
+    const ehRacao = ehTipoRacao(tipo, categoria, produtoTexto);
+
+    const totalRecebido = numeroSeguro(
+      body.total || body.totalPedido || body.valorTotal,
+      0,
+    );
+
+    const valorRecebido =
+      numeroSeguro(body.valor, 0) ||
+      numeroSeguro(body.price, 0) ||
+      numeroSeguro(body.valorUnitario, 0) ||
+      numeroSeguro(body.unit_price, 0);
+
+    let valorUnitario = 0;
+
+    const valorRecebidoEhTotal =
+      totalRecebido > 0 &&
+      valorRecebido > 0 &&
+      Math.abs(totalRecebido - valorRecebido) < 0.01;
+
+    if (totalRecebido > 0 && valorFrete > 0 && valorRecebidoEhTotal) {
+      valorUnitario = (totalRecebido - valorFrete) / quantidade;
+    } else if (totalRecebido > 0 && valorRecebido <= 0) {
+      valorUnitario = (totalRecebido - valorFrete) / quantidade;
+    } else if (valorRecebido > 0) {
+      valorUnitario = valorRecebido;
+    } else if (totalRecebido > 0) {
+      valorUnitario = totalRecebido / quantidade;
+    } else {
+      valorUnitario = 0;
     }
 
     if (modoTesteUmReal) {
@@ -319,6 +380,8 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error: "Valor inválido.",
+          detalhe:
+            "Envie valor, valorUnitario, price, total, totalPedido ou valorTotal maior que zero.",
         },
         { status: 400 },
       );
@@ -329,6 +392,31 @@ export async function POST(request: Request) {
     const totalProdutos = Number((valorUnitario * quantidade).toFixed(2));
     const totalPedido = Number((totalProdutos + valorFrete).toFixed(2));
 
+    const ingressosSimbolicos =
+      numeroSeguro(body.ingressosSimbolicos) ||
+      numeroSeguro(body.ingressos_simbolicos) ||
+      (ehCamisa ? quantidade * INGRESSOS_SIMBOLICOS_POR_CAMISA : 0);
+
+    let kgAlimentos =
+      numeroSeguro(body.kgAlimentos) ||
+      numeroSeguro(body.kg_alimentos) ||
+      (ehIngressoColecionavel ? quantidade : 0);
+
+    if (ehCamisa && kgAlimentos <= 0) {
+      kgAlimentos = quantidade * KG_ALIMENTOS_POR_CAMISA;
+    }
+
+    if (ehRacao) {
+      kgAlimentos = 0;
+    }
+
+    const kgRacao =
+      numeroSeguro(body.kgRacao) ||
+      numeroSeguro(body.kg_racao) ||
+      numeroSeguro(body.racaoKg) ||
+      numeroSeguro(body.racao_kg) ||
+      (ehRacao ? quantidade : 0);
+
     const metadataPedido = {
       origem: "hotdogueres",
 
@@ -338,7 +426,7 @@ export async function POST(request: Request) {
       tipo,
       categoria,
 
-      produto: body.produto || titulo,
+      produto: produtoTexto,
       titulo,
       descricao,
 
@@ -358,8 +446,14 @@ export async function POST(request: Request) {
       quantidade_total: quantidade,
 
       ingressos: ehIngressoColecionavel ? quantidade : 0,
+      ingressos_simbolicos: ingressosSimbolicos,
+      ingressosSimbolicos,
+
       kg_alimentos: kgAlimentos,
       kgAlimentos,
+
+      kg_racao: kgRacao,
+      kgRacao,
 
       eh_ingresso_colecionavel: ehIngressoColecionavel,
 
@@ -476,6 +570,19 @@ export async function POST(request: Request) {
 
     const urlCheckout = result.init_point || result.sandbox_init_point;
 
+    if (!urlCheckout) {
+      return NextResponse.json(
+        {
+          error: "Preferência criada, mas o Mercado Pago não retornou link.",
+          detalhe:
+            "Confira no retorno/logs se existe init_point ou sandbox_init_point.",
+          preferenceId: result.id,
+          mercadoPago: result,
+        },
+        { status: 500 },
+      );
+    }
+
     const { error: erroPedido } = await supabaseAdmin.from("pedidos").insert({
       external_reference: pedidoReferencia,
       mercado_pago_preference_id: result.id,
@@ -515,16 +622,28 @@ export async function POST(request: Request) {
         {
           error: "Preferência criada, mas erro ao salvar pedido no banco.",
           detalhe: erroPedido.message,
+          preferenceId: result.id,
+          url: urlCheckout,
+          initPoint: urlCheckout,
+          init_point: urlCheckout,
+          checkoutUrl: urlCheckout,
+          sandbox_init_point: result.sandbox_init_point,
+          external_reference: pedidoReferencia,
         },
         { status: 500 },
       );
     }
 
     return NextResponse.json({
+      ok: true,
+
       id: result.id,
       preferenceId: result.id,
+
       url: urlCheckout,
-      init_point: result.init_point,
+      initPoint: urlCheckout,
+      init_point: urlCheckout,
+      checkoutUrl: urlCheckout,
       sandbox_init_point: result.sandbox_init_point,
 
       quantidade,
@@ -543,7 +662,9 @@ export async function POST(request: Request) {
       descricao,
 
       eh_ingresso_colecionavel: ehIngressoColecionavel,
+      ingressos_simbolicos: ingressosSimbolicos,
       kg_alimentos: kgAlimentos,
+      kg_racao: kgRacao,
 
       evento_id: eventoId,
       nome_evento: nomeEvento,
