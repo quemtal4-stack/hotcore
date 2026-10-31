@@ -278,7 +278,6 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
     process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000";
 
   const siteUrl = siteUrlBase.replace(/\/$/, "");
-  const usarAutoReturn = siteUrl.startsWith("https://");
 
   const externalReference = criarExternalReference(tipo);
 
@@ -452,12 +451,6 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
       },
 
       notification_url: `${siteUrl}/api/mercado-pago/webhook`,
-
-      ...(usarAutoReturn
-        ? {
-            auto_return: "approved" as const,
-          }
-        : {}),
 
       statement_descriptor: "HOTDOGUERES",
     },
