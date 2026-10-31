@@ -8,6 +8,7 @@ type DadosCadastro = {
   telefone: string;
   cpf: string;
   ingressos: number;
+  ingressosSelecionados?: string | null;
   sextoIngresso: boolean;
   quantidadeTotal: number;
   kgAlimentos: number;
@@ -15,7 +16,7 @@ type DadosCadastro = {
   tipo: string;
   nomeProduto: string;
   nomeIngressoEternizado?: string;
-
+  modoAdminTeste?: boolean;
 };
 
 function formatarMoeda(valor: number) {
@@ -27,7 +28,11 @@ function formatarMoeda(valor: number) {
   }).format(valorSeguro);
 }
 
-function obterNumeroParametro(params: URLSearchParams, nome: string, padrao = 0) {
+function obterNumeroParametro(
+  params: URLSearchParams,
+  nome: string,
+  padrao = 0,
+) {
   const valor = Number(params.get(nome));
 
   if (!Number.isFinite(valor)) {
@@ -35,6 +40,25 @@ function obterNumeroParametro(params: URLSearchParams, nome: string, padrao = 0)
   }
 
   return valor;
+}
+
+function parametroAtivo(params: URLSearchParams, nome: string) {
+  const valor = params.get(nome)?.toLowerCase();
+
+  return (
+    valor === "sim" ||
+    valor === "true" ||
+    valor === "1" ||
+    valor === "yes"
+  );
+}
+
+function limparNumero(valor: string) {
+  return valor.replace(/\D/g, "");
+}
+
+function validarEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 export default function CheckoutIngressosPage() {
@@ -45,44 +69,60 @@ export default function CheckoutIngressosPage() {
 
   useEffect(() => {
     try {
-      const dadosSalvos = sessionStorage.getItem("hotdogueres_cadastro");
       const params = new URLSearchParams(window.location.search);
+      const dadosSalvos = sessionStorage.getItem("hotdogueres_cadastro");
+
+      const modoAdminTeste =
+        parametroAtivo(params, "admin") || parametroAtivo(params, "teste");
 
       if (dadosSalvos) {
         const dados = JSON.parse(dadosSalvos) as DadosCadastro;
 
-        const valorParametro = obterNumeroParametro(params, "valor", dados.total);
+        const valorParametro = obterNumeroParametro(
+          params,
+          "valor",
+          dados.total,
+        );
+
         const quantidadeTotalParametro = obterNumeroParametro(
           params,
           "quantidadeTotal",
-          dados.quantidadeTotal
+          dados.quantidadeTotal,
         );
+
         const kgAlimentosParametro = obterNumeroParametro(
           params,
           "kgAlimentos",
-          dados.kgAlimentos
+          dados.kgAlimentos,
         );
 
-       setDadosCadastro({
-  ...dados,
-  total: valorParametro > 0 ? valorParametro : dados.total,
-  quantidadeTotal:
-    quantidadeTotalParametro > 0
-      ? quantidadeTotalParametro
-      : dados.quantidadeTotal,
-  kgAlimentos:
-    kgAlimentosParametro >= 0 ? kgAlimentosParametro : dados.kgAlimentos,
-  nomeIngressoEternizado:
-    dados.nomeIngressoEternizado ||
-    params.get("nomeIngressoEternizado") ||
-    "",
-});
+        setDadosCadastro({
+          ...dados,
+          total: valorParametro > 0 ? valorParametro : dados.total,
+          quantidadeTotal:
+            quantidadeTotalParametro > 0
+              ? quantidadeTotalParametro
+              : dados.quantidadeTotal,
+          kgAlimentos:
+            kgAlimentosParametro >= 0
+              ? kgAlimentosParametro
+              : dados.kgAlimentos,
+          ingressosSelecionados:
+            params.get("ingressosSelecionados") ||
+            dados.ingressosSelecionados ||
+            null,
+          nomeIngressoEternizado:
+            dados.nomeIngressoEternizado ||
+            params.get("nomeIngressoEternizado") ||
+            "",
+          modoAdminTeste,
+        });
 
-        setCarregando(false);
         return;
       }
 
       const tipo = params.get("tipo") || "ingresso-solidario-colecionavel";
+
       const titulo =
         params.get("titulo") ||
         (tipo === "hot-dog-day"
@@ -94,7 +134,7 @@ export default function CheckoutIngressosPage() {
       const quantidadeTotal = obterNumeroParametro(
         params,
         "quantidadeTotal",
-        ingressos
+        ingressos,
       );
       const kgAlimentos = obterNumeroParametro(params, "kgAlimentos", 0);
 
@@ -104,13 +144,15 @@ export default function CheckoutIngressosPage() {
         telefone: "",
         cpf: "",
         ingressos,
+        ingressosSelecionados: params.get("ingressosSelecionados"),
         sextoIngresso: params.get("sextoIngresso") === "sim",
         quantidadeTotal,
         kgAlimentos,
         total: valor,
         tipo,
         nomeProduto: titulo,
-         nomeIngressoEternizado: params.get("nomeIngressoEternizado") || "",
+        nomeIngressoEternizado: params.get("nomeIngressoEternizado") || "",
+        modoAdminTeste,
       });
     } catch {
       setErro("Não foi possível carregar os dados do checkout.");
@@ -139,9 +181,48 @@ export default function CheckoutIngressosPage() {
     window.history.back();
   }
 
+  function validarDadosAntesDoPagamento() {
+    if (!dadosCadastro) {
+      return "Dados do pedido não encontrados.";
+    }
+
+    if (!dadosCadastro.nome.trim()) {
+      return "Nome do comprador não encontrado. Volte ao cadastro e preencha novamente.";
+    }
+
+    if (!validarEmail(dadosCadastro.email)) {
+      return "E-mail do comprador inválido. Volte ao cadastro e corrija o e-mail.";
+    }
+
+    if (limparNumero(dadosCadastro.telefone).length < 10) {
+      return "Telefone do comprador inválido. Volte ao cadastro e corrija o telefone.";
+    }
+
+    if (!ehHotDogDay && limparNumero(dadosCadastro.cpf).length !== 11) {
+      return "CPF do comprador inválido. Volte ao cadastro e corrija o CPF.";
+    }
+
+    if (!dadosCadastro.quantidadeTotal || dadosCadastro.quantidadeTotal <= 0) {
+      return "Quantidade inválida para gerar o pagamento.";
+    }
+
+    if (!dadosCadastro.total || dadosCadastro.total <= 0) {
+      return "Valor inválido para gerar o pagamento.";
+    }
+
+    return "";
+  }
+
   async function iniciarPagamento() {
     if (!dadosCadastro) {
       setErro("Dados do pedido não encontrados.");
+      return;
+    }
+
+    const erroValidacao = validarDadosAntesDoPagamento();
+
+    if (erroValidacao) {
+      setErro(erroValidacao);
       return;
     }
 
@@ -149,7 +230,7 @@ export default function CheckoutIngressosPage() {
     setProcessandoPagamento(true);
 
     try {
-      const resposta = await fetch("/api/mercado-pago/checkout", {
+      const resposta = await fetch("/api/checkout/ingressos", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -164,12 +245,14 @@ export default function CheckoutIngressosPage() {
           titulo: resumoProduto,
           quantidade: dadosCadastro.quantidadeTotal,
           ingressos: dadosCadastro.ingressos,
+          ingressosSelecionados: dadosCadastro.ingressosSelecionados || "",
           sextoIngresso: dadosCadastro.sextoIngresso,
           kgAlimentos: dadosCadastro.kgAlimentos,
           valor: dadosCadastro.total,
           total: dadosCadastro.total,
           nomeIngressoEternizado: dadosCadastro.nomeIngressoEternizado || "",
-
+          admin: dadosCadastro.modoAdminTeste ? "true" : "false",
+          teste: dadosCadastro.modoAdminTeste ? "true" : "false",
         }),
       });
 
@@ -179,7 +262,7 @@ export default function CheckoutIngressosPage() {
         throw new Error(
           resultado?.erro ||
             resultado?.error ||
-            "Não foi possível iniciar o pagamento."
+            "Não foi possível iniciar o pagamento.",
         );
       }
 
@@ -192,33 +275,36 @@ export default function CheckoutIngressosPage() {
       if (!urlPagamento) {
         throw new Error("A API não retornou o link de pagamento.");
       }
-const pedidosAtuais = JSON.parse(
-  localStorage.getItem("hotdogueres_colecao_pedidos") || "[]"
-);
 
-const novoPedido = {
-  id: `pedido-${Date.now()}`,
-  externalReference: resultado?.external_reference || resultado?.externalReference || "",
-  nome: dadosCadastro.nome,
-  email: dadosCadastro.email,
-  telefone: dadosCadastro.telefone,
-  cpf: dadosCadastro.cpf,
-  produto: resumoProduto,
-  tipo: dadosCadastro.tipo,
-  quantidadeTotal: dadosCadastro.quantidadeTotal,
-  ingressos: dadosCadastro.ingressos,
-  sextoIngresso: dadosCadastro.sextoIngresso,
-  kgAlimentos: dadosCadastro.kgAlimentos,
-  valor: dadosCadastro.total,
-  nomeIngressoEternizado: dadosCadastro.nomeIngressoEternizado || "",
-  status: "pendente",
-  criadoEm: new Date().toISOString(),
-};
+      const pedidosAtuais = JSON.parse(
+        localStorage.getItem("hotdogueres_colecao_pedidos") || "[]",
+      );
 
-localStorage.setItem(
-  "hotdogueres_colecao_pedidos",
-  JSON.stringify([...pedidosAtuais, novoPedido])
-);
+      const novoPedido = {
+        id: `pedido-${Date.now()}`,
+        externalReference:
+          resultado?.external_reference || resultado?.externalReference || "",
+        nome: dadosCadastro.nome,
+        email: dadosCadastro.email,
+        telefone: dadosCadastro.telefone,
+        cpf: dadosCadastro.cpf,
+        produto: resumoProduto,
+        tipo: dadosCadastro.tipo,
+        quantidadeTotal: dadosCadastro.quantidadeTotal,
+        ingressos: dadosCadastro.ingressos,
+        ingressosSelecionados: dadosCadastro.ingressosSelecionados || "",
+        sextoIngresso: dadosCadastro.sextoIngresso,
+        kgAlimentos: dadosCadastro.kgAlimentos,
+        valor: dadosCadastro.total,
+        nomeIngressoEternizado: dadosCadastro.nomeIngressoEternizado || "",
+        status: "pendente",
+        criadoEm: new Date().toISOString(),
+      };
+
+      localStorage.setItem(
+        "hotdogueres_colecao_pedidos",
+        JSON.stringify([...pedidosAtuais, novoPedido]),
+      );
 
       window.location.href = urlPagamento;
     } catch (error) {
@@ -286,6 +372,12 @@ localStorage.setItem(
           <p className="mt-6 inline-flex rounded-full bg-red-100 px-4 py-2 text-sm font-black uppercase tracking-wide text-red-600">
             Checkout Hot Dogueres
           </p>
+
+          {dadosCadastro.modoAdminTeste && (
+            <p className="mt-4 inline-flex rounded-full bg-yellow-100 px-4 py-2 text-sm font-black uppercase tracking-wide text-yellow-700">
+              Modo teste admin ativo
+            </p>
+          )}
 
           <h1 className="mt-6 text-4xl font-black leading-tight text-gray-900 md:text-5xl">
             Confira seu pedido
@@ -387,11 +479,27 @@ localStorage.setItem(
                   <strong>{dadosCadastro.sextoIngresso ? "Sim" : "Não"}</strong>
                 </div>
 
+                {dadosCadastro.nomeIngressoEternizado && (
+                  <div className="flex justify-between gap-4 text-gray-700">
+                    <span>Nome eternizado</span>
+                    <strong className="text-right">
+                      {dadosCadastro.nomeIngressoEternizado}
+                    </strong>
+                  </div>
+                )}
+
                 <div className="flex justify-between gap-4 text-gray-700">
                   <span>Doação abatida</span>
                   <strong>{dadosCadastro.kgAlimentos} kg</strong>
                 </div>
               </>
+            )}
+
+            {dadosCadastro.modoAdminTeste && (
+              <div className="flex justify-between rounded-2xl bg-yellow-100 p-3 text-yellow-800">
+                <span className="font-black">Teste admin</span>
+                <strong>{formatarMoeda(dadosCadastro.total)}</strong>
+              </div>
             )}
 
             <div className="flex justify-between border-t border-gray-200 pt-4 text-xl">
