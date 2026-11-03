@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Pagamento | Clube Hot Dogueres",
   description:
-    "Finalize seu plano do Clube Hot Dogueres via PIX ou WhatsApp com segurança e praticidade.",
+    "Finalize seu plano do Clube Hot Dogueres via PIX orientado pelo WhatsApp com segurança e praticidade.",
 };
 
 type PagamentoSearchParams = {
@@ -13,6 +13,8 @@ type PagamentoSearchParams = {
   nome?: string | string[];
   email?: string | string[];
   whatsapp?: string | string[];
+  telefone?: string | string[];
+  cpf?: string | string[];
 };
 
 type Plano = {
@@ -22,6 +24,7 @@ type Plano = {
   recorrencia: string;
   descricao: string;
   destaque: string;
+  impacto: string;
   beneficios: string[];
 };
 
@@ -35,13 +38,31 @@ const PLANOS: Record<string, Plano> = {
     valor: "R$ 19,90",
     recorrencia: "por mês",
     descricao:
-      "Plano ideal para entrar no Clube Hot Dogueres, apoiar o projeto e fazer parte dessa caminhada.",
+      "Plano ideal para entrar no Clube Hot Dogueres, apoiar o projeto e fazer parte dessa caminhada solidária.",
     destaque: "Entrada no clube",
+    impacto: "1 kg de alimento por pagamento aprovado",
     beneficios: [
       "Participação como membro apoiador",
       "Nome ligado à construção da marca",
       "Acesso às novidades do projeto",
       "Apoio direto ao crescimento da Hot Dogueres",
+    ],
+  },
+
+  lendario: {
+    id: "lendario",
+    nome: "Lendário",
+    valor: "R$ 29,90",
+    recorrencia: "por mês",
+    descricao:
+      "Plano mensal para quem deseja fortalecer a Hot Dogueres com apoio recorrente e fazer parte da comunidade solidária.",
+    destaque: "Apoiador lendário",
+    impacto: "1 kg de alimento por pagamento aprovado",
+    beneficios: [
+      "Participação como membro lendário",
+      "Apoio recorrente à construção do projeto",
+      "Acesso às novidades e campanhas do clube",
+      "Presença mais forte dentro da comunidade Hot Dogueres",
     ],
   },
 
@@ -53,6 +74,7 @@ const PLANOS: Record<string, Plano> = {
     descricao:
       "Plano para quem quer apoiar ainda mais a Hot Dogueres todos os meses e caminhar mais perto da marca.",
     destaque: "Mais apoio mensal",
+    impacto: "1 kg de alimento por pagamento aprovado",
     beneficios: [
       "Participação como membro fundador",
       "Reconhecimento especial dentro do clube",
@@ -61,35 +83,54 @@ const PLANOS: Record<string, Plano> = {
     ],
   },
 
-  anual: {
-    id: "anual",
-    nome: "Anual",
-    valor: "R$ 497,00",
-    recorrencia: "por ano",
+  colecionador: {
+    id: "colecionador",
+    nome: "Colecionador",
+    valor: "R$ 59,90",
+    recorrencia: "por mês",
     descricao:
-      "Plano anual para quem quer apoiar a Hot Dogueres por 12 meses e fortalecer a construção do projeto.",
-    destaque: "Apoio por 12 meses",
+      "Plano mensal para quem quer apoiar o projeto e se conectar ainda mais com o universo dos colecionáveis Hot Dogueres.",
+    destaque: "Coleção solidária",
+    impacto: "1 kg de alimento por pagamento aprovado",
     beneficios: [
-      "Participação anual no Clube Hot Dogueres",
-      "Apoio antecipado ao crescimento da marca",
-      "Reconhecimento especial como apoiador anual",
-      "Mais estabilidade para o projeto continuar evoluindo",
+      "Participação como membro colecionador",
+      "Conexão com o universo dos colecionáveis Hot Dogueres",
+      "Reconhecimento especial dentro do clube",
+      "Apoio recorrente ao crescimento da campanha",
     ],
   },
 
-  eternizado: {
-    id: "eternizado",
-    nome: "Eternizado",
+  guardiao: {
+    id: "guardiao",
+    nome: "Guardião",
+    valor: "R$ 89,90",
+    recorrencia: "por mês",
+    descricao:
+      "Plano mensal para quem deseja assumir um papel de maior impacto na campanha, ajudando a ampliar as doações e ações sociais.",
+    destaque: "Guardião da causa",
+    impacto: "3 kg de alimentos por pagamento aprovado",
+    beneficios: [
+      "Participação como membro guardião",
+      "Maior impacto mensal na campanha solidária",
+      "Reconhecimento especial como guardião da causa",
+      "Apoio direto à expansão das ações sociais",
+    ],
+  },
+
+  eternizados: {
+    id: "eternizados",
+    nome: "Eternizados",
     valor: "R$ 497,00",
     recorrencia: "por ano",
     descricao:
-      "Plano anual especial para quem quer eternizar sua participação na história da Hot Dogueres.",
+      "Plano anual especial para quem quer caminhar junto com a Hot Dogueres por 12 meses e eternizar sua participação na campanha.",
     destaque: "Participação eternizada",
+    impacto: "14 kg de alimentos por pagamento aprovado",
     beneficios: [
       "Participação anual no Clube Hot Dogueres",
       "Reconhecimento especial como membro eternizado",
       "Apoio antecipado ao crescimento da marca",
-      "Mais estabilidade para o projeto continuar evoluindo",
+      "Contribuição equivalente a uma cesta básica simbólica",
     ],
   },
 };
@@ -102,25 +143,67 @@ function pegarTexto(valor?: string | string[]) {
   return valor || "";
 }
 
+function normalizarTexto(valor?: string | string[]) {
+  return pegarTexto(valor)
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/_/g, "-");
+}
+
 function normalizarPlano(plano?: string | string[]) {
-  const planoRecebido = pegarTexto(plano).toLowerCase().trim();
+  const planoRecebido = normalizarTexto(plano);
+
+  if (planoRecebido === "lendario" || planoRecebido === "lenda") {
+    return PLANOS.lendario;
+  }
 
   if (planoRecebido === "fundador") {
     return PLANOS.fundador;
   }
 
-  if (planoRecebido === "anual") {
-    return PLANOS.anual;
+  if (planoRecebido === "colecionador") {
+    return PLANOS.colecionador;
+  }
+
+  if (planoRecebido === "guardiao") {
+    return PLANOS.guardiao;
   }
 
   if (
+    planoRecebido === "anual" ||
     planoRecebido === "eternizado" ||
     planoRecebido === "eternizados"
   ) {
-    return PLANOS.eternizado;
+    return PLANOS.eternizados;
   }
 
   return PLANOS.apoiador;
+}
+
+function limparNumero(valor: string) {
+  return valor.replace(/\D/g, "");
+}
+
+function formatarCpf(valor: string) {
+  const numeros = limparNumero(valor);
+
+  if (numeros.length !== 11) {
+    return valor;
+  }
+
+  return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(
+    6,
+    9,
+  )}-${numeros.slice(9)}`;
+}
+
+function formatarCampo(valor: string) {
+  const texto = valor.trim();
+
+  return texto.length > 0 ? texto : "Não informado";
 }
 
 type PagamentoClubePageProps = {
@@ -132,22 +215,26 @@ export default async function PagamentoClubePage({
 }: PagamentoClubePageProps) {
   const params = (await searchParams) ?? {};
 
-
   const plano = normalizarPlano(params.plano);
   const nome = pegarTexto(params.nome);
   const email = pegarTexto(params.email);
-  const whatsapp = pegarTexto(params.whatsapp);
+  const whatsapp =
+    pegarTexto(params.whatsapp) || pegarTexto(params.telefone);
+  const cpf = pegarTexto(params.cpf);
 
   const mensagemWhatsApp = encodeURIComponent(
     `Olá! Acabei de fazer meu cadastro no Clube Hot Dogueres.
 
-Nome: ${nome || "Não informado"}
-E-mail: ${email || "Não informado"}
-WhatsApp: ${whatsapp || "Não informado"}
+Nome: ${formatarCampo(nome)}
+E-mail: ${formatarCampo(email)}
+WhatsApp: ${formatarCampo(whatsapp)}
+CPF: ${cpf ? formatarCpf(cpf) : "Não informado"}
+
 Plano: ${plano.nome}
 Valor: ${plano.valor} ${plano.recorrencia}
+Impacto: ${plano.impacto}
 
-Quero finalizar meu pagamento.`,
+Quero finalizar meu pagamento e receber a chave PIX ou QR Code.`,
   );
 
   const linkWhatsApp = `https://wa.me/${WHATSAPP_HOT_DOGUERES}?text=${mensagemWhatsApp}`;
@@ -155,16 +242,24 @@ Quero finalizar meu pagamento.`,
   const dadosCliente = [
     {
       label: "Nome",
-      valor: nome || "Não informado",
+      valor: formatarCampo(nome),
     },
     {
       label: "E-mail",
-      valor: email || "Não informado",
+      valor: formatarCampo(email),
     },
     {
       label: "WhatsApp",
-      valor: whatsapp || "Não informado",
+      valor: formatarCampo(whatsapp),
     },
+    ...(cpf
+      ? [
+          {
+            label: "CPF",
+            valor: formatarCpf(cpf),
+          },
+        ]
+      : []),
     {
       label: "Plano",
       valor: plano.nome,
@@ -255,6 +350,16 @@ Quero finalizar meu pagamento.`,
               {plano.descricao}
             </p>
           </div>
+
+          <div className="mt-5 rounded-3xl border border-green-300/30 bg-green-400/10 p-5">
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-green-200">
+              Impacto solidário
+            </p>
+
+            <p className="mt-3 text-base font-bold leading-relaxed text-white/85">
+              {plano.impacto}
+            </p>
+          </div>
         </div>
 
         <div className="rounded-[2rem] border border-white/50 bg-white p-5 shadow-2xl md:p-7">
@@ -307,7 +412,8 @@ Quero finalizar meu pagamento.`,
 
               <p className="mx-auto mt-2 max-w-md text-sm font-semibold leading-relaxed text-[#444444]">
                 Nesta etapa, você fala com a Hot Dogueres pelo WhatsApp para
-                receber a chave PIX ou o QR Code e concluir o pagamento.
+                confirmar os dados, receber a chave PIX ou o QR Code e concluir
+                o pagamento.
               </p>
 
               <div className="mt-4 rounded-2xl border border-[#FFB347]/50 bg-white p-4">
@@ -317,6 +423,11 @@ Quero finalizar meu pagamento.`,
 
                 <p className="mt-1 break-all text-lg font-black text-[#111111]">
                   {CHAVE_PIX}
+                </p>
+
+                <p className="mt-2 text-xs font-bold leading-relaxed text-gray-500">
+                  Confirme pelo WhatsApp antes de finalizar, para a equipe
+                  identificar corretamente seu plano e cadastro.
                 </p>
               </div>
             </div>
@@ -366,6 +477,12 @@ Quero finalizar meu pagamento.`,
                 ← Escolher outro plano
               </Link>
             </div>
+
+            <p className="mt-5 text-center text-xs font-bold leading-relaxed text-gray-500">
+              Esta página não confirma o pagamento automaticamente. A assinatura
+              só deve ser considerada ativa após conferência e confirmação do
+              pagamento pela equipe Hot Dogueres.
+            </p>
           </div>
         </div>
       </section>

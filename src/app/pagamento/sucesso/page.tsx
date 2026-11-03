@@ -26,8 +26,29 @@ function pegarTexto(valor?: string | string[]) {
   return valor || "";
 }
 
+function normalizarPlano(valor?: string | string[]) {
+  return pegarTexto(valor)
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "-");
+}
+
 function obterPlano(plano?: string | string[]) {
-  const planoRecebido = pegarTexto(plano).toLowerCase();
+  const planoRecebido = normalizarPlano(plano);
+
+  if (planoRecebido === "lendario") {
+    return {
+      nome: "Lendário",
+      valor: "R$ 29,90",
+      recorrencia: "por mês",
+      descricao:
+        "Plano mensal para quem deseja fortalecer a Hot Dogueres com apoio recorrente e fazer parte da comunidade solidária.",
+      selo: "Apoiador lendário",
+      cor: "bg-purple-600",
+    };
+  }
 
   if (planoRecebido === "fundador") {
     return {
@@ -41,13 +62,41 @@ function obterPlano(plano?: string | string[]) {
     };
   }
 
-  if (planoRecebido === "anual" || planoRecebido === "eternizado") {
+  if (planoRecebido === "colecionador") {
     return {
-      nome: "Anual",
+      nome: "Colecionador",
+      valor: "R$ 59,90",
+      recorrencia: "por mês",
+      descricao:
+        "Plano mensal para quem quer apoiar o projeto e se conectar ainda mais com o universo dos colecionáveis Hot Dogueres.",
+      selo: "Coleção solidária",
+      cor: "bg-blue-600",
+    };
+  }
+
+  if (planoRecebido === "guardiao") {
+    return {
+      nome: "Guardião",
+      valor: "R$ 89,90",
+      recorrencia: "por mês",
+      descricao:
+        "Plano mensal para quem deseja assumir um papel de maior impacto na campanha, ajudando a ampliar as doações e ações sociais.",
+      selo: "Guardião da causa",
+      cor: "bg-green-600",
+    };
+  }
+
+  if (
+    planoRecebido === "anual" ||
+    planoRecebido === "eternizado" ||
+    planoRecebido === "eternizados"
+  ) {
+    return {
+      nome: "Eternizados",
       valor: "R$ 497,00",
       recorrencia: "por ano",
       descricao:
-        "Plano anual para quem quer caminhar junto com a Hot Dogueres durante 12 meses.",
+        "Plano anual para quem quer caminhar junto com a Hot Dogueres durante 12 meses e deixar sua participação eternizada na campanha.",
       selo: "Compromisso anual",
       cor: "bg-yellow-500",
     };

@@ -14,11 +14,132 @@ type DadosClube = {
   tipo?: string;
 };
 
+type PlanoClube = {
+  slug: string;
+  nome: string;
+  valor: number;
+  recorrencia: string;
+  ciclo: "mensal" | "anual";
+  descricao: string;
+  selo: string;
+};
+
+type CheckoutResponse = {
+  error?: string;
+  initPoint?: string;
+  init_point?: string;
+  sandbox_init_point?: string;
+  url?: string;
+};
+
+const PLANOS_CLUBE: PlanoClube[] = [
+  {
+    slug: "apoiador",
+    nome: "Apoiador",
+    valor: 19.9,
+    recorrencia: "por mês",
+    ciclo: "mensal",
+    descricao: "Plano mensal Apoiador do Clube Hot Dogueres.",
+    selo: "Entrada no clube",
+  },
+  {
+    slug: "lendario",
+    nome: "Lendário",
+    valor: 29.9,
+    recorrencia: "por mês",
+    ciclo: "mensal",
+    descricao: "Plano mensal Lendário do Clube Hot Dogueres.",
+    selo: "Apoiador lendário",
+  },
+  {
+    slug: "fundador",
+    nome: "Fundador",
+    valor: 39.9,
+    recorrencia: "por mês",
+    ciclo: "mensal",
+    descricao: "Plano mensal Fundador do Clube Hot Dogueres.",
+    selo: "Apoiador fundador",
+  },
+  {
+    slug: "colecionador",
+    nome: "Colecionador",
+    valor: 59.9,
+    recorrencia: "por mês",
+    ciclo: "mensal",
+    descricao: "Plano mensal Colecionador do Clube Hot Dogueres.",
+    selo: "Colecionador oficial",
+  },
+  {
+    slug: "guardiao",
+    nome: "Guardião",
+    valor: 89.9,
+    recorrencia: "por mês",
+    ciclo: "mensal",
+    descricao: "Plano mensal Guardião do Clube Hot Dogueres.",
+    selo: "Guardião da campanha",
+  },
+  {
+    slug: "eternizados",
+    nome: "Eternizados",
+    valor: 497,
+    recorrencia: "por ano",
+    ciclo: "anual",
+    descricao: "Plano anual Eternizados do Clube Hot Dogueres.",
+    selo: "Compromisso anual",
+  },
+];
+
 function formatarMoeda(valor: number) {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",
   }).format(valor);
+}
+
+function normalizarTexto(valor?: string) {
+  return String(valor || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+function valoresProximos(valorA: number, valorB: number) {
+  return Math.abs(valorA - valorB) < 0.01;
+}
+
+function obterPlanoClube(dadosClube: DadosClube | null): PlanoClube {
+  if (!dadosClube) {
+    return PLANOS_CLUBE[0];
+  }
+
+  const textoBusca = normalizarTexto(
+    `${dadosClube.plano || ""} ${dadosClube.nomeProduto || ""} ${dadosClube.tipo || ""}`,
+  );
+
+  const planoPorTexto = PLANOS_CLUBE.find((plano) => {
+    const slugNormalizado = normalizarTexto(plano.slug);
+    const nomeNormalizado = normalizarTexto(plano.nome);
+
+    return (
+      textoBusca === slugNormalizado ||
+      textoBusca === nomeNormalizado ||
+      textoBusca.includes(slugNormalizado) ||
+      textoBusca.includes(nomeNormalizado)
+    );
+  });
+
+  if (planoPorTexto) {
+    return planoPorTexto;
+  }
+
+  const total = Number(dadosClube.total);
+
+  const planoPorValor = PLANOS_CLUBE.find((plano) =>
+    valoresProximos(plano.valor, total),
+  );
+
+  return planoPorValor || PLANOS_CLUBE[0];
 }
 
 function mascararCPF(cpf: string) {
@@ -100,17 +221,13 @@ export default function PagamentoClubePage() {
     }
   }, []);
 
-  const nomeProduto = useMemo(() => {
-    if (!dadosClube) {
-      return "Clube de Membros Hot Dogueres";
-    }
-
-    return (
-      dadosClube.nomeProduto ||
-      dadosClube.plano ||
-      "Clube de Membros Hot Dogueres"
-    );
+  const planoSelecionado = useMemo(() => {
+    return obterPlanoClube(dadosClube);
   }, [dadosClube]);
+
+  const nomeProduto = useMemo(() => {
+    return `Clube Hot Dogueres - ${planoSelecionado.nome}`;
+  }, [planoSelecionado]);
 
   function voltarParaCadastroClube() {
     window.location.href = "/clube-de-membros";
@@ -137,19 +254,37 @@ export default function PagamentoClubePage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title: `Hot Dogueres - ${nomeProduto}`,
+          title: `Hot Dogueres - ${planoSelecionado.nome}`,
           price: dadosClube.total,
           quantidade: 1,
+
+          nome: dadosClube.nome,
           nomeComprador: dadosClube.nome,
+
+          email: dadosClube.email,
           emailComprador: dadosClube.email,
+
+          telefone: dadosClube.telefone,
+          whatsapp: dadosClube.telefone,
           telefoneComprador: dadosClube.telefone,
+
+          cpf: dadosClube.cpf,
           cpfComprador: dadosClube.cpf,
+
           tipo: "clube-membros",
+          produto: "clube-membros",
           nomeProduto,
+
+          plano: planoSelecionado.slug,
+          planoNome: planoSelecionado.nome,
+          ciclo: planoSelecionado.ciclo,
+          recorrencia: planoSelecionado.recorrencia,
         }),
       });
 
-      const dados = await resposta.json();
+      const dados = (await resposta
+        .json()
+        .catch(() => ({}))) as CheckoutResponse;
 
       console.log("RESPOSTA DO CHECKOUT CLUBE:", dados);
 
@@ -159,7 +294,11 @@ export default function PagamentoClubePage() {
         return;
       }
 
-      const checkoutUrl = dados.init_point || dados.sandbox_init_point;
+      const checkoutUrl =
+        dados.init_point ||
+        dados.sandbox_init_point ||
+        dados.initPoint ||
+        dados.url;
 
       if (!checkoutUrl) {
         setErro("O link de pagamento não foi gerado.");
@@ -313,12 +452,52 @@ export default function PagamentoClubePage() {
                     <div className="mt-5 space-y-4">
                       <div className="flex items-start justify-between gap-5 rounded-2xl bg-white p-4 shadow-sm">
                         <span className="text-sm font-bold text-gray-600">
+                          Plano
+                        </span>
+
+                        <strong className="text-right text-sm font-black text-gray-950">
+                          {planoSelecionado.nome}
+                        </strong>
+                      </div>
+
+                      <div className="flex items-start justify-between gap-5 rounded-2xl bg-white p-4 shadow-sm">
+                        <span className="text-sm font-bold text-gray-600">
                           Produto
                         </span>
 
                         <strong className="text-right text-sm font-black text-gray-950">
                           {nomeProduto}
                         </strong>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-5 rounded-2xl bg-white p-4 shadow-sm">
+                        <span className="text-sm font-bold text-gray-600">
+                          Recorrência
+                        </span>
+
+                        <strong className="text-sm font-black text-gray-950">
+                          {planoSelecionado.recorrencia}
+                        </strong>
+                      </div>
+
+                      <div className="flex items-start justify-between gap-5 rounded-2xl bg-white p-4 shadow-sm">
+                        <span className="text-sm font-bold text-gray-600">
+                          Benefício
+                        </span>
+
+                        <strong className="text-right text-sm font-black text-gray-950">
+                          {planoSelecionado.selo}
+                        </strong>
+                      </div>
+
+                      <div className="rounded-2xl bg-white p-4 shadow-sm">
+                        <p className="text-sm font-bold text-gray-600">
+                          Descrição
+                        </p>
+
+                        <p className="mt-2 text-sm font-bold leading-relaxed text-gray-800">
+                          {planoSelecionado.descricao}
+                        </p>
                       </div>
 
                       <div className="flex items-center justify-between gap-5 rounded-2xl bg-white p-4 shadow-sm">

@@ -1012,89 +1012,92 @@ export default function HomePage() {
         <div className="mt-6 space-y-6">
   <TermometroImpacto />
   <TermometroRacao />
-    <section className="px-4 pb-8">
-      <div className="mx-auto max-w-6xl overflow-hidden rounded-[2rem] border-4 border-red-600 bg-white shadow-2xl">
-        <div className="grid gap-0 lg:grid-cols-[0.85fr_1.15fr]">
-          <div className="relative flex min-h-[260px] items-center justify-center overflow-hidden bg-gradient-to-br from-red-700 via-red-600 to-yellow-400 p-8 text-white">
-            <div className="absolute left-[-80px] top-[-80px] h-56 w-56 rounded-full bg-white/20 blur-3xl" />
-            <div className="absolute bottom-[-100px] right-[-80px] h-64 w-64 rounded-full bg-black/25 blur-3xl" />
+    <section className="pb-8">
+  <div className="mx-auto max-w-6xl overflow-hidden rounded-[2rem] border-4 border-red-600 bg-white shadow-2xl">
+    <div className="grid gap-0 lg:grid-cols-[0.85fr_1.15fr]">
+      <div className="relative flex min-h-[260px] items-center justify-center overflow-hidden bg-gradient-to-br from-red-700 via-red-600 to-yellow-400 p-6 text-center text-white md:p-8">
+        <div className="absolute left-[-80px] top-[-80px] h-56 w-56 rounded-full bg-white/20 blur-3xl" />
+        <div className="absolute bottom-[-100px] right-[-80px] h-64 w-64 rounded-full bg-black/25 blur-3xl" />
 
-            <div className="relative z-10 text-center">
-              <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-white text-5xl shadow-2xl">
-                🛡️
-              </div>
+        <div className="relative z-10 mx-auto flex max-w-md flex-col items-center">
+          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-white text-5xl shadow-2xl">
+            🛡️
+          </div>
 
-              <p className="mt-5 inline-flex rounded-full bg-black/35 px-5 py-2 text-xs font-black uppercase tracking-[0.25em] text-white">
-                Alerta oficial
+          <p className="mt-5 inline-flex rounded-full bg-black/35 px-5 py-2 text-center text-xs font-black uppercase tracking-[0.25em] text-white">
+            Alerta oficial
+          </p>
+
+          <h2 className="mt-4 text-center text-4xl font-black leading-tight md:text-5xl">
+            Cuidado com golpes
+          </h2>
+
+          <p className="mx-auto mt-3 max-w-sm text-center text-sm font-bold leading-relaxed text-white/90">
+            Produtos Hot Dogueres só devem ser comprados pelo site oficial.
+          </p>
+        </div>
+      </div>
+
+      <div className="bg-[#FFF8E7] p-5 text-center md:p-8 lg:text-left">
+        <div className="mx-auto max-w-2xl lg:max-w-none">
+          <p className="inline-flex rounded-full bg-red-100 px-4 py-2 text-center text-xs font-black uppercase tracking-[0.2em] text-red-700">
+            Compra segura
+          </p>
+
+          <h3 className="mx-auto mt-5 max-w-2xl text-center text-3xl font-black leading-tight text-gray-950 md:text-4xl lg:mx-0 lg:text-left">
+            Todos os produtos do ecossistema Hot Dogueres são vendidos apenas
+            pelo site oficial.
+          </h3>
+
+          <div className="mx-auto mt-5 max-w-xl rounded-3xl border-2 border-dashed border-red-300 bg-white p-5 shadow-inner lg:mx-0">
+            <p className="break-words text-center text-2xl font-black text-red-700 md:text-3xl">
+              www.hotdogueres.com.br
+            </p>
+          </div>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <div className="mx-auto w-full max-w-md rounded-3xl bg-white p-5 text-center shadow-md md:max-w-none">
+              <p className="text-lg font-black text-gray-950">
+                A Hot Dogueres não aborda pessoas para vender
               </p>
 
-              <h2 className="mt-4 text-4xl font-black leading-tight md:text-5xl">
-                Cuidado com golpes
-              </h2>
+              <p className="mt-2 text-sm font-bold leading-relaxed text-gray-700">
+                Nós não mandamos mensagens privadas, não ligamos e não
+                abordamos ninguém oferecendo ingressos, camisas, livros, kits
+                de alimentação, kits de ração ou qualquer outro produto.
+              </p>
+            </div>
 
-              <p className="mx-auto mt-3 max-w-sm text-sm font-bold leading-relaxed text-white/90">
-                Produtos Hot Dogueres só devem ser comprados pelo site oficial.
+            <div className="mx-auto w-full max-w-md rounded-3xl bg-white p-5 text-center shadow-md md:max-w-none">
+              <p className="text-lg font-black text-gray-950">
+                Se alguém oferecer fora do site, é golpe
+              </p>
+
+              <p className="mt-2 text-sm font-bold leading-relaxed text-gray-700">
+                Desconfie de perfis, números, links ou pessoas dizendo vender
+                produtos Hot Dogueres fora do domínio oficial.
               </p>
             </div>
           </div>
 
-          <div className="bg-[#FFF8E7] p-6 md:p-8">
-            <p className="inline-flex rounded-full bg-red-100 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-red-700">
-              Compra segura
+          <div className="mx-auto mt-6 max-w-2xl rounded-3xl bg-gray-950 p-5 text-center text-white shadow-xl lg:mx-0">
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-yellow-300">
+              Regra de segurança
             </p>
 
-            <h3 className="mt-5 text-3xl font-black leading-tight text-gray-950 md:text-4xl">
-              Todos os produtos do ecossistema Hot Dogueres são vendidos apenas
-              pelo site oficial.
-            </h3>
-
-            <div className="mt-5 rounded-3xl border-2 border-dashed border-red-300 bg-white p-5 shadow-inner">
-              <p className="text-center text-2xl font-black text-red-700 md:text-3xl">
-                www.hotdogueres.com.br
-              </p>
-            </div>
-
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
-              <div className="rounded-3xl bg-white p-5 shadow-md">
-                <p className="text-lg font-black text-gray-950">
-                  A Hot Dogueres não aborda pessoas para vender
-                </p>
-
-                <p className="mt-2 text-sm font-bold leading-relaxed text-gray-700">
-                  Nós não mandamos mensagens privadas, não ligamos e não
-                  abordamos ninguém oferecendo ingressos, camisas, livros, kits
-                  de alimentação, kits de ração ou qualquer outro produto.
-                </p>
-              </div>
-
-              <div className="rounded-3xl bg-white p-5 shadow-md">
-                <p className="text-lg font-black text-gray-950">
-                  Se alguém oferecer fora do site, é golpe
-                </p>
-
-                <p className="mt-2 text-sm font-bold leading-relaxed text-gray-700">
-                  Desconfie de perfis, números, links ou pessoas dizendo vender
-                  produtos Hot Dogueres fora do domínio oficial.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-6 rounded-3xl bg-gray-950 p-5 text-white shadow-xl">
-              <p className="text-sm font-black uppercase tracking-[0.2em] text-yellow-300">
-                Regra de segurança
-              </p>
-
-              <p className="mt-3 text-base font-bold leading-relaxed text-white/85">
-                Antes de comprar qualquer produto do ecossistema Hot Dogueres,
-                confirme se você está no site oficial:
-                <strong className="text-yellow-300"> www.hotdogueres.com.br</strong>.
-                Qualquer venda fora dele deve ser considerada suspeita.
-              </p>
-            </div>
+            <p className="mt-3 text-base font-bold leading-relaxed text-white/85">
+              Antes de comprar qualquer produto do ecossistema Hot Dogueres,
+              confirme se você está no site oficial:
+              <strong className="text-yellow-300"> www.hotdogueres.com.br</strong>.
+              Qualquer venda fora dele deve ser considerada suspeita.
+            </p>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </div>
+</section>
+
 
 </div>
 

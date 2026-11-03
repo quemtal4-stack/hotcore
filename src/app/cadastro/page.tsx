@@ -7,6 +7,8 @@ const VALOR_SEXTO_INGRESSO = 80;
 const VALOR_HOT_DOG_DAY = 20;
 const MIN_INGRESSOS = 1;
 const QUANTIDADE_PARA_LIBERAR_SEXTO = 5;
+const ANO_COLECAO_PADRAO = 2028;
+const ANOS_COLECAO_SUPORTADOS = [2027, 2028] as const;
 
 type TipoCompra = "ingresso-solidario-colecionavel" | "hot-dog-day";
 type PerfilRanking = "pessoa-fisica" | "empresa";
@@ -20,6 +22,7 @@ type IngressoColecaoModelo = {
   imagem: string;
   tag: string;
   especial?: boolean;
+  colecaoAno?: number;
 };
 
 type IngressoColecaoLocal = IngressoColecaoModelo & {
@@ -29,67 +32,87 @@ type IngressoColecaoLocal = IngressoColecaoModelo & {
   nome_eternizado?: string;
 };
 
-const MAPA_INGRESSOS_COLECAO: IngressoColecaoModelo[] = [
-  {
-    numero: 1,
-    id: "fundador",
-    titulo: "Fundador",
-    descricao:
-      "Ingresso especial para quem entra na história desde o começo do Hot Dogueres Solidário.",
-    imagem: "/ingressos/fundador.png",
-    tag: "Ingresso #1",
-  },
-  {
-    numero: 2,
-    id: "gigante-solidario",
-    titulo: "Gigante Solidário",
-    descricao:
-      "Um ingresso criado para representar a força da solidariedade em torno do hot dog gigante.",
-    imagem: "/ingressos/gigante-solidario.png",
-    tag: "Ingresso #2",
-  },
-  {
-    numero: 3,
-    id: "raizes-do-futuro",
-    titulo: "Raízes do Futuro",
-    descricao:
-      "Ingresso ligado ao futuro, ao meio ambiente e às ações que plantam esperança para as próximas gerações.",
-    imagem: "/ingressos/raizes-do-futuro.png",
-    tag: "Ingresso #3",
-  },
-  {
-    numero: 4,
-    id: "amigos-de-pata",
-    titulo: "Amigos de Pata",
-    descricao:
-      "Ingresso dedicado ao cuidado, proteção e apoio aos animais que precisam de ajuda.",
-    imagem: "/ingressos/amigos-de-pata.png",
-    tag: "Ingresso #4",
-  },
-  {
-    numero: 5,
-    id: "sua-fome-ajuda-a-quem-precisa",
-    titulo: "Sua Fome Ajuda a Quem Precisa",
-    descricao:
-      "Cada participação fortalece uma corrente de alimento, dignidade e apoio a quem mais precisa.",
-    imagem: "/ingressos/sua-fome-ajuda-a-quem-precisa.png",
-    tag: "Ingresso #5",
-  },
-];
-
-const INGRESSO_ETERNIZADO: IngressoColecaoModelo = {
-  numero: 6,
-  id: "eternizados-250-metros",
-  titulo: "Eternizados 250 Metros",
-  descricao:
-    "Ingresso especial para quem desbloqueia a peça mais exclusiva da coleção.",
-  imagem: "/ingressos/eternizados-250-metros.png",
-  tag: "Ingresso especial",
-  especial: true,
-};
-
 function limparNumero(valor: string) {
   return valor.replace(/\D/g, "");
+}
+
+function normalizarAnoColecao(valor?: string | null) {
+  const ano = Number(valor);
+
+  if (ANOS_COLECAO_SUPORTADOS.includes(ano as 2027 | 2028)) {
+    return ano;
+  }
+
+  return ANO_COLECAO_PADRAO;
+}
+
+function criarMapaIngressosColecao(anoColecao: number): IngressoColecaoModelo[] {
+  return [
+    {
+      numero: 1,
+      id: `fundador-${anoColecao}`,
+      titulo: "Fundador",
+      descricao:
+        "Ingresso especial para quem entra na história desde o começo do Hot Dogueres Solidário.",
+      imagem: `/ingressos/${anoColecao}/ingresso-01-${anoColecao}.png`,
+      tag: `Ingresso #1 • Coleção ${anoColecao}`,
+      colecaoAno: anoColecao,
+    },
+    {
+      numero: 2,
+      id: `gigante-solidario-${anoColecao}`,
+      titulo: "Gigante Solidário",
+      descricao:
+        "Um ingresso criado para representar a força da solidariedade em torno do hot dog gigante.",
+      imagem: `/ingressos/${anoColecao}/ingresso-02-${anoColecao}.png`,
+      tag: `Ingresso #2 • Coleção ${anoColecao}`,
+      colecaoAno: anoColecao,
+    },
+    {
+      numero: 3,
+      id: `raizes-do-futuro-${anoColecao}`,
+      titulo: "Raízes do Futuro",
+      descricao:
+        "Ingresso ligado ao futuro, ao meio ambiente e às ações que plantam esperança para as próximas gerações.",
+      imagem: `/ingressos/${anoColecao}/ingresso-03-${anoColecao}.png`,
+      tag: `Ingresso #3 • Coleção ${anoColecao}`,
+      colecaoAno: anoColecao,
+    },
+    {
+      numero: 4,
+      id: `amigos-de-pata-${anoColecao}`,
+      titulo: "Amigos de Pata",
+      descricao:
+        "Ingresso dedicado ao cuidado, proteção e apoio aos animais que precisam de ajuda.",
+      imagem: `/ingressos/${anoColecao}/ingresso-04-${anoColecao}.png`,
+      tag: `Ingresso #4 • Coleção ${anoColecao}`,
+      colecaoAno: anoColecao,
+    },
+    {
+      numero: 5,
+      id: `sua-fome-ajuda-a-quem-precisa-${anoColecao}`,
+      titulo: "Sua Fome Ajuda a Quem Precisa",
+      descricao:
+        "Cada participação fortalece uma corrente de alimento, dignidade e apoio a quem mais precisa.",
+      imagem: `/ingressos/${anoColecao}/ingresso-05-${anoColecao}.png`,
+      tag: `Ingresso #5 • Coleção ${anoColecao}`,
+      colecaoAno: anoColecao,
+    },
+  ];
+}
+
+function criarIngressoEternizado(anoColecao: number): IngressoColecaoModelo {
+  return {
+    numero: 6,
+    id: `eternizados-${anoColecao}`,
+    titulo: `Eternizados ${anoColecao}`,
+    descricao:
+      "Ingresso especial para quem desbloqueia a peça mais exclusiva da coleção.",
+    imagem: `/ingressos/${anoColecao}/ingresso-eternizados-${anoColecao}.png`,
+    tag: `Ingresso especial • Coleção ${anoColecao}`,
+    especial: true,
+    colecaoAno: anoColecao,
+  };
 }
 
 function formatarCpf(valor: string) {
@@ -246,6 +269,8 @@ function chaveColecaoPorCpf(cpf: string) {
 
 function montarColecaoPorParametro(
   ingressosSelecionados: string | null,
+  mapaIngressosColecao: IngressoColecaoModelo[],
+  ingressoEternizado: IngressoColecaoModelo,
 ): IngressoColecaoLocal[] {
   if (!ingressosSelecionados) {
     return [];
@@ -258,9 +283,10 @@ function montarColecaoPorParametro(
     const numero = Number(numeroTexto);
     const quantidade = Number(quantidadeTexto);
 
-    const ingresso = MAPA_INGRESSOS_COLECAO.find(
-      (modelo) => modelo.numero === numero,
-    );
+    const ingresso =
+      numero === ingressoEternizado.numero
+        ? ingressoEternizado
+        : mapaIngressosColecao.find((modelo) => modelo.numero === numero);
 
     if (!ingresso || !Number.isFinite(quantidade) || quantidade <= 0) {
       continue;
@@ -276,12 +302,15 @@ function montarColecaoPorParametro(
   return colecao;
 }
 
-function montarColecaoPadrao(quantidadeIngressos: number) {
+function montarColecaoPadrao(
+  quantidadeIngressos: number,
+  mapaIngressosColecao: IngressoColecaoModelo[],
+) {
   const quantidadeSegura = normalizarQuantidadeIngressos(quantidadeIngressos);
   const colecao: IngressoColecaoLocal[] = [];
   let quantidadeRestante = quantidadeSegura;
 
-  for (const ingresso of MAPA_INGRESSOS_COLECAO) {
+  for (const ingresso of mapaIngressosColecao) {
     if (quantidadeRestante <= 0) {
       break;
     }
@@ -307,38 +336,60 @@ function salvarPastaColecionadorLocal({
   incluirSextoIngresso,
   quantidadeIngressos,
   nomeIngressoEternizado,
+  mapaIngressosColecao,
+  ingressoEternizado,
 }: {
   cpf: string;
   incluirSextoIngresso: boolean;
   quantidadeIngressos: number;
   nomeIngressoEternizado: string;
+  mapaIngressosColecao: IngressoColecaoModelo[];
+  ingressoEternizado: IngressoColecaoModelo;
 }) {
   const chave = chaveColecaoPorCpf(cpf);
 
   const params = new URLSearchParams(window.location.search);
   const ingressosSelecionados = params.get("ingressosSelecionados");
 
-  let colecao = montarColecaoPorParametro(ingressosSelecionados);
+  let colecao = montarColecaoPorParametro(
+    ingressosSelecionados,
+    mapaIngressosColecao,
+    ingressoEternizado,
+  );
 
   if (colecao.length === 0) {
-    colecao = montarColecaoPadrao(quantidadeIngressos);
+    colecao = montarColecaoPadrao(quantidadeIngressos, mapaIngressosColecao);
   }
 
   if (incluirSextoIngresso) {
-    colecao.push({
-      ...INGRESSO_ETERNIZADO,
-      quantidade: 1,
-      status: "pendente",
-      nomeEternizado: nomeIngressoEternizado,
-      nome_eternizado: nomeIngressoEternizado,
-    });
+    const jaTemSexto = colecao.some(
+      (ingresso) => ingresso.numero === ingressoEternizado.numero,
+    );
+
+    if (!jaTemSexto) {
+      colecao.push({
+        ...ingressoEternizado,
+        quantidade: 1,
+        status: "pendente",
+        nomeEternizado: nomeIngressoEternizado,
+        nome_eternizado: nomeIngressoEternizado,
+      });
+    }
   }
 
   localStorage.setItem(chave, JSON.stringify(colecao));
 }
 
-function obterResumoIngressosSelecionados(ingressosSelecionados: string | null) {
-  const colecao = montarColecaoPorParametro(ingressosSelecionados);
+function obterResumoIngressosSelecionados(
+  ingressosSelecionados: string | null,
+  mapaIngressosColecao: IngressoColecaoModelo[],
+  ingressoEternizado: IngressoColecaoModelo,
+) {
+  const colecao = montarColecaoPorParametro(
+    ingressosSelecionados,
+    mapaIngressosColecao,
+    ingressoEternizado,
+  );
 
   return colecao.map((ingresso) => `${ingresso.titulo} (${ingresso.quantidade}x)`);
 }
@@ -350,6 +401,7 @@ export default function CadastroPage() {
   const [perfilRanking, setPerfilRanking] =
     useState<PerfilRanking>("pessoa-fisica");
 
+  const [anoColecao, setAnoColecao] = useState(ANO_COLECAO_PADRAO);
   const [quantidadeIngressos, setQuantidadeIngressos] = useState(1);
   const [incluirSextoIngresso, setIncluirSextoIngresso] = useState(false);
   const [ingressosSelecionadosParametro, setIngressosSelecionadosParametro] =
@@ -375,8 +427,22 @@ export default function CadastroPage() {
   const [modoAdminTeste, setModoAdminTeste] = useState(false);
   const [valorAdminTeste, setValorAdminTeste] = useState<number | null>(null);
 
+  const mapaIngressosColecao = useMemo(() => {
+    return criarMapaIngressosColecao(anoColecao);
+  }, [anoColecao]);
+
+  const ingressoEternizado = useMemo(() => {
+    return criarIngressoEternizado(anoColecao);
+  }, [anoColecao]);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+
+    const anoColecaoParametro = normalizarAnoColecao(
+      params.get("anoColecao") || params.get("colecaoAno") || params.get("ano"),
+    );
+
+    setAnoColecao(anoColecaoParametro);
 
     const tipoParam = params.get("tipo");
     const perfilParam = params.get("perfil");
@@ -474,8 +540,16 @@ export default function CadastroPage() {
   );
 
   const ingressosSelecionadosResumo = useMemo(() => {
-    return obterResumoIngressosSelecionados(ingressosSelecionadosParametro);
-  }, [ingressosSelecionadosParametro]);
+    return obterResumoIngressosSelecionados(
+      ingressosSelecionadosParametro,
+      mapaIngressosColecao,
+      ingressoEternizado,
+    );
+  }, [
+    ingressosSelecionadosParametro,
+    mapaIngressosColecao,
+    ingressoEternizado,
+  ]);
 
   const totalOriginal = useMemo(() => {
     if (ehHotDogDay) {
@@ -673,16 +747,18 @@ export default function CadastroPage() {
       email: email.trim(),
       telefone,
       cpf,
-      ingressos: ehHotDogDay ? quantidadeIngressosSegura : quantidadeIngressosSegura,
+      ingressos: quantidadeIngressosSegura,
       ingressosSelecionados: ehHotDogDay ? null : ingressosSelecionadosParametro,
       sextoIngresso: ehHotDogDay ? false : incluirSextoIngresso,
       quantidadeTotal,
       kgAlimentos,
       total,
       tipo: tipoCompra,
+      colecaoAno: ehHotDogDay ? null : anoColecao,
+      anoColecao: ehHotDogDay ? null : anoColecao,
       nomeProduto: ehHotDogDay
         ? "Hot Dog Day"
-        : "Ingresso Solidário Colecionável",
+        : `Ingresso Solidário Colecionável ${anoColecao}`,
       nomeIngressoEternizado: nomeParaIngressoEternizado,
     };
 
@@ -724,7 +800,7 @@ export default function CadastroPage() {
       paramsOriginais.get("titulo") ||
       (ehHotDogDay
         ? "Ingresso Hot Dog Day"
-        : "Ingresso Solidário Colecionável");
+        : `Ingresso Solidário Colecionável ${anoColecao}`);
 
     const ingressosSelecionadosOriginal =
       paramsOriginais.get("ingressosSelecionados") || ingressosSelecionadosParametro;
@@ -732,6 +808,11 @@ export default function CadastroPage() {
     params.set("produto", produtoParametro);
     params.set("titulo", tituloParametro);
     params.set("valor", String(valorParaCheckout));
+
+    if (!ehHotDogDay) {
+      params.set("anoColecao", String(anoColecao));
+      params.set("colecaoAno", String(anoColecao));
+    }
 
     if (!ehHotDogDay && ingressosSelecionadosOriginal) {
       params.set("ingressosSelecionados", ingressosSelecionadosOriginal);
@@ -752,6 +833,8 @@ export default function CadastroPage() {
         incluirSextoIngresso,
         quantidadeIngressos: quantidadeIngressosSegura,
         nomeIngressoEternizado: nomeParaIngressoEternizado,
+        mapaIngressosColecao,
+        ingressoEternizado,
       });
     }
 
@@ -1042,7 +1125,7 @@ export default function CadastroPage() {
           <p className="mt-4 max-w-2xl text-lg text-gray-700">
             Preencha as informações abaixo para continuar para o pagamento do{" "}
             <strong>
-              {ehHotDogDay ? "Hot Dog Day" : "Ingresso Solidário Colecionável"}
+              {ehHotDogDay ? "Hot Dog Day" : `Ingresso Solidário Colecionável ${anoColecao}`}
             </strong>
             .
           </p>
@@ -1148,7 +1231,7 @@ export default function CadastroPage() {
           </p>
 
           <h2 className="mt-2 text-3xl font-black text-gray-900">
-            {ehHotDogDay ? "Seu pedido" : "Seus ingressos"}
+            {ehHotDogDay ? "Seu pedido" : `Seus ingressos ${anoColecao}`}
           </h2>
 
           <div className="mt-8 space-y-4 rounded-3xl bg-gray-50 p-5">
@@ -1171,6 +1254,11 @@ export default function CadastroPage() {
               </>
             ) : (
               <>
+                <div className="flex justify-between text-gray-700">
+                  <span>Coleção</span>
+                  <strong>{anoColecao}</strong>
+                </div>
+
                 {ingressosSelecionadosResumo.length > 0 && (
                   <div className="flex justify-between gap-4 text-gray-700">
                     <span>Modelos escolhidos</span>

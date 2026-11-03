@@ -1,244 +1,398 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { Suspense } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 const WHATSAPP = "5579981314109";
 
-function criarLinkWhatsapp(mensagem: string) {
-  return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(mensagem)}`;
+type ContextoPagamento = {
+  origem: string;
+  tituloOrigem: string;
+  hrefRetorno: string;
+  textoRetorno: string;
+};
+
+type ParametrosBusca = {
+  get: (name: string) => string | null;
+};
+
+function linkWhatsapp(texto: string) {
+  return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`;
+}
+
+function normalizarTexto(valor?: string | null) {
+  return String(valor || "")
+    .trim()
+    .toLowerCase();
+}
+
+function obterMensagemStatus(status?: string | null) {
+  const statusNormalizado = normalizarTexto(status);
+
+  if (!statusNormalizado) {
+    return {
+      titulo: "Pagamento pendente",
+      descricao:
+        "Ainda não recebemos a confirmação final do pagamento. Dependendo do método escolhido, isso pode levar alguns minutos.",
+      classe: "bg-yellow-100 text-yellow-800",
+    };
+  }
+
+  if (
+    statusNormalizado === "pending" ||
+    statusNormalizado === "in_process" ||
+    statusNormalizado === "in_mediation" ||
+    statusNormalizado === "em_processamento" ||
+    statusNormalizado === "pendente"
+  ) {
+    return {
+      titulo: "Pagamento em processamento",
+      descricao:
+        "Seu pagamento foi iniciado e está sendo processado. Aguarde a confirmação antes de tentar pagar novamente.",
+      classe: "bg-yellow-100 text-yellow-800",
+    };
+  }
+
+  if (
+    statusNormalizado === "approved" ||
+    statusNormalizado === "accredited" ||
+    statusNormalizado === "aprovado" ||
+    statusNormalizado === "pago"
+  ) {
+    return {
+      titulo: "Pagamento aprovado",
+      descricao:
+        "O pagamento aparece como aprovado. Se sua página de confirmação ainda não abriu, aguarde alguns instantes ou fale conosco pelo WhatsApp.",
+      classe: "bg-green-100 text-green-700",
+    };
+  }
+
+  if (
+    statusNormalizado === "rejected" ||
+    statusNormalizado === "failure" ||
+    statusNormalizado === "failed" ||
+    statusNormalizado === "recusado" ||
+    statusNormalizado === "rejeitado"
+  ) {
+    return {
+      titulo: "Pagamento recusado",
+      descricao:
+        "O pagamento foi recusado pela operadora, banco, cartão ou meio de pagamento utilizado.",
+      classe: "bg-red-100 text-red-700",
+    };
+  }
+
+  if (
+    statusNormalizado === "cancelled" ||
+    statusNormalizado === "canceled" ||
+    statusNormalizado === "cancelado"
+  ) {
+    return {
+      titulo: "Pagamento cancelado",
+      descricao:
+        "A tentativa de pagamento foi cancelada antes da confirmação.",
+      classe: "bg-orange-100 text-orange-700",
+    };
+  }
+
+  return {
+    titulo: "Pagamento aguardando confirmação",
+    descricao:
+      "Não recebemos ainda uma resposta final sobre esta tentativa de pagamento.",
+    classe: "bg-yellow-100 text-yellow-800",
+  };
+}
+
+function obterContextoPagamento(params: ParametrosBusca): ContextoPagamento {
+  const tipo = normalizarTexto(params.get("tipo"));
+  const produto = normalizarTexto(params.get("produto"));
+  const origem = normalizarTexto(params.get("origem"));
+
+  if (
+    tipo === "clube-membros" ||
+    produto === "clube-membros" ||
+    origem === "clube-membros" ||
+    origem === "clube"
+  ) {
+    return {
+      origem: "clube-membros",
+      tituloOrigem: "Clube de Membros",
+      hrefRetorno: "/clube-de-membros#planos",
+      textoRetorno: "← Voltar para os planos",
+    };
+  }
+
+  if (
+    tipo === "ingresso-solidario-colecionavel" ||
+    tipo === "hot-dog-day" ||
+    produto === "ingresso-solidario-colecionavel" ||
+    produto === "hot-dog-day" ||
+    origem === "checkout-ingressos" ||
+    origem === "ingressos"
+  ) {
+    return {
+      origem: "ingressos",
+      tituloOrigem: "Ingressos Solidários",
+      hrefRetorno: "/#ingressos",
+      textoRetorno: "← Voltar para os ingressos",
+    };
+  }
+
+  return {
+    origem: "loja-solidaria",
+    tituloOrigem: "Loja Solidária",
+    hrefRetorno: "/loja-solidaria",
+    textoRetorno: "← Voltar para a Loja Solidária",
+  };
 }
 
 function PagamentoPendenteConteudo() {
   const searchParams = useSearchParams();
+  const [copiado, setCopiado] = useState(false);
+
+  const contextoPagamento = useMemo(() => {
+    return obterContextoPagamento(searchParams);
+  }, [searchParams]);
 
   const paymentId =
     searchParams.get("payment_id") ||
     searchParams.get("collection_id") ||
     searchParams.get("id");
 
-  const status = searchParams.get("status");
-  const preferenceId = searchParams.get("preference_id");
-  const collectionStatus = searchParams.get("collection_status");
-  const merchantOrderId = searchParams.get("merchant_order_id");
+  const status =
+    searchParams.get("status") ||
+    searchParams.get("collection_status") ||
+    searchParams.get("payment_status");
 
-  const statusExibido = status || collectionStatus || "Pendente";
+  const preferenceId = searchParams.get("preference_id");
+  const merchantOrderId = searchParams.get("merchant_order_id");
+  const externalReference = searchParams.get("external_reference");
+
+  const statusInfo = obterMensagemStatus(status);
+
+  const dadosTentativa = useMemo(
+    () => [
+      {
+        label: "Origem",
+        value: contextoPagamento.tituloOrigem,
+      },
+      {
+        label: "Status",
+        value: status || "Pendente",
+      },
+      {
+        label: "Pagamento",
+        value: paymentId,
+      },
+      {
+        label: "Preferência",
+        value: preferenceId,
+      },
+      {
+        label: "Pedido Mercado Pago",
+        value: merchantOrderId,
+      },
+      {
+        label: "Referência",
+        value: externalReference,
+      },
+    ],
+    [
+      contextoPagamento.tituloOrigem,
+      status,
+      paymentId,
+      preferenceId,
+      merchantOrderId,
+      externalReference,
+    ],
+  );
+
+  const textoWhatsapp = [
+    "Olá! Meu pagamento na Hot Dogueres está pendente ou aguardando confirmação.",
+    "",
+    `Origem: ${contextoPagamento.tituloOrigem}`,
+    `Status: ${status || "Pendente"}`,
+    paymentId ? `Pagamento: ${paymentId}` : "",
+    preferenceId ? `Preferência: ${preferenceId}` : "",
+    merchantOrderId ? `Pedido Mercado Pago: ${merchantOrderId}` : "",
+    externalReference ? `Referência: ${externalReference}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  async function copiarDadosTentativa() {
+    const texto = dadosTentativa
+      .filter((item) => item.value)
+      .map((item) => `${item.label}: ${item.value}`)
+      .join("\n");
+
+    if (!texto || !navigator.clipboard) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(texto);
+      setCopiado(true);
+
+      window.setTimeout(() => {
+        setCopiado(false);
+      }, 2500);
+    } catch {
+      setCopiado(false);
+    }
+  }
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#fff7e8] px-4 py-10 text-gray-950">
-      <section className="relative mx-auto max-w-5xl">
-        <div className="absolute left-[-120px] top-[-120px] h-72 w-72 rounded-full bg-yellow-300/30 blur-3xl" />
-        <div className="absolute bottom-[-140px] right-[-120px] h-80 w-80 rounded-full bg-red-400/20 blur-3xl" />
+    <main className="min-h-screen bg-[#fff7e8] text-gray-950">
+      <section className="relative overflow-hidden px-4 py-10 md:py-14">
+        <div className="absolute left-[-120px] top-[-120px] h-80 w-80 rounded-full bg-yellow-200/60 blur-3xl" />
+        <div className="absolute bottom-[-140px] right-[-120px] h-96 w-96 rounded-full bg-orange-300/40 blur-3xl" />
 
-        <div className="relative overflow-hidden rounded-[2rem] bg-white shadow-2xl ring-1 ring-yellow-100">
-          <div className="bg-gradient-to-br from-yellow-300 via-yellow-400 to-red-500 px-6 py-10 text-center md:px-10 md:py-14">
-            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-white text-5xl shadow-xl">
-              ⏳
-            </div>
+        <div className="relative mx-auto max-w-4xl">
+          <Link
+            href={contextoPagamento.hrefRetorno}
+            className="inline-flex rounded-full bg-white px-5 py-3 text-sm font-black text-yellow-800 shadow-md ring-1 ring-yellow-200 transition hover:bg-yellow-50"
+          >
+            {contextoPagamento.textoRetorno}
+          </Link>
 
-            <p className="mx-auto mt-6 inline-flex rounded-full bg-black px-5 py-2 text-xs font-black uppercase tracking-[0.25em] text-yellow-300 shadow-lg">
-              Aguardando confirmação
-            </p>
-
-            <h1 className="mx-auto mt-6 max-w-3xl text-4xl font-black leading-tight text-white drop-shadow-md md:text-6xl">
-              Pagamento pendente
-            </h1>
-
-            <p className="mx-auto mt-5 max-w-3xl text-base font-bold leading-relaxed text-white/95 md:text-lg">
-              Seu pagamento foi iniciado, mas ainda está em análise ou aguardando
-              confirmação pelo Mercado Pago.
-            </p>
-          </div>
-
-          <div className="grid gap-8 p-6 md:p-10 lg:grid-cols-[1fr_0.8fr]">
-            <div>
-              <div className="rounded-[1.5rem] border border-yellow-200 bg-yellow-50 p-6 shadow-md">
-                <h2 className="text-2xl font-black text-yellow-800">
-                  O que acontece agora?
-                </h2>
-
-                <div className="mt-5 space-y-4">
-                  <div className="flex gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-yellow-400 text-sm font-black text-gray-950">
-                      1
-                    </div>
-
-                    <div>
-                      <h3 className="font-black text-gray-950">
-                        O Mercado Pago está analisando
-                      </h3>
-
-                      <p className="mt-1 text-sm font-semibold leading-relaxed text-gray-700">
-                        Alguns pagamentos, como boleto, Pix em processamento ou
-                        cartão em análise, podem levar um tempo para serem
-                        confirmados.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-yellow-400 text-sm font-black text-gray-950">
-                      2
-                    </div>
-
-                    <div>
-                      <h3 className="font-black text-gray-950">
-                        Aguarde a confirmação
-                      </h3>
-
-                      <p className="mt-1 text-sm font-semibold leading-relaxed text-gray-700">
-                        Assim que o pagamento for confirmado, o pedido poderá
-                        seguir para a próxima etapa.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-yellow-400 text-sm font-black text-gray-950">
-                      3
-                    </div>
-
-                    <div>
-                      <h3 className="font-black text-gray-950">
-                        Em caso de dúvida, fale conosco
-                      </h3>
-
-                      <p className="mt-1 text-sm font-semibold leading-relaxed text-gray-700">
-                        Se quiser confirmar alguma informação do pedido, você
-                        pode chamar a Hot Dogueres pelo WhatsApp.
-                      </p>
-                    </div>
-                  </div>
-                </div>
+          <div className="mt-8 overflow-hidden rounded-[2rem] bg-white shadow-2xl ring-1 ring-yellow-200">
+            <div className="bg-gradient-to-br from-yellow-400 via-orange-400 to-red-500 px-6 py-10 text-center text-white md:px-10">
+              <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-white text-5xl shadow-xl">
+                ⏳
               </div>
 
-              <div className="mt-6 rounded-[1.5rem] border border-red-100 bg-[#fff7e8] p-6 shadow-md">
-                <h2 className="text-xl font-black text-red-700">
-                  Importante
-                </h2>
+              <p className="mt-6 inline-flex rounded-full bg-white/20 px-5 py-2 text-xs font-black uppercase tracking-[0.25em] text-white backdrop-blur">
+                Pagamento pendente
+              </p>
 
-                <p className="mt-3 text-sm font-semibold leading-relaxed text-gray-700">
-                  Não é necessário refazer o pagamento imediatamente. Primeiro,
-                  aguarde a atualização do status pelo Mercado Pago. Caso o
-                  pagamento seja recusado ou cancelado, você poderá tentar
-                  novamente.
-                </p>
-              </div>
+              <h1 className="mx-auto mt-5 max-w-3xl text-4xl font-black leading-tight md:text-6xl">
+                Seu pagamento está aguardando confirmação
+              </h1>
+
+              <p className="mx-auto mt-5 max-w-2xl text-base font-bold leading-relaxed text-white/90 md:text-lg">
+                Não se preocupe. Alguns métodos de pagamento podem levar alguns
+                minutos para serem confirmados pelo Mercado Pago.
+              </p>
             </div>
 
-            <aside>
-              <div className="rounded-[1.5rem] bg-gray-950 p-6 text-white shadow-xl">
-                <p className="text-sm font-black uppercase tracking-[0.25em] text-yellow-300">
-                  Dados do pagamento
-                </p>
+            <div className="p-6 md:p-10">
+              <div className={`rounded-3xl p-5 ${statusInfo.classe}`}>
+                <h2 className="text-xl font-black">{statusInfo.titulo}</h2>
 
-                <div className="mt-6 space-y-4">
-                  <div className="rounded-2xl bg-white/10 p-4">
-                    <p className="text-xs font-black uppercase tracking-wide text-white/60">
-                      Status
+                <p className="mt-2 text-sm font-bold leading-relaxed">
+                  {statusInfo.descricao}
+                </p>
+              </div>
+
+              <div className="mt-6 rounded-3xl bg-[#fff7e8] p-5 shadow-inner">
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <p className="text-sm font-black uppercase tracking-wide text-yellow-800">
+                      Dados da tentativa
                     </p>
 
-                    <p className="mt-1 text-lg font-black text-yellow-300">
-                      {statusExibido}
+                    <p className="mt-1 text-sm font-semibold text-gray-700">
+                      Use essas informações caso precise falar com o atendimento.
                     </p>
                   </div>
 
-                  {paymentId && (
-                    <div className="rounded-2xl bg-white/10 p-4">
-                      <p className="text-xs font-black uppercase tracking-wide text-white/60">
-                        ID do pagamento
+                  <button
+                    type="button"
+                    onClick={copiarDadosTentativa}
+                    className="rounded-full bg-gray-950 px-5 py-3 text-xs font-black uppercase tracking-wide text-white shadow-md transition hover:bg-gray-800"
+                  >
+                    {copiado ? "Dados copiados" : "Copiar dados"}
+                  </button>
+                </div>
+
+                <div className="mt-5 grid gap-3">
+                  {dadosTentativa.map((item) => (
+                    <div
+                      key={item.label}
+                      className="rounded-2xl bg-white p-4 shadow-sm"
+                    >
+                      <p className="text-xs font-black uppercase tracking-wide text-gray-500">
+                        {item.label}
                       </p>
 
-                      <p className="mt-1 break-all text-sm font-bold text-white">
-                        {paymentId}
+                      <p className="mt-1 break-words text-sm font-black text-gray-900">
+                        {item.value || "Não informado"}
                       </p>
                     </div>
-                  )}
-
-                  {preferenceId && (
-                    <div className="rounded-2xl bg-white/10 p-4">
-                      <p className="text-xs font-black uppercase tracking-wide text-white/60">
-                        Preferência
-                      </p>
-
-                      <p className="mt-1 break-all text-sm font-bold text-white">
-                        {preferenceId}
-                      </p>
-                    </div>
-                  )}
-
-                  {merchantOrderId && (
-                    <div className="rounded-2xl bg-white/10 p-4">
-                      <p className="text-xs font-black uppercase tracking-wide text-white/60">
-                        Pedido Mercado Pago
-                      </p>
-
-                      <p className="mt-1 break-all text-sm font-bold text-white">
-                        {merchantOrderId}
-                      </p>
-                    </div>
-                  )}
-
-                  {!paymentId && !preferenceId && !merchantOrderId && (
-                    <div className="rounded-2xl bg-white/10 p-4">
-                      <p className="text-sm font-semibold leading-relaxed text-white/75">
-                        Nenhum código adicional foi enviado pelo Mercado Pago
-                        nesta tentativa.
-                      </p>
-                    </div>
-                  )}
+                  ))}
                 </div>
               </div>
 
-              <div className="mt-6 rounded-[1.5rem] border border-green-200 bg-green-50 p-6 shadow-md">
-                <h2 className="text-xl font-black text-green-700">
-                  Precisa de ajuda?
-                </h2>
-
-                <p className="mt-3 text-sm font-semibold leading-relaxed text-gray-700">
-                  Se você acredita que já pagou, envie o comprovante ou informe
-                  o ID do pagamento pelo WhatsApp.
-                </p>
+              <div className="mt-8 grid gap-4 md:grid-cols-2">
+                <Link
+                  href={contextoPagamento.hrefRetorno}
+                  className="rounded-full bg-yellow-500 px-6 py-4 text-center text-sm font-black uppercase tracking-wide text-gray-950 shadow-lg transition hover:scale-105 hover:bg-yellow-400"
+                >
+                  Voltar para {contextoPagamento.tituloOrigem}
+                </Link>
 
                 <a
-                  href={criarLinkWhatsapp(
-                    `Olá! Meu pagamento ficou pendente na Hot Dogueres. Status: ${statusExibido}${
-                      paymentId ? ` | ID do pagamento: ${paymentId}` : ""
-                    }${preferenceId ? ` | Preferência: ${preferenceId}` : ""}`
-                  )}
+                  href={linkWhatsapp(textoWhatsapp)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-5 block rounded-full bg-green-600 px-6 py-3 text-center text-sm font-black text-white shadow-md transition hover:scale-105 hover:bg-green-700"
+                  className="rounded-full bg-green-600 px-6 py-4 text-center text-sm font-black uppercase tracking-wide text-white shadow-lg transition hover:scale-105 hover:bg-green-700"
                 >
                   Falar no WhatsApp
                 </a>
               </div>
-            </aside>
-          </div>
 
-          <div className="border-t border-gray-100 bg-gray-50 px-6 py-6 md:px-10">
-            <div className="grid gap-4 md:grid-cols-3">
-              <Link
-                href="/loja-solidaria"
-                className="rounded-full bg-red-600 px-6 py-4 text-center text-sm font-black text-white shadow-md transition hover:scale-105 hover:bg-red-700"
-              >
-                Voltar para a loja
-              </Link>
+              <div className="mt-8 rounded-3xl border border-yellow-300 bg-yellow-50 p-5">
+                <h3 className="text-lg font-black text-yellow-800">
+                  O que você pode fazer agora?
+                </h3>
 
-              <Link
-                href="/clube-de-membros"
-                className="rounded-full bg-yellow-400 px-6 py-4 text-center text-sm font-black text-gray-950 shadow-md transition hover:scale-105 hover:bg-yellow-500"
-              >
-                Clube de Membros
-              </Link>
+                <ul className="mt-4 space-y-3 text-sm font-bold leading-relaxed text-gray-800">
+                  <li>
+                    • Aguarde alguns minutos para o Mercado Pago concluir a
+                    confirmação.
+                  </li>
+                  <li>
+                    • Verifique seu e-mail, aplicativo do banco ou conta do
+                    Mercado Pago.
+                  </li>
+                  <li>
+                    • Evite pagar novamente de imediato se o valor já saiu da
+                    sua conta.
+                  </li>
+                  <li>
+                    • Se tiver dúvida, fale conosco no WhatsApp com os dados da
+                    tentativa.
+                  </li>
+                </ul>
+              </div>
 
-              <Link
-                href="/"
-                className="rounded-full bg-gray-950 px-6 py-4 text-center text-sm font-black text-white shadow-md transition hover:scale-105 hover:bg-black"
-              >
-                Ir para o início
-              </Link>
+              <div className="mt-8 rounded-3xl bg-gray-950 p-6 text-center text-white">
+                <p className="text-sm font-black uppercase tracking-[0.25em] text-yellow-300">
+                  Hot Dogueres
+                </p>
+
+                <h3 className="mt-3 text-2xl font-black">
+                  Sua compra será considerada confirmada após o pagamento
+                  aprovado.
+                </h3>
+
+                <p className="mx-auto mt-3 max-w-2xl text-sm font-semibold leading-relaxed text-white/80">
+                  Assim que o Mercado Pago confirmar o pagamento, o sistema
+                  poderá atualizar o pedido automaticamente. Se a confirmação
+                  demorar, envie os dados pelo WhatsApp para conferência.
+                </p>
+              </div>
+
+              <div className="mt-6 flex justify-center">
+                <Link
+                  href="/"
+                  className="rounded-full border border-gray-200 bg-white px-6 py-3 text-sm font-black text-gray-800 shadow-sm transition hover:bg-gray-50"
+                >
+                  Ir para a página inicial
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -249,14 +403,12 @@ function PagamentoPendenteConteudo() {
 
 function CarregandoPagamentoPendente() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#fff7e8] px-4">
-      <div className="rounded-[2rem] bg-white p-8 text-center shadow-xl">
-        <div className="mx-auto mb-5 flex h-16 w-16 animate-pulse items-center justify-center rounded-full bg-yellow-100 text-3xl">
-          ⏳
-        </div>
+    <main className="flex min-h-screen items-center justify-center bg-[#fff7e8] px-4 text-gray-950">
+      <div className="rounded-3xl bg-white p-8 text-center shadow-xl">
+        <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-yellow-200 border-t-yellow-500" />
 
-        <p className="text-lg font-black text-gray-900">
-          Carregando informações do pagamento...
+        <p className="mt-5 text-lg font-black">
+          Carregando dados do pagamento...
         </p>
       </div>
     </main>

@@ -6,12 +6,25 @@ import { useSearchParams } from "next/navigation";
 
 const WHATSAPP = "5579981314109";
 
+type ContextoPagamento = {
+  origem: string;
+  tituloOrigem: string;
+  hrefRetorno: string;
+  textoRetorno: string;
+};
+
 function linkWhatsapp(texto: string) {
   return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`;
 }
 
+function normalizarTexto(valor?: string | null) {
+  return String(valor || "")
+    .trim()
+    .toLowerCase();
+}
+
 function obterMensagemStatus(status?: string | null) {
-  const statusNormalizado = status?.toLowerCase();
+  const statusNormalizado = normalizarTexto(status);
 
   if (!statusNormalizado) {
     return {
@@ -25,7 +38,9 @@ function obterMensagemStatus(status?: string | null) {
   if (
     statusNormalizado === "rejected" ||
     statusNormalizado === "failure" ||
-    statusNormalizado === "failed"
+    statusNormalizado === "failed" ||
+    statusNormalizado === "recusado" ||
+    statusNormalizado === "rejeitado"
   ) {
     return {
       titulo: "Pagamento recusado",
@@ -51,7 +66,8 @@ function obterMensagemStatus(status?: string | null) {
   if (
     statusNormalizado === "pending" ||
     statusNormalizado === "in_process" ||
-    statusNormalizado === "em_processamento"
+    statusNormalizado === "em_processamento" ||
+    statusNormalizado === "pendente"
   ) {
     return {
       titulo: "Pagamento pendente",
@@ -69,9 +85,56 @@ function obterMensagemStatus(status?: string | null) {
   };
 }
 
-function PagamentoErroConteudo() {
+function obterContextoPagamento(params: URLSearchParams): ContextoPagamento {
+  const tipo = normalizarTexto(params.get("tipo"));
+  const produto = normalizarTexto(params.get("produto"));
+  const origem = normalizarTexto(params.get("origem"));
+
+  if (
+    tipo === "clube-membros" ||
+    produto === "clube-membros" ||
+    origem === "clube-membros" ||
+    origem === "clube"
+  ) {
+    return {
+      origem: "clube-membros",
+      tituloOrigem: "Clube de Membros",
+      hrefRetorno: "/clube-de-membros#planos",
+      textoRetorno: "← Voltar para os planos",
+    };
+  }
+
+  if (
+    tipo === "ingresso-solidario-colecionavel" ||
+    tipo === "hot-dog-day" ||
+    produto === "ingresso-solidario-colecionavel" ||
+    produto === "hot-dog-day" ||
+    origem === "checkout-ingressos" ||
+    origem === "ingressos"
+  ) {
+    return {
+      origem: "ingressos",
+      tituloOrigem: "Ingressos Solidários",
+      hrefRetorno: "/#ingressos",
+      textoRetorno: "← Voltar para os ingressos",
+    };
+  }
+
+  return {
+    origem: "loja-solidaria",
+    tituloOrigem: "Loja Solidária",
+    hrefRetorno: "/loja-solidaria",
+    textoRetorno: "← Voltar para a Loja Solidária",
+  };
+}
+
+function PagamentoFalhaConteudo() {
   const searchParams = useSearchParams();
   const [copiado, setCopiado] = useState(false);
+
+  const contextoPagamento = useMemo(() => {
+    return obterContextoPagamento(searchParams);
+  }, [searchParams]);
 
   const paymentId =
     searchParams.get("payment_id") ||
@@ -91,6 +154,10 @@ function PagamentoErroConteudo() {
 
   const dadosTentativa = useMemo(
     () => [
+      {
+        label: "Origem",
+        value: contextoPagamento.tituloOrigem,
+      },
       {
         label: "Status",
         value: status || "Não aprovado",
@@ -112,12 +179,20 @@ function PagamentoErroConteudo() {
         value: externalReference,
       },
     ],
-    [status, paymentId, preferenceId, merchantOrderId, externalReference]
+    [
+      contextoPagamento.tituloOrigem,
+      status,
+      paymentId,
+      preferenceId,
+      merchantOrderId,
+      externalReference,
+    ],
   );
 
   const textoWhatsapp = [
     "Olá! Tive um problema ao tentar pagar meu pedido na Hot Dogueres.",
     "",
+    `Origem: ${contextoPagamento.tituloOrigem}`,
     `Status: ${status || "Não aprovado"}`,
     paymentId ? `Pagamento: ${paymentId}` : "",
     preferenceId ? `Preferência: ${preferenceId}` : "",
@@ -133,7 +208,7 @@ function PagamentoErroConteudo() {
       .map((item) => `${item.label}: ${item.value}`)
       .join("\n");
 
-    if (!texto) {
+    if (!texto || !navigator.clipboard) {
       return;
     }
 
@@ -157,10 +232,10 @@ function PagamentoErroConteudo() {
 
         <div className="relative mx-auto max-w-4xl">
           <Link
-            href="/loja-solidaria"
+            href={contextoPagamento.hrefRetorno}
             className="inline-flex rounded-full bg-white px-5 py-3 text-sm font-black text-red-700 shadow-md ring-1 ring-red-100 transition hover:bg-red-50"
           >
-            ← Voltar para a Loja Solidária
+            {contextoPagamento.textoRetorno}
           </Link>
 
           <div className="mt-8 overflow-hidden rounded-[2rem] bg-white shadow-2xl ring-1 ring-red-100">
@@ -233,7 +308,7 @@ function PagamentoErroConteudo() {
 
               <div className="mt-8 grid gap-4 md:grid-cols-2">
                 <Link
-                  href="/loja-solidaria"
+                  href={contextoPagamento.hrefRetorno}
                   className="rounded-full bg-red-600 px-6 py-4 text-center text-sm font-black uppercase tracking-wide text-white shadow-lg transition hover:scale-105 hover:bg-red-700"
                 >
                   Tentar novamente
@@ -255,10 +330,21 @@ function PagamentoErroConteudo() {
                 </h3>
 
                 <ul className="mt-4 space-y-3 text-sm font-bold leading-relaxed text-gray-800">
-                  <li>• Conferir se os dados do cartão ou método de pagamento estão corretos.</li>
-                  <li>• Tentar pagar novamente pela Loja Solidária.</li>
-                  <li>• Usar outro cartão, Pix ou forma de pagamento disponível.</li>
-                  <li>• Falar conosco no WhatsApp informando os dados da tentativa.</li>
+                  <li>
+                    • Conferir se os dados do cartão ou método de pagamento
+                    estão corretos.
+                  </li>
+                  <li>
+                    • Tentar pagar novamente voltando para{" "}
+                    {contextoPagamento.tituloOrigem}.
+                  </li>
+                  <li>
+                    • Usar outro cartão, Pix ou forma de pagamento disponível.
+                  </li>
+                  <li>
+                    • Falar conosco no WhatsApp informando os dados da
+                    tentativa.
+                  </li>
                 </ul>
               </div>
 
@@ -277,6 +363,15 @@ function PagamentoErroConteudo() {
                   verificarmos com segurança.
                 </p>
               </div>
+
+              <div className="mt-6 flex justify-center">
+                <Link
+                  href="/"
+                  className="rounded-full border border-gray-200 bg-white px-6 py-3 text-sm font-black text-gray-800 shadow-sm transition hover:bg-gray-50"
+                >
+                  Ir para a página inicial
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -285,7 +380,7 @@ function PagamentoErroConteudo() {
   );
 }
 
-function CarregandoPagamentoErro() {
+function CarregandoPagamentoFalha() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#fff7e8] px-4 text-gray-950">
       <div className="rounded-3xl bg-white p-8 text-center shadow-xl">
@@ -299,10 +394,10 @@ function CarregandoPagamentoErro() {
   );
 }
 
-export default function PagamentoErroPage() {
+export default function PagamentoFalhaPage() {
   return (
-    <Suspense fallback={<CarregandoPagamentoErro />}>
-      <PagamentoErroConteudo />
+    <Suspense fallback={<CarregandoPagamentoFalha />}>
+      <PagamentoFalhaConteudo />
     </Suspense>
   );
 }
