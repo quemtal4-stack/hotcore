@@ -1012,9 +1012,10 @@ export default function HomePage() {
         <div className="mt-6 space-y-6">
   <TermometroImpacto />
   <TermometroRacao />
-  <section className="flex w-full justify-center pb-8">
+ <section className="flex w-full justify-center pb-8">
   <div className="mx-auto w-full max-w-6xl overflow-hidden rounded-[2rem] border-4 border-red-600 bg-white text-center shadow-2xl">
-  <div className="grid w-full gap-0 lg:grid-cols-[0.85fr_1.15fr]">
+    <div className="grid w-full gap-0 lg:grid-cols-[0.85fr_1.15fr]">
+
 
       <div className="relative flex min-h-[260px] items-center justify-center overflow-hidden bg-gradient-to-br from-red-700 via-red-600 to-yellow-400 p-6 text-center text-white md:p-8">
         <div className="absolute left-[-80px] top-[-80px] h-56 w-56 rounded-full bg-white/20 blur-3xl" />
@@ -1039,9 +1040,9 @@ export default function HomePage() {
         </div>
       </div>
 
-    <div className="flex w-full items-center justify-center bg-[#FFF8E7] p-5 text-center md:p-8 lg:justify-start lg:text-left">
+  <div className="flex w-full items-center justify-center bg-[#FFF8E7] p-5 text-center md:p-8 lg:justify-start lg:text-left">
+  <div className="mx-auto w-full max-w-2xl">
 
-       <div className="mx-auto w-full max-w-2xl">
 
           <p className="inline-flex rounded-full bg-red-100 px-4 py-2 text-center text-xs font-black uppercase tracking-[0.2em] text-red-700">
             Compra segura
