@@ -1408,7 +1408,8 @@ export default function HomePage() {
       </div>
 
       <section id="livros" className="scroll-mt-28 px-4 pb-8">
-        <div className="mx-auto max-w-6xl rounded-[2rem] bg-white p-5 shadow-xl md:p-6">
+       <div className="mx-auto max-w-6xl translate-x-2 overflow-hidden rounded-[2rem] border-4 border-red-600 bg-white shadow-2xl sm:translate-x-3 lg:translate-x-0">
+
           <div className="text-center">
             <p className="inline-flex rounded-full bg-purple-700 px-5 py-2 text-xs font-black uppercase tracking-wide text-white">
               Livros colecionáveis
