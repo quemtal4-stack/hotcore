@@ -868,7 +868,8 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#fff7e8] text-gray-950">
+    <main className="min-h-screen overflow-x-hidden bg-[#fff7e8] text-gray-950">
+
       <SetasNavegacao
         proxima="/nossa-historia"
         labelProxima="Ir para Nossa História"
