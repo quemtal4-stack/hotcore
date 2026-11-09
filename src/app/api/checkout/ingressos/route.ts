@@ -59,11 +59,11 @@ function textoSeguro(valor: unknown, padrao = "") {
   return padrao;
 }
 
-function normalizarNumero(valor: unknown) {
+function numeroSeguro(valor: unknown, padrao = 0) {
   const numero = Number(valor);
 
   if (!Number.isFinite(numero)) {
-    return 0;
+    return padrao;
   }
 
   return numero;
@@ -73,7 +73,7 @@ function limparNumero(valor: unknown) {
   return String(valor || "").replace(/\D/g, "");
 }
 
-function normalizarBoolean(valor: unknown) {
+function booleanoSeguro(valor: unknown) {
   if (typeof valor === "boolean") {
     return valor;
   }
@@ -88,8 +88,12 @@ function normalizarBoolean(valor: unknown) {
   );
 }
 
+function validarEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 function limitarQuantidade(valor: unknown, minimo = 1, maximo = 999) {
-  const numero = Math.floor(normalizarNumero(valor));
+  const numero = Math.floor(numeroSeguro(valor, minimo));
 
   if (!Number.isFinite(numero) || numero < minimo) {
     return minimo;
@@ -98,67 +102,8 @@ function limitarQuantidade(valor: unknown, minimo = 1, maximo = 999) {
   return Math.min(numero, maximo);
 }
 
-function validarEmail(email: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
 function criarExternalReference(tipo: TipoCompra) {
   return `${tipo}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-}
-
-async function salvarPedidoPendente(params: {
-  externalReference: string;
-  preferenceId?: string | number;
-  initPoint: string;
-  tipo: TipoCompra;
-  produto: string;
-  titulo: string;
-  nome: string;
-  email: string;
-  telefone: string;
-  cpf: string;
-  ingressos: number;
-  quantidadeTotal: number;
-  sextoIngresso: boolean;
-  kgAlimentos: number;
-  total: number;
-  metadata: Record<string, unknown>;
-}) {
-  const agora = new Date().toISOString();
-  const valorUnitarioMedio =
-    params.quantidadeTotal > 0 ? params.total / params.quantidadeTotal : params.total;
-
-  const { error } = await supabaseAdmin.from("pedidos").insert({
-    external_reference: params.externalReference,
-    mercado_pago_preference_id: params.preferenceId
-      ? String(params.preferenceId)
-      : null,
-    mercado_pago_init_point: params.initPoint,
-
-    tipo: params.tipo,
-    categoria: params.tipo,
-    produto: params.titulo,
-
-    nome_comprador: params.nome,
-    email_comprador: params.email,
-    whatsapp: params.telefone,
-
-    quantidade: params.quantidadeTotal,
-    valor_unitario: Number(valorUnitarioMedio.toFixed(2)),
-    valor_frete: 0,
-    total_produtos: Number(params.total.toFixed(2)),
-    total_pedido: Number(params.total.toFixed(2)),
-
-    status: "aguardando_pagamento",
-
-    metadata: params.metadata,
-    created_at: agora,
-    updated_at: agora,
-  });
-
-  if (error) {
-    throw new Error(`Erro ao salvar pedido pendente: ${error.message}`);
-  }
 }
 
 async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
@@ -174,7 +119,7 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
   }
 
   const tipo: TipoCompra =
-    dados.tipo === "hot-dog-day"
+    textoSeguro(dados.tipo) === "hot-dog-day"
       ? "hot-dog-day"
       : "ingresso-solidario-colecionavel";
 
@@ -236,7 +181,7 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
   );
 
   const sextoIngresso =
-    !ehHotDogDay && ingressos >= 5 && normalizarBoolean(dados.sextoIngresso);
+    !ehHotDogDay && ingressos >= 5 && booleanoSeguro(dados.sextoIngresso);
 
   const quantidadeTotal = ehHotDogDay
     ? ingressos
@@ -244,14 +189,13 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
 
   const kgAlimentos = ehHotDogDay
     ? 0
-    : normalizarNumero(dados.kgAlimentos) ||
-      ingressos + (sextoIngresso ? 3 : 0);
+    : numeroSeguro(dados.kgAlimentos) || ingressos + (sextoIngresso ? 3 : 0);
 
   const modoAdmin =
-    normalizarBoolean(dados.admin) || normalizarBoolean(dados.teste);
+    booleanoSeguro(dados.admin) || booleanoSeguro(dados.teste);
 
   const valorParametro =
-    normalizarNumero(dados.valor) || normalizarNumero(dados.total);
+    numeroSeguro(dados.valor) || numeroSeguro(dados.total);
 
   const totalCalculado = ehHotDogDay
     ? ingressos * VALOR_HOT_DOG_DAY
@@ -274,10 +218,11 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
     );
   }
 
-  const siteUrlBase =
-    process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000";
+  const siteUrl = (
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000"
+  ).replace(/\/$/, "");
 
-  const siteUrl = siteUrlBase.replace(/\/$/, "");
+  const usarAutoReturn = siteUrl.startsWith("https://");
 
   const externalReference = criarExternalReference(tipo);
 
@@ -337,14 +282,9 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
     ingressos,
     quantidade: ingressos,
 
-    /*
-      Importante:
-      Para o webhook montar corretamente a pasta do colecionador,
-      quantidade_total fica com a quantidade de ingressos comuns.
-      O total da compra com o especial fica em quantidade_total_compra.
-    */
     quantidade_total: ingressos,
     quantidadeTotal: ingressos,
+
     quantidade_total_compra: quantidadeTotal,
     quantidadeTotalCompra: quantidadeTotal,
 
@@ -367,19 +307,7 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
     modo_admin: modoAdmin,
   };
 
-  const client = new MercadoPagoConfig({
-    accessToken,
-  });
-
-  const preference = new Preference(client);
-
-  const items: Array<{
-    id: string;
-    title: string;
-    quantity: number;
-    unit_price: number;
-    currency_id: "BRL";
-  }> =
+  const items =
     modoAdmin && valorParametro > 0
       ? [
           {
@@ -387,7 +315,7 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
             title: `${titulo} - Teste Admin`,
             quantity: 1,
             unit_price: total,
-            currency_id: "BRL",
+            currency_id: "BRL" as const,
           },
         ]
       : ehHotDogDay
@@ -397,7 +325,7 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
               title: titulo,
               quantity: ingressos,
               unit_price: VALOR_HOT_DOG_DAY,
-              currency_id: "BRL",
+              currency_id: "BRL" as const,
             },
           ]
         : [
@@ -406,7 +334,7 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
               title: "Ingresso Solidário Colecionável",
               quantity: ingressos,
               unit_price: VALOR_INGRESSO_COLECIONAVEL,
-              currency_id: "BRL",
+              currency_id: "BRL" as const,
             },
             ...(sextoIngresso
               ? [
@@ -420,6 +348,12 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
                 ]
               : []),
           ];
+
+  const client = new MercadoPagoConfig({
+    accessToken,
+  });
+
+  const preference = new Preference(client);
 
   const result = await preference.create({
     body: {
@@ -446,11 +380,17 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
 
       back_urls: {
         success: `${siteUrl}/pagamento/sucesso?${paramsSucesso.toString()}`,
-        failure: `${siteUrl}/pagamento/erro`,
-        pending: `${siteUrl}/pagamento/pendente`,
+        failure: `${siteUrl}/pagamento/falha?tipo=${tipo}&external_reference=${externalReference}`,
+        pending: `${siteUrl}/pagamento/pendente?tipo=${tipo}&external_reference=${externalReference}`,
       },
 
       notification_url: `${siteUrl}/api/mercado-pago/webhook`,
+
+      ...(usarAutoReturn
+        ? {
+            auto_return: "approved" as const,
+          }
+        : {}),
 
       statement_descriptor: "HOTDOGUERES",
     },
@@ -468,44 +408,86 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
     );
   }
 
-  try {
-    await salvarPedidoPendente({
-      externalReference,
-      preferenceId: result.id,
-      initPoint,
-      tipo,
-      produto,
-      titulo,
-      nome,
-      email,
-      telefone,
-      cpf,
-      ingressos,
-      quantidadeTotal,
-      sextoIngresso,
-      kgAlimentos,
-      total,
-      metadata,
-    });
-  } catch (error) {
-    console.error("Pedido criado no Mercado Pago, mas não salvo no Supabase:", error);
+  const valorUnitarioMedio =
+    quantidadeTotal > 0 ? Number((total / quantidadeTotal).toFixed(2)) : total;
+
+  const agora = new Date().toISOString();
+
+  const { error: erroPedido } = await supabaseAdmin.from("pedidos").insert({
+    external_reference: externalReference,
+
+    preference_id: result.id ? String(result.id) : null,
+    mercado_pago_preference_id: result.id ? String(result.id) : null,
+    mercado_pago_init_point: initPoint,
+
+    payment_id: null,
+    mercado_pago_payment_id: null,
+
+    status: "aguardando_pagamento",
+
+    tipo,
+    produto,
+    categoria: tipo,
+
+    nome_comprador: nome,
+    email_comprador: email,
+    whatsapp: telefone,
+
+    cpf,
+    cpf_comprador: cpf,
+
+    quantidade: quantidadeTotal,
+    valor_unitario: valorUnitarioMedio,
+    valor_frete: 0,
+    total_produtos: total,
+    total_pedido: total,
+    valor_total: total,
+
+    forma_entrega: "retirada",
+    modalidade_entrega: "retirada",
+    retirada_no_local: true,
+
+    kg_alimentos: kgAlimentos,
+
+    plano: null,
+    evento_id: null,
+    nome_evento: null,
+    ano_colecao: null,
+    ingresso_modelo_id: null,
+
+    metadata,
+
+    created_at: agora,
+    updated_at: agora,
+  });
+
+  if (erroPedido) {
+    console.error("ERRO AO SALVAR PEDIDO NO SUPABASE:", erroPedido);
 
     return NextResponse.json(
       {
         error: "Pagamento criado, mas houve erro ao salvar o pedido no banco.",
-        detalhe: transformarErroEmTexto(error),
+        detalhe: erroPedido.message,
+        codigo: erroPedido.code,
+        hint: erroPedido.hint,
+        details: erroPedido.details,
+
         initPoint,
         init_point: initPoint,
         sandbox_init_point: result.sandbox_init_point,
         url: initPoint,
+
         preferenceId: result.id,
         externalReference,
+        external_reference: externalReference,
       },
       { status: 500 },
     );
   }
 
   return NextResponse.json({
+    ok: true,
+
     initPoint,
     init_point: initPoint,
     sandbox_init_point: result.sandbox_init_point,
@@ -537,7 +519,7 @@ export async function POST(request: Request) {
 
     return await criarCheckoutIngressos(body);
   } catch (error) {
-    console.error("Erro ao criar checkout de ingressos:", error);
+    console.error("ERRO AO CRIAR CHECKOUT DE INGRESSOS:", error);
 
     return NextResponse.json(
       {
@@ -556,7 +538,7 @@ export async function GET(request: Request) {
 
     return await criarCheckoutIngressos(dados);
   } catch (error) {
-    console.error("Erro ao criar checkout de ingressos via GET:", error);
+    console.error("ERRO AO CRIAR CHECKOUT DE INGRESSOS VIA GET:", error);
 
     return NextResponse.json(
       {

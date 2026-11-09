@@ -8,6 +8,8 @@ export const dynamic = "force-dynamic";
 const FRETE_LOCAL_SERGIPE = 12;
 const DIAS_DISPONIVEL_RETIRADA = 7;
 const DIAS_DISPONIVEL_ENTREGA = 10;
+const ENTREGA_CAMISA_EVENTO_TEXTO =
+  "Retirada no local do evento, mediante conferência de nome, CPF e tamanho.";
 
 type ItemMercadoPago = {
   id: string;
@@ -171,8 +173,7 @@ export async function POST(request: Request) {
     const nomeComprador =
       textoSeguro(body.nomeComprador) ||
       textoSeguro(body.nome) ||
-      textoSeguro(body.name) ||
-      "Comprador";
+      textoSeguro(body.name);
 
     const emailComprador =
       textoSeguro(body.emailComprador) || textoSeguro(body.email);
@@ -182,6 +183,13 @@ export async function POST(request: Request) {
       textoSeguro(body.whatsapp) ||
       textoSeguro(body.telefone) ||
       null;
+
+    const cpfComprador =
+      textoSeguro(body.cpfComprador) ||
+      textoSeguro(body.cpf) ||
+      textoSeguro(body.documento);
+
+    const cpfSomenteNumeros = cpfComprador.replace(/\D/g, "");
 
     if (!titulo) {
       return NextResponse.json(
@@ -210,16 +218,32 @@ export async function POST(request: Request) {
       );
     }
 
-    const modalidadeEntrega = obterModalidadeEntrega(body);
-    const retiradaNoLocal = ehRetiradaNoLocal(modalidadeEntrega);
+    if (!nomeComprador) {
+      return NextResponse.json(
+        {
+          error: "Informe o nome do comprador para reservar a camisa.",
+        },
+        { status: 400 },
+      );
+    }
 
-    const valorFrete = retiradaNoLocal ? 0 : FRETE_LOCAL_SERGIPE;
+    if (cpfSomenteNumeros.length !== 11) {
+      return NextResponse.json(
+        {
+          error: "Informe um CPF válido para retirada da camisa no evento.",
+        },
+        { status: 400 },
+      );
+    }
 
-    const dataDisponivelISO = retiradaNoLocal
-      ? somarDiasISO(DIAS_DISPONIVEL_RETIRADA)
-      : somarDiasISO(DIAS_DISPONIVEL_ENTREGA);
+    const modalidadeEntrega = "retirada_evento";
+    const retiradaNoLocal = true;
 
-    const dataDisponivel = formatarDataBrasil(dataDisponivelISO);
+    const valorFrete = 0;
+
+    const dataDisponivelISO = somarDiasISO(DIAS_DISPONIVEL_RETIRADA);
+
+    const dataDisponivel = ENTREGA_CAMISA_EVENTO_TEXTO;
 
     const ingressosSimbolicos =
       numeroOuNull(body.ingressosSimbolicos) ??
@@ -273,6 +297,10 @@ export async function POST(request: Request) {
       nome: nomeComprador,
       nomeComprador,
 
+      cpf: cpfComprador,
+      cpfComprador,
+      cpf_somente_numeros: cpfSomenteNumeros,
+
       email: emailComprador || null,
       emailComprador: emailComprador || null,
 
@@ -310,7 +338,8 @@ export async function POST(request: Request) {
       retirada_no_local: retiradaNoLocal,
       retiradaNoLocal,
 
-      tipoEntrega: retiradaNoLocal ? "Retirada no local" : "Entrega em Sergipe",
+      tipoEntrega: "Retirada no local do evento",
+      observacaoEntrega: ENTREGA_CAMISA_EVENTO_TEXTO,
       freteSergipe: Number(valorFrete.toFixed(2)),
     };
 
@@ -318,7 +347,7 @@ export async function POST(request: Request) {
       {
         id,
         title: `${titulo} - Tamanho ${tamanho}`,
-        description: `Camisa oficial Hot Dogueres. Disponível a partir de ${dataDisponivel}.`,
+        description: `Camisa oficial Hot Dogueres. ${ENTREGA_CAMISA_EVENTO_TEXTO}`,
         quantity: quantidade,
         unit_price: Number(valorUnitario.toFixed(2)),
         currency_id: "BRL",
@@ -359,7 +388,7 @@ export async function POST(request: Request) {
 
         back_urls: {
           success: `${baseUrl}/pagamento/sucesso?${paramsSucesso.toString()}`,
-          failure: `${baseUrl}/pagamento/erro`,
+          failure: `${baseUrl}/pagamento/falha`,
           pending: `${baseUrl}/pagamento/pendente`,
         },
 
@@ -406,6 +435,7 @@ export async function POST(request: Request) {
       produto: titulo,
 
       nome_comprador: nomeComprador,
+      cpf: cpfSomenteNumeros,
       email_comprador: emailComprador || null,
       whatsapp,
 
@@ -419,10 +449,8 @@ export async function POST(request: Request) {
 
       modalidade_entrega: modalidadeEntrega,
       retirada_no_local: retiradaNoLocal,
-      servico_frete: retiradaNoLocal ? "Retirada no local" : "Entrega em Sergipe",
-      prazo_frete: retiradaNoLocal
-        ? `Disponível a partir de ${dataDisponivel}`
-        : `Entrega a partir de ${dataDisponivel}`,
+      servico_frete: "Retirada no local do evento",
+      prazo_frete: ENTREGA_CAMISA_EVENTO_TEXTO,
 
       status: "aguardando_pagamento",
 
