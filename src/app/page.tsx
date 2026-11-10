@@ -8,7 +8,7 @@ import SetasNavegacao from "@/components/SetasNavegacao";
 import SecaoCalendario2027 from "@/components/SecaoCalendario2027";
 import { TermometroImpacto } from "@/components/TermometroImpacto";
 import { TermometroRacao } from "@/components/TermometroRacao";
-
+import SecaoCamisasEventos from "@/components/SecaoCamisasEventos";
 
 const META_DOACAO_KG = 104000;
 const ALIMENTOS_ARRECADADOS_ATUAL_KG = 0;
@@ -53,44 +53,6 @@ const PATROCINADORES = [
     nome: "Patrocinador 03",
     video: "/patrocinadores/patrocinador-03.mp4",
     contato: "Adicionar contato",
-  },
-];
-
-const VALOR_CAMISA_EVENTO = 60;
-const INGRESSOS_SIMBOLICOS_POR_CAMISA = 3;
-const KG_ALIMENTOS_POR_CAMISA = 3;
-
-type TamanhoCamisa = "P" | "M" | "G" | "GG";
-
-type CamisaEvento = {
-  id: string;
-  titulo: string;
-  descricao: string;
-  imagem: string;
-  valor?: number;
-};
-
-type CamisasSelecionadas = Record<
-  string,
-  {
-    quantidade: number;
-    tamanho: TamanhoCamisa;
-  }
->;
-
-const CAMISAS_EVENTOS: CamisaEvento[] = [
-  {
-    id: "camisa-ecossistema-hot-dogueres-apresentacao",
-    titulo: "Camisa Ecossistema Hot Dogueres",
-    descricao:
-      "Camisa oficial do evento Apresentação do Ecossistema Hot Dogueres.",
-    imagem: "/camisas/camisa-ecossistema-hot-dogueres-apresentacao.png",
-  },
-  {
-    id: "camisa-gastronomia-que-salva-vidas",
-    titulo: "Camisa Gastronomia que Salva Vidas",
-    descricao: "Camisa do projeto Gastronomia que Salva Vidas.",
-    imagem: "/camisas/camisa-gastronomia-que-salva-vidas.png",
   },
 ];
 
@@ -682,8 +644,6 @@ function SecaoIngressoApresentacaoDoEcossistemaHotDogueres({
 }
 
 export default function HomePage() {
-  const [camisasSelecionadas, setCamisasSelecionadas] =
-    useState<CamisasSelecionadas>({});
 
   const [contadorCarregado, setContadorCarregado] = useState(false);
 
@@ -713,25 +673,9 @@ export default function HomePage() {
     return total + (quantidadesAlimentos[kit.id] || 0) * kit.pesoKg;
   }, 0);
 
-
-  const totalCamisasSelecionadas = CAMISAS_EVENTOS.reduce((total, camisa) => {
-    return total + (camisasSelecionadas[camisa.id]?.quantidade || 0);
-  }, 0);
-
-  const ingressosSimbolicosCamisasSelecionadas =
-    totalCamisasSelecionadas * INGRESSOS_SIMBOLICOS_POR_CAMISA;
-
-  const kgCamisasSelecionadas =
-    totalCamisasSelecionadas * KG_ALIMENTOS_POR_CAMISA;
-
-  const ingressosVendidosParaExibicao =
-    ingressosVendidos + ingressosSimbolicosCamisasSelecionadas;
-
-  const kgAlimentosTermometro =
-    ALIMENTOS_ARRECADADOS_ATUAL_KG +
-    ingressosVendidos +
-    kgAlimentosSelecionados +
-    kgCamisasSelecionadas;
+const kgAlimentosTermometro =
+  ALIMENTOS_ARRECADADOS_ATUAL_KG + ingressosVendidos + kgAlimentosSelecionados;
+const ingressosVendidosParaExibicao = ingressosVendidos;
 
 
   const patrocinador = PATROCINADORES[patrocinadorAtual];
@@ -762,84 +706,6 @@ export default function HomePage() {
         [id]: novaQuantidade,
       };
     });
-  }
-
-  function alterarQuantidadeCamisa(id: string, valor: number) {
-    setCamisasSelecionadas((estadoAtual) => {
-      const camisaAtual = estadoAtual[id] || {
-        quantidade: 0,
-        tamanho: "M" as TamanhoCamisa,
-      };
-
-      const novaQuantidade = Math.max(0, camisaAtual.quantidade + valor);
-
-      return {
-        ...estadoAtual,
-        [id]: {
-          ...camisaAtual,
-          quantidade: novaQuantidade,
-        },
-      };
-    });
-  }
-
-  function alterarTamanhoCamisa(id: string, tamanho: TamanhoCamisa) {
-    setCamisasSelecionadas((estadoAtual) => {
-      const camisaAtual = estadoAtual[id] || {
-        quantidade: 1,
-        tamanho,
-      };
-
-      return {
-        ...estadoAtual,
-        [id]: {
-          ...camisaAtual,
-          tamanho,
-        },
-      };
-    });
-  }
-
-  async function comprarCamisa(camisa: CamisaEvento) {
-    const selecao = camisasSelecionadas[camisa.id];
-
-    const quantidade = selecao?.quantidade || 1;
-    const tamanho = selecao?.tamanho || "M";
-
-    try {
-      const resposta = await fetch("/api/checkout/camisas", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: camisa.id,
-          titulo: camisa.titulo,
-          quantidade,
-          tamanho,
-          valorUnitario: VALOR_CAMISA_EVENTO,
-          ingressosSimbolicos: quantidade * INGRESSOS_SIMBOLICOS_POR_CAMISA,
-          kgAlimentos: quantidade * KG_ALIMENTOS_POR_CAMISA,
-        }),
-      });
-
-      const dados = await resposta.json();
-
-      console.log("Resposta checkout camisas:", dados);
-
-      const linkPagamento =
-        dados.initPoint || dados.init_point || dados.sandbox_init_point;
-
-      if (linkPagamento) {
-        window.location.href = linkPagamento;
-        return;
-      }
-
-      alert("Não foi possível iniciar o pagamento. Link de pagamento não retornado.");
-    } catch (erro) {
-      console.error("Erro ao comprar camisa:", erro);
-      alert("Erro ao conectar com o pagamento. Tente novamente.");
-    }
   }
 
   useEffect(() => {
@@ -1175,171 +1041,7 @@ export default function HomePage() {
               </Link>
             </article>
 
-            {CAMISAS_EVENTOS.map((camisa, index) => {
-              const selecao = camisasSelecionadas[camisa.id];
-              const quantidadeSelecionada = selecao?.quantidade || 1;
-              const quantidadeCompra = quantidadeSelecionada;
-              const tamanhoSelecionado = selecao?.tamanho || "M";
-
-              const valorTotal = quantidadeCompra * VALOR_CAMISA_EVENTO;
-              const ingressosTotal =
-                quantidadeCompra * INGRESSOS_SIMBOLICOS_POR_CAMISA;
-              const kgTotal = quantidadeCompra * KG_ALIMENTOS_POR_CAMISA;
-
-              const primeiraCamisa = index === 0;
-
-              return (
-                <article
-                  key={camisa.id}
-                  className={`rounded-[2rem] bg-white p-5 shadow-xl ring-1 ${
-                    primeiraCamisa ? "ring-red-100" : "ring-green-100"
-                  }`}
-                >
-                  <p
-                    className={`inline-flex rounded-full px-4 py-2 text-xs font-black uppercase tracking-wide ${
-                      primeiraCamisa
-                        ? "bg-gray-950 text-white"
-                        : "bg-green-600 text-white"
-                    }`}
-                  >
-                    Camisa oficial do evento
-                  </p>
-
-                  <h2 className="mt-4 text-2xl font-black leading-tight text-gray-950">
-                    {camisa.titulo}
-                  </h2>
-
-                  <p className="mt-3 text-sm leading-relaxed text-gray-700">
-                    {camisa.descricao}
-                  </p>
-
-                  <div className="relative mt-5 h-72 overflow-hidden rounded-[1.5rem] bg-gray-50 shadow-inner">
-                    <Image
-                      src={camisa.imagem}
-                      alt={camisa.titulo}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 520px"
-                      className="object-contain p-3"
-                      unoptimized
-                    />
-                  </div>
-
-                  <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                    <div className="rounded-2xl bg-gray-50 p-4 text-center shadow-sm">
-                      <p className="text-[10px] font-black uppercase text-gray-500">
-                        Valor
-                      </p>
-
-                      <p className="mt-1 text-2xl font-black text-red-600">
-                        {formatarMoeda(VALOR_CAMISA_EVENTO)}
-                      </p>
-                    </div>
-
-                    <div className="rounded-2xl bg-yellow-50 p-4 text-center shadow-sm">
-                      <p className="text-[10px] font-black uppercase text-gray-500">
-                        Ingressos
-                      </p>
-
-                      <p className="mt-1 text-2xl font-black text-gray-950">
-                        +{ingressosTotal}
-                      </p>
-                    </div>
-
-                    <div className="rounded-2xl bg-green-50 p-4 text-center shadow-sm">
-                      <p className="text-[10px] font-black uppercase text-gray-500">
-                        Alimentos
-                      </p>
-
-                      <p className="mt-1 text-2xl font-black text-green-700">
-                        +{kgTotal} kg
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-5 rounded-2xl bg-gray-50 p-4 shadow-sm">
-                    <p className="text-[10px] font-black uppercase tracking-wide text-gray-500">
-                      Escolha o tamanho
-                    </p>
-
-                    <div className="mt-3 grid grid-cols-4 gap-2">
-                      {(["P", "M", "G", "GG"] as TamanhoCamisa[]).map(
-                        (tamanho) => (
-                          <button
-                            key={tamanho}
-                            type="button"
-                            onClick={() =>
-                              alterarTamanhoCamisa(camisa.id, tamanho)
-                            }
-                            className={`rounded-full px-4 py-3 text-sm font-black transition ${
-                              tamanhoSelecionado === tamanho
-                                ? primeiraCamisa
-                                  ? "bg-red-600 text-white shadow-md"
-                                  : "bg-green-600 text-white shadow-md"
-                                : "bg-white text-gray-950 hover:bg-red-50"
-                            }`}
-                          >
-                            {tamanho}
-                          </button>
-                        ),
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="mt-5 flex items-center justify-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => alterarQuantidadeCamisa(camisa.id, -1)}
-                      className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-xl font-black text-red-600 shadow-md transition hover:bg-red-100"
-                    >
-                      -
-                    </button>
-
-                    <span className="min-w-10 text-center text-2xl font-black text-gray-950">
-                      {quantidadeSelecionada}
-                    </span>
-
-                    <button
-                      type="button"
-                      onClick={() => alterarQuantidadeCamisa(camisa.id, 1)}
-                      className={`flex h-10 w-10 items-center justify-center rounded-full text-xl font-black text-white shadow-md transition ${
-                        primeiraCamisa
-                          ? "bg-red-600 hover:bg-red-700"
-                          : "bg-green-600 hover:bg-green-700"
-                      }`}
-                    >
-                      +
-                    </button>
-                  </div>
-
-                  <div className="mt-5 rounded-2xl bg-gray-50 p-4 text-center shadow-sm">
-                    <p className="text-[10px] font-black uppercase text-gray-500">
-                      Total da compra
-                    </p>
-
-                    <p className="mt-1 text-2xl font-black text-gray-950">
-                      {formatarMoeda(valorTotal)}
-                    </p>
-
-                    <p className="mt-1 text-xs font-bold text-green-700">
-                      {ingressosTotal} ingressos simbólicos + {kgTotal} kg de
-                      alimentos
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => comprarCamisa(camisa)}
-                    className={`mt-5 flex w-full justify-center rounded-full px-5 py-3 text-xs font-black uppercase tracking-wide text-white shadow-lg transition ${
-                      primeiraCamisa
-                        ? "bg-gray-950 hover:bg-gray-800"
-                        : "bg-green-600 hover:bg-green-700"
-                    }`}
-                  >
-                    Comprar camisa no Mercado Pago
-                  </button>
-                </article>
-              );
-            })}
+           
           </div>
 
           <div className="mt-6 rounded-[2rem] bg-gray-950 p-5 text-white shadow-xl md:p-8">
