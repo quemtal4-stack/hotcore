@@ -127,7 +127,7 @@ export default function ClubeDeMembrosPage() {
   },
   {
     nome: "Eternizado",
-    preco: "R$ 497,00",
+    preco: "R$ 499,90",
     periodo: "/ano",
     destaque: false,
     descricao:

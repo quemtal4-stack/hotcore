@@ -9,18 +9,16 @@ import SecaoCalendario2027 from "@/components/SecaoCalendario2027";
 import { TermometroImpacto } from "@/components/TermometroImpacto";
 import { TermometroRacao } from "@/components/TermometroRacao";
 import SecaoCamisasEventos from "@/components/SecaoCamisasEventos";
+import SecaoIngressosEventos from "@/components/SecaoIngressosEventos";
 
 const META_DOACAO_KG = 106000;
 const ALIMENTOS_ARRECADADOS_ATUAL_KG = 0;
-
 
 const CHECKOUT_ALIMENTO_URL = "/checkout/alimentos";
 const CHECKOUT_RACAO_URL = "/checkout/racao";
 const CHECKOUT_LIVROS_URL = "/checkout/livros";
 
-const TOTAL_INGRESSOS_APRESENTACAO_DO_ECOSSISTEMA_HOT_DOGUERES = 25000;
 const INGRESSOS_VENDIDOS_APRESENTACAO_DO_ECOSSISTEMA_HOT_DOGUERES = 0;
-const VALOR_INGRESSO_APRESENTACAO_DO_ECOSSISTEMA_HOT_DOGUERES = 20;
 
 const DATA_EVENTO = new Date("2026-12-12T17:00:00-03:00");
 
@@ -490,161 +488,7 @@ function montarLinkCompraLivro({
   return `${CHECKOUT_LIVROS_URL}?${parametros.toString()}`;
 }
 
-type SecaoIngressoApresentacaoDoEcossistemaHotDogueresProps = {
-  kgDoados: number;
-  metaKg: number;
-  ingressosVendidos: number;
-};
-
-function SecaoIngressoApresentacaoDoEcossistemaHotDogueres({
-  kgDoados,
-  metaKg,
-  ingressosVendidos,
-}: SecaoIngressoApresentacaoDoEcossistemaHotDogueresProps) {
-  const percentualMeta =
-    metaKg > 0 ? Math.min((kgDoados / metaKg) * 100, 100) : 0;
-
-  const ingressosRestantes = Math.max(
-    TOTAL_INGRESSOS_APRESENTACAO_DO_ECOSSISTEMA_HOT_DOGUERES -
-      ingressosVendidos,
-    0,
-  );
-
-  const totalArrecadado =
-    ingressosVendidos *
-    VALOR_INGRESSO_APRESENTACAO_DO_ECOSSISTEMA_HOT_DOGUERES;
-
-  const porcentagemVendida = Math.min(
-    (ingressosVendidos /
-      TOTAL_INGRESSOS_APRESENTACAO_DO_ECOSSISTEMA_HOT_DOGUERES) *
-      100,
-    100,
-  );
-
-  const linkCadastro = `/cadastro?${new URLSearchParams({
-    tipo: "apresentacao-do-ecossistema-hot-dogueres",
-    ingressos: "1",
-  }).toString()}`;
-
-  return (
-    <section className="mx-auto max-w-6xl rounded-[2rem] bg-white p-5 shadow-xl ring-1 ring-red-100 md:p-6">
-      <div className="grid gap-6 lg:grid-cols-[1fr_0.8fr] lg:items-center">
-        <div>
-          <p className="inline-flex rounded-full bg-red-600 px-5 py-2 text-xs font-black uppercase tracking-wide text-white">
-            Ingresso oficial
-          </p>
-
-          <h2 className="mt-4 text-3xl font-black leading-tight text-gray-950 md:text-4xl">
-            Apresentação do Ecossistema Hot Dogueres
-          </h2>
-
-          <p className="mt-3 text-sm leading-relaxed text-gray-700">
-            Garanta seu ingresso para o primeiro grande encontro do Ecossistema
-            Hot Dogueres. Cada ingresso fortalece a campanha solidária e ajuda a
-            movimentar a meta de alimentos.
-          </p>
-
-          <div className="mt-5 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-2xl bg-red-50 p-4 text-center">
-              <p className="text-[10px] font-black uppercase text-gray-500">
-                Valor
-              </p>
-
-              <p className="mt-1 text-2xl font-black text-red-600">
-                {formatarMoeda(
-                  VALOR_INGRESSO_APRESENTACAO_DO_ECOSSISTEMA_HOT_DOGUERES,
-                )}
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-yellow-50 p-4 text-center">
-              <p className="text-[10px] font-black uppercase text-gray-500">
-                Restantes
-              </p>
-
-              <p className="mt-1 text-2xl font-black text-gray-950">
-                {ingressosRestantes.toLocaleString("pt-BR")}
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-green-50 p-4 text-center">
-              <p className="text-[10px] font-black uppercase text-gray-500">
-                Arrecadado
-              </p>
-
-              <p className="mt-1 text-2xl font-black text-green-700">
-                {formatarMoeda(totalArrecadado)}
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-5">
-            <div className="mb-2 flex items-center justify-between text-[10px] font-black uppercase text-gray-500">
-              <span>Ingressos vendidos</span>
-              <span>{porcentagemVendida.toFixed(0)}%</span>
-            </div>
-
-            <div className="h-3 overflow-hidden rounded-full bg-red-50">
-              <div
-                className="h-full rounded-full bg-red-600 transition-all"
-                style={{
-                  width: `${porcentagemVendida}%`,
-                }}
-              />
-            </div>
-
-            <p className="mt-2 text-xs font-bold text-gray-600">
-              {ingressosVendidos.toLocaleString("pt-BR")} ingressos
-              contabilizados
-            </p>
-          </div>
-
-          <div className="mt-5">
-            <div className="mb-2 flex items-center justify-between text-[10px] font-black uppercase text-gray-500">
-              <span>Meta solidária</span>
-              <span>{percentualMeta.toFixed(0)}%</span>
-            </div>
-
-            <div className="h-3 overflow-hidden rounded-full bg-yellow-50">
-              <div
-                className="h-full rounded-full bg-yellow-400 transition-all"
-                style={{
-                  width: `${percentualMeta}%`,
-                }}
-              />
-            </div>
-
-            <p className="mt-2 text-xs font-bold text-gray-600">
-              {kgDoados.toLocaleString("pt-BR")} kg de{" "}
-              {metaKg.toLocaleString("pt-BR")} kg
-            </p>
-          </div>
-
-          <Link
-            href={linkCadastro}
-            className="mt-6 flex w-full justify-center rounded-full bg-red-600 px-6 py-4 text-sm font-black uppercase tracking-wide text-white shadow-lg transition hover:bg-red-700"
-          >
-            Comprar ingresso
-          </Link>
-        </div>
-
-        <div className="relative h-96 overflow-hidden rounded-[1.5rem] bg-gray-50 shadow-inner">
-          <Image
-            src="/ingressos/apresentacao-do-ecossistema-hot-dogueres-2026.png"
-            alt="Ingresso Apresentação do Ecossistema Hot Dogueres 2026"
-            fill
-            sizes="(max-width: 1024px) 100vw, 480px"
-            className="object-contain p-3"
-            unoptimized
-          />
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export default function HomePage() {
-
   const [contadorCarregado, setContadorCarregado] = useState(false);
 
   const [tempoRestante, setTempoRestante] = useState<TempoRestante>({
@@ -673,10 +517,12 @@ export default function HomePage() {
     return total + (quantidadesAlimentos[kit.id] || 0) * kit.pesoKg;
   }, 0);
 
-const kgAlimentosTermometro =
-  ALIMENTOS_ARRECADADOS_ATUAL_KG + ingressosVendidos + kgAlimentosSelecionados;
-const ingressosVendidosParaExibicao = ingressosVendidos;
+  const kgAlimentosTermometro =
+    ALIMENTOS_ARRECADADOS_ATUAL_KG +
+    ingressosVendidos +
+    kgAlimentosSelecionados;
 
+  const ingressosVendidosParaExibicao = ingressosVendidos;
 
   const patrocinador = PATROCINADORES[patrocinadorAtual];
 
@@ -735,7 +581,6 @@ const ingressosVendidosParaExibicao = ingressosVendidos;
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#fff7e8] text-gray-950">
-
       <SetasNavegacao
         proxima="/nossa-historia"
         labelProxima="Ir para Nossa História"
@@ -765,78 +610,120 @@ const ingressosVendidosParaExibicao = ingressosVendidos;
             ))}
           </Link>
 
-         <nav className="flex w-full flex-wrap items-center justify-center gap-3 text-center text-xs font-black uppercase tracking-wide md:grid md:grid-cols-4">
-  {/* Sempre visíveis, inclusive no celular */}
-  <Link
-    href="/clube-de-membros"
-    className="w-full max-w-xs rounded-2xl bg-red-600 px-4 py-3 text-center text-white shadow-sm transition hover:bg-red-700"
-  >
-    Clube de Membros
-  </Link>
-{/* Menu "Mais" — some no desktop, aparece como dropdown no mobile */}
-  <details className="group relative w-full max-w-xs md:hidden">
-    <summary className="flex w-full cursor-pointer list-none items-center justify-center gap-1 rounded-2xl bg-gray-950 px-4 py-3 text-center text-white shadow-sm">
-      Mais ▾
-    </summary>
+          <nav className="flex w-full flex-wrap items-center justify-center gap-3 text-center text-xs font-black uppercase tracking-wide md:grid md:grid-cols-4">
+            <Link
+              href="/clube-de-membros"
+              className="w-full max-w-xs rounded-2xl bg-red-600 px-4 py-3 text-center text-white shadow-sm transition hover:bg-red-700 md:rounded-full"
+            >
+              Clube de Membros
+            </Link>
 
-  <Link
-    href="/ranking-do-bem"
-    className="w-full max-w-xs rounded-2xl bg-yellow-400 px-4 py-3 text-center text-gray-950 shadow-sm transition hover:bg-yellow-500"
-  >
-    Ranking do Bem
-  </Link>
+            <details className="group relative w-full max-w-xs md:hidden">
+              <summary className="flex w-full cursor-pointer list-none items-center justify-center gap-1 rounded-2xl bg-gray-950 px-4 py-3 text-center text-white shadow-sm">
+                Mais ▾
+              </summary>
 
-  <Link
-    href="/loja-solidaria"
-    className="w-full max-w-xs rounded-2xl border border-red-200 bg-white px-4 py-3 text-center text-red-600 shadow-sm transition hover:bg-red-50"
-  >
-    Loja Solidária
-  </Link>
+              <div className="absolute left-0 right-0 z-30 mt-2 flex flex-col gap-2 rounded-2xl bg-white p-3 text-center shadow-xl ring-1 ring-gray-100">
+                <Link
+                  href="/ranking-do-bem"
+                  className="rounded-2xl bg-yellow-400 px-4 py-3 text-center leading-tight text-gray-950 hover:bg-yellow-500"
+                >
+                  Ranking do Bem
+                </Link>
 
-    <div className="absolute left-0 right-0 z-30 mt-2 flex flex-col gap-2 rounded-2xl bg-white p-3 text-center shadow-xl ring-1 ring-gray-100">
-      <Link href="/nossa-historia" className="rounded-2xl border border-red-200 px-4 py-3 text-center leading-tight text-red-600 hover:bg-red-50">
-        Nossa História
-      </Link>
-      <Link href="/area-do-colecionador" className="rounded-2xl bg-gray-950 px-4 py-3 text-center leading-tight text-white hover:bg-gray-800">
-        Área do Colecionador
-      </Link>
-      <Link href="/impacto-social" className="rounded-2xl bg-green-600 px-4 py-3 text-center leading-tight text-white hover:bg-green-700">
-        Impacto Social
-      </Link>
-      <Link href="/parceiros-empresas" className="rounded-2xl bg-blue-700 px-4 py-3 text-center leading-tight text-white hover:bg-blue-800">
-        Área do Parceiro
-      </Link>
-      <Link href="/calendario-2027" className="rounded-2xl bg-purple-700 px-4 py-3 text-center leading-tight text-white hover:bg-purple-800">
-        Calendário 2027
-      </Link>
-    </div>
-  </details>
+                <Link
+                  href="/loja-solidaria"
+                  className="rounded-2xl border border-red-200 px-4 py-3 text-center leading-tight text-red-600 hover:bg-red-50"
+                >
+                  Loja Solidária
+                </Link>
 
-  {/* No desktop, mostra todos os botões direto (sem o "Mais") */}
-  <Link href="/ranking-do-bem" className="hidden rounded-full bg-yellow-400 px-4 py-3 text-gray-950 shadow-sm transition hover:bg-yellow-500 md:block">
-    Ranking do Bem
-  </Link>
-  <Link href="/loja-solidaria" className="hidden rounded-full border border-red-200 bg-white px-4 py-3 text-red-600 shadow-sm transition hover:bg-red-50 md:block">
-    Loja Solidária
-  </Link>
-  <Link href="/nossa-historia" className="hidden rounded-full border border-red-200 bg-white px-4 py-3 text-red-600 shadow-sm transition hover:bg-red-50 md:block">
-    Nossa História
-  </Link>
+                <Link
+                  href="/nossa-historia"
+                  className="rounded-2xl border border-red-200 px-4 py-3 text-center leading-tight text-red-600 hover:bg-red-50"
+                >
+                  Nossa História
+                </Link>
 
-  <Link href="/area-do-colecionador" className="hidden rounded-full bg-gray-950 px-4 py-3 text-white shadow-sm transition hover:bg-gray-800 md:block">
-    Área do Colecionador
-  </Link>
-  <Link href="/impacto-social" className="hidden rounded-full bg-green-600 px-4 py-3 text-white shadow-sm transition hover:bg-green-700 md:block">
-    Impacto Social
-  </Link>
-  <Link href="/parceiros-empresas" className="hidden rounded-full bg-blue-700 px-4 py-3 text-white shadow-sm transition hover:bg-blue-800 md:block">
-    Área do Parceiro
-  </Link>
-  <Link href="/calendario-2027" className="hidden rounded-full bg-purple-700 px-4 py-3 text-white shadow-sm transition hover:bg-purple-800 md:block">
-    Calendário 2027
-  </Link>
-</nav>
+                <Link
+                  href="/area-do-colecionador"
+                  className="rounded-2xl bg-gray-950 px-4 py-3 text-center leading-tight text-white hover:bg-gray-800"
+                >
+                  Área do Colecionador
+                </Link>
 
+                <Link
+                  href="/impacto-social"
+                  className="rounded-2xl bg-green-600 px-4 py-3 text-center leading-tight text-white hover:bg-green-700"
+                >
+                  Impacto Social
+                </Link>
+
+                <Link
+                  href="/parceiros-empresas"
+                  className="rounded-2xl bg-blue-700 px-4 py-3 text-center leading-tight text-white hover:bg-blue-800"
+                >
+                  Área do Parceiro
+                </Link>
+
+                <Link
+                  href="/calendario-2027"
+                  className="rounded-2xl bg-purple-700 px-4 py-3 text-center leading-tight text-white hover:bg-purple-800"
+                >
+                  Calendário 2027
+                </Link>
+              </div>
+            </details>
+
+            <Link
+              href="/ranking-do-bem"
+              className="hidden rounded-full bg-yellow-400 px-4 py-3 text-gray-950 shadow-sm transition hover:bg-yellow-500 md:block"
+            >
+              Ranking do Bem
+            </Link>
+
+            <Link
+              href="/loja-solidaria"
+              className="hidden rounded-full border border-red-200 bg-white px-4 py-3 text-red-600 shadow-sm transition hover:bg-red-50 md:block"
+            >
+              Loja Solidária
+            </Link>
+
+            <Link
+              href="/nossa-historia"
+              className="hidden rounded-full border border-red-200 bg-white px-4 py-3 text-red-600 shadow-sm transition hover:bg-red-50 md:block"
+            >
+              Nossa História
+            </Link>
+
+            <Link
+              href="/area-do-colecionador"
+              className="hidden rounded-full bg-gray-950 px-4 py-3 text-white shadow-sm transition hover:bg-gray-800 md:block"
+            >
+              Área do Colecionador
+            </Link>
+
+            <Link
+              href="/impacto-social"
+              className="hidden rounded-full bg-green-600 px-4 py-3 text-white shadow-sm transition hover:bg-green-700 md:block"
+            >
+              Impacto Social
+            </Link>
+
+            <Link
+              href="/parceiros-empresas"
+              className="hidden rounded-full bg-blue-700 px-4 py-3 text-white shadow-sm transition hover:bg-blue-800 md:block"
+            >
+              Área do Parceiro
+            </Link>
+
+            <Link
+              href="/calendario-2027"
+              className="hidden rounded-full bg-purple-700 px-4 py-3 text-white shadow-sm transition hover:bg-purple-800 md:block"
+            >
+              Calendário 2027
+            </Link>
+          </nav>
         </div>
       </header>
 
@@ -876,103 +763,103 @@ const ingressosVendidosParaExibicao = ingressosVendidos;
 
           <SecaoCalendario2027 />
 
-        <div className="mt-6 space-y-6">
-  <TermometroImpacto />
-  <TermometroRacao />
- <section className="flex w-full justify-center pb-8">
-  <div className="mx-auto w-full max-w-6xl overflow-hidden rounded-[2rem] border-4 border-red-600 bg-white text-center shadow-2xl">
-    <div className="grid w-full gap-0 lg:grid-cols-[0.85fr_1.15fr]">
+          <div className="mt-6 space-y-6">
+            <TermometroImpacto />
+            <TermometroRacao />
 
+            <section className="flex w-full justify-center pb-8">
+              <div className="mx-auto w-full max-w-6xl overflow-hidden rounded-[2rem] border-4 border-red-600 bg-white text-center shadow-2xl">
+                <div className="grid w-full gap-0 lg:grid-cols-[0.85fr_1.15fr]">
+                  <div className="relative flex min-h-[260px] items-center justify-center overflow-hidden bg-gradient-to-br from-red-700 via-red-600 to-yellow-400 p-6 text-center text-white md:p-8">
+                    <div className="absolute left-[-80px] top-[-80px] h-56 w-56 rounded-full bg-white/20 blur-3xl" />
+                    <div className="absolute bottom-[-100px] right-[-80px] h-64 w-64 rounded-full bg-black/25 blur-3xl" />
 
-      <div className="relative flex min-h-[260px] items-center justify-center overflow-hidden bg-gradient-to-br from-red-700 via-red-600 to-yellow-400 p-6 text-center text-white md:p-8">
-        <div className="absolute left-[-80px] top-[-80px] h-56 w-56 rounded-full bg-white/20 blur-3xl" />
-        <div className="absolute bottom-[-100px] right-[-80px] h-64 w-64 rounded-full bg-black/25 blur-3xl" />
+                    <div className="relative z-10 mx-auto flex max-w-md flex-col items-center">
+                      <div className="flex h-24 w-24 items-center justify-center rounded-full bg-white text-5xl shadow-2xl">
+                        🛡️
+                      </div>
 
-        <div className="relative z-10 mx-auto flex max-w-md flex-col items-center">
-          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-white text-5xl shadow-2xl">
-            🛡️
+                      <p className="mt-5 inline-flex rounded-full bg-black/35 px-5 py-2 text-center text-xs font-black uppercase tracking-[0.25em] text-white">
+                        Alerta oficial
+                      </p>
+
+                      <h2 className="mt-4 text-center text-4xl font-black leading-tight md:text-5xl">
+                        Cuidado com golpes
+                      </h2>
+
+                      <p className="mx-auto mt-3 max-w-sm text-center text-sm font-bold leading-relaxed text-white/90">
+                        Produtos Hot Dogueres só devem ser comprados pelo site
+                        oficial.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex w-full items-center justify-center bg-[#FFF8E7] p-5 text-center md:p-8 lg:justify-start lg:text-left">
+                    <div className="mx-auto w-full max-w-2xl">
+                      <p className="inline-flex rounded-full bg-red-100 px-4 py-2 text-center text-xs font-black uppercase tracking-[0.2em] text-red-700">
+                        Compra segura
+                      </p>
+
+                      <h3 className="mx-auto mt-5 max-w-2xl text-center text-2xl font-black leading-tight text-gray-950 sm:text-3xl md:text-4xl lg:mx-0 lg:text-left">
+                        Todos os produtos do ecossistema Hot Dogueres são
+                        vendidos apenas pelo site oficial.
+                      </h3>
+
+                      <div className="mx-auto mt-5 max-w-xl rounded-3xl border-2 border-dashed border-red-300 bg-white p-5 shadow-inner lg:mx-0">
+                        <p className="break-all text-center text-xl font-black text-red-700 sm:break-words sm:text-2xl md:text-3xl">
+                          www.hotdogueres.com.br
+                        </p>
+                      </div>
+
+                      <div className="mt-6 grid gap-4 md:grid-cols-2">
+                        <div className="mx-auto w-full max-w-md rounded-3xl bg-white p-5 text-center shadow-md md:max-w-none">
+                          <p className="text-lg font-black text-gray-950">
+                            A Hot Dogueres não aborda pessoas para vender
+                          </p>
+
+                          <p className="mt-2 text-sm font-bold leading-relaxed text-gray-700">
+                            Nós não mandamos mensagens privadas, não ligamos e
+                            não abordamos ninguém oferecendo ingressos, camisas,
+                            livros, kits de alimentação, kits de ração ou
+                            qualquer outro produto.
+                          </p>
+                        </div>
+
+                        <div className="mx-auto w-full max-w-md rounded-3xl bg-white p-5 text-center shadow-md md:max-w-none">
+                          <p className="text-lg font-black text-gray-950">
+                            Se alguém oferecer fora do site, é golpe
+                          </p>
+
+                          <p className="mt-2 text-sm font-bold leading-relaxed text-gray-700">
+                            Desconfie de perfis, números, links ou pessoas
+                            dizendo vender produtos Hot Dogueres fora do domínio
+                            oficial.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mx-auto mt-6 max-w-2xl rounded-3xl bg-gray-950 p-5 text-center text-white shadow-xl lg:mx-0">
+                        <p className="text-sm font-black uppercase tracking-[0.2em] text-yellow-300">
+                          Regra de segurança
+                        </p>
+
+                        <p className="mt-3 text-base font-bold leading-relaxed text-white/85">
+                          Antes de comprar qualquer produto do ecossistema Hot
+                          Dogueres, confirme se você está no site oficial:
+                          <strong className="text-yellow-300">
+                            {" "}
+                            www.hotdogueres.com.br
+                          </strong>
+                          . Qualquer venda fora dele deve ser considerada
+                          suspeita.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
-
-          <p className="mt-5 inline-flex rounded-full bg-black/35 px-5 py-2 text-center text-xs font-black uppercase tracking-[0.25em] text-white">
-            Alerta oficial
-          </p>
-
-          <h2 className="mt-4 text-center text-4xl font-black leading-tight md:text-5xl">
-            Cuidado com golpes
-          </h2>
-
-          <p className="mx-auto mt-3 max-w-sm text-center text-sm font-bold leading-relaxed text-white/90">
-            Produtos Hot Dogueres só devem ser comprados pelo site oficial.
-          </p>
-        </div>
-      </div>
-
-  <div className="flex w-full items-center justify-center bg-[#FFF8E7] p-5 text-center md:p-8 lg:justify-start lg:text-left">
-  <div className="mx-auto w-full max-w-2xl">
-
-
-          <p className="inline-flex rounded-full bg-red-100 px-4 py-2 text-center text-xs font-black uppercase tracking-[0.2em] text-red-700">
-            Compra segura
-          </p>
-
-          <h3 className="mx-auto mt-5 max-w-2xl text-center text-2xl font-black leading-tight text-gray-950 sm:text-3xl md:text-4xl lg:mx-0 lg:text-left">
-
-            Todos os produtos do ecossistema Hot Dogueres são vendidos apenas
-            pelo site oficial.
-          </h3>
-
-          <div className="mx-auto mt-5 max-w-xl rounded-3xl border-2 border-dashed border-red-300 bg-white p-5 shadow-inner lg:mx-0">
-            <p className="break-all text-center text-xl font-black text-red-700 sm:break-words sm:text-2xl md:text-3xl">
-
-              www.hotdogueres.com.br
-            </p>
-          </div>
-
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            <div className="mx-auto w-full max-w-md rounded-3xl bg-white p-5 text-center shadow-md md:max-w-none">
-              <p className="text-lg font-black text-gray-950">
-                A Hot Dogueres não aborda pessoas para vender
-              </p>
-
-              <p className="mt-2 text-sm font-bold leading-relaxed text-gray-700">
-                Nós não mandamos mensagens privadas, não ligamos e não
-                abordamos ninguém oferecendo ingressos, camisas, livros, kits
-                de alimentação, kits de ração ou qualquer outro produto.
-              </p>
-            </div>
-
-            <div className="mx-auto w-full max-w-md rounded-3xl bg-white p-5 text-center shadow-md md:max-w-none">
-              <p className="text-lg font-black text-gray-950">
-                Se alguém oferecer fora do site, é golpe
-              </p>
-
-              <p className="mt-2 text-sm font-bold leading-relaxed text-gray-700">
-                Desconfie de perfis, números, links ou pessoas dizendo vender
-                produtos Hot Dogueres fora do domínio oficial.
-              </p>
-            </div>
-          </div>
-
-          <div className="mx-auto mt-6 max-w-2xl rounded-3xl bg-gray-950 p-5 text-center text-white shadow-xl lg:mx-0">
-            <p className="text-sm font-black uppercase tracking-[0.2em] text-yellow-300">
-              Regra de segurança
-            </p>
-
-            <p className="mt-3 text-base font-bold leading-relaxed text-white/85">
-              Antes de comprar qualquer produto do ecossistema Hot Dogueres,
-              confirme se você está no site oficial:
-              <strong className="text-yellow-300"> www.hotdogueres.com.br</strong>.
-              Qualquer venda fora dele deve ser considerada suspeita.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-</div>
 
           <div className="mt-6 grid gap-5 lg:grid-cols-2">
             <article className="rounded-[2rem] bg-white p-5 shadow-xl ring-1 ring-red-100">
@@ -1038,11 +925,10 @@ const ingressosVendidosParaExibicao = ingressosVendidos;
                 className="mt-5 flex w-full justify-center rounded-full bg-yellow-400 px-5 py-3 text-xs font-black uppercase tracking-wide text-gray-950 shadow-lg transition hover:bg-yellow-500"
               >
                 Ver ingresso
-               
               </Link>
             </article>
 
-           <SecaoCamisasEventos />
+            <SecaoCamisasEventos />
           </div>
 
           <div className="mt-6 rounded-[2rem] bg-gray-950 p-5 text-white shadow-xl md:p-8">
@@ -1103,7 +989,7 @@ const ingressosVendidosParaExibicao = ingressosVendidos;
       </section>
 
       <div id="ingressos" className="scroll-mt-28 space-y-8 px-4 pb-8">
-        <SecaoIngressoApresentacaoDoEcossistemaHotDogueres
+        <SecaoIngressosEventos
           kgDoados={kgAlimentosTermometro}
           metaKg={META_DOACAO_KG}
           ingressosVendidos={ingressosVendidosParaExibicao}
@@ -1113,8 +999,7 @@ const ingressosVendidosParaExibicao = ingressosVendidos;
       </div>
 
       <section id="livros" className="scroll-mt-28 px-4 pb-8">
-       <div className="mx-auto max-w-6xl translate-x-2 overflow-hidden rounded-[2rem] border-4 border-red-600 bg-white shadow-2xl sm:translate-x-3 lg:translate-x-0">
-
+        <div className="mx-auto max-w-6xl translate-x-2 overflow-hidden rounded-[2rem] border-4 border-red-600 bg-white p-5 shadow-2xl sm:translate-x-3 md:p-6 lg:translate-x-0">
           <div className="text-center">
             <p className="inline-flex rounded-full bg-purple-700 px-5 py-2 text-xs font-black uppercase tracking-wide text-white">
               Livros colecionáveis
@@ -1163,9 +1048,9 @@ const ingressosVendidosParaExibicao = ingressosVendidos;
           </div>
 
           <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-  <input type="checkbox" id="toggle-livros-mobile" className="peer hidden" />
-  {LIVROS_PREVENDA.map((livro, index) => {
+            <input type="checkbox" id="toggle-livros-mobile" className="peer hidden" />
 
+            {LIVROS_PREVENDA.map((livro, index) => {
               const compraLiberada = livroEstaLiberadoParaCompra(livro);
               const statusLivro = textoStatusLivro(livro);
               const valorCompra = valorPrincipalLivro(livro);
@@ -1173,7 +1058,7 @@ const ingressosVendidosParaExibicao = ingressosVendidos;
               const textoEntrega = textoEntregaLivro(livro);
 
               return (
-               <article
+                <article
                   key={livro.id}
                   className={`group relative z-0 flex flex-col rounded-[2rem] p-5 shadow-md ring-1 transition-all duration-300 ease-out hover:z-20 hover:-translate-y-2 hover:scale-[1.03] hover:shadow-2xl ${
                     index > 0 ? "hidden md:flex peer-checked:flex" : ""
@@ -1183,7 +1068,6 @@ const ingressosVendidosParaExibicao = ingressosVendidos;
                       : "bg-purple-50 ring-purple-100 hover:ring-purple-300"
                   }`}
                 >
-
                   {livro.destaque && (
                     <div className="absolute left-5 top-5 z-10 rounded-full bg-yellow-400 px-4 py-2 text-[10px] font-black uppercase tracking-wide text-gray-950 shadow-lg">
                       Edição especial
@@ -1324,7 +1208,6 @@ const ingressosVendidosParaExibicao = ingressosVendidos;
                           livro,
                           valor: valorCompra,
                         })}
-                        
                         className="flex w-full justify-center rounded-full bg-red-600 px-5 py-3 text-xs font-black uppercase tracking-wide text-white shadow-lg transition hover:bg-red-700"
                       >
                         {livroEstaEmPreVenda(livro)
@@ -1344,10 +1227,13 @@ const ingressosVendidosParaExibicao = ingressosVendidos;
                 </article>
               );
             })}
-            <label htmlFor="toggle-livros-mobile" className="col-span-full block cursor-pointer rounded-full bg-purple-700 px-6 py-4 text-center text-sm font-black uppercase tracking-wide text-white shadow-lg peer-checked:hidden md:hidden">
-  Ver os outros 17 livros
-</label>
 
+            <label
+              htmlFor="toggle-livros-mobile"
+              className="col-span-full block cursor-pointer rounded-full bg-purple-700 px-6 py-4 text-center text-sm font-black uppercase tracking-wide text-white shadow-lg peer-checked:hidden md:hidden"
+            >
+              Ver os outros 17 livros
+            </label>
           </div>
         </div>
       </section>
@@ -1364,24 +1250,27 @@ const ingressosVendidosParaExibicao = ingressosVendidos;
             </h2>
           </div>
 
-                    <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <input type="checkbox" id="toggle-kits-alimentos-mobile" className="peer hidden" />
+          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <input
+              type="checkbox"
+              id="toggle-kits-alimentos-mobile"
+              className="peer hidden"
+            />
+
             {KITS_ALIMENTOS.map((kit, index) => {
               const quantidadeSelecionada = quantidadesAlimentos[kit.id] || 1;
-
               const quantidadeCompra = quantidadeSelecionada || 1;
               const totalValorSelecionado =
                 quantidadeSelecionada * kit.valorNumero;
               const totalKgSelecionado = quantidadeSelecionada * kit.pesoKg;
 
-                            return (
+              return (
                 <article
                   key={kit.id}
                   className={`group relative z-0 flex flex-col rounded-[2rem] bg-red-50 p-5 shadow-md ring-1 ring-red-100 transition-all duration-300 ease-out hover:z-20 hover:-translate-y-2 hover:scale-[1.04] hover:shadow-2xl hover:ring-red-300 ${
                     index !== 1 ? "hidden md:flex peer-checked:flex" : ""
                   }`}
                 >
-
                   <div className="relative h-72 overflow-hidden rounded-[1.5rem] bg-white shadow-sm">
                     <Image
                       src={kit.imagem}
@@ -1471,8 +1360,12 @@ const ingressosVendidosParaExibicao = ingressosVendidos;
                   </Link>
                 </article>
               );
-                        })}
-            <label htmlFor="toggle-kits-alimentos-mobile" className="col-span-full block cursor-pointer rounded-full bg-red-600 px-6 py-4 text-center text-sm font-black uppercase tracking-wide text-white shadow-lg peer-checked:hidden md:hidden">
+            })}
+
+            <label
+              htmlFor="toggle-kits-alimentos-mobile"
+              className="col-span-full block cursor-pointer rounded-full bg-red-600 px-6 py-4 text-center text-sm font-black uppercase tracking-wide text-white shadow-lg peer-checked:hidden md:hidden"
+            >
               Ver outras opções de kits
             </label>
           </div>
@@ -1491,24 +1384,27 @@ const ingressosVendidosParaExibicao = ingressosVendidos;
             </h2>
           </div>
 
-                   <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <input type="checkbox" id="toggle-kits-racao-mobile" className="peer hidden" />
+          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <input
+              type="checkbox"
+              id="toggle-kits-racao-mobile"
+              className="peer hidden"
+            />
+
             {KITS_RACAO.map((kit, index) => {
               const quantidadeSelecionada = quantidadesRacao[kit.id] || 1;
-
               const quantidadeCompra = quantidadeSelecionada || 1;
               const totalValorSelecionado =
                 quantidadeSelecionada * kit.valorNumero;
               const totalKgSelecionado = quantidadeSelecionada * kit.pesoKg;
 
-                         return (
+              return (
                 <article
                   key={kit.id}
                   className={`group relative z-0 flex flex-col rounded-[2rem] bg-blue-50 p-5 shadow-md ring-1 ring-blue-100 transition-all duration-300 ease-out hover:z-20 hover:-translate-y-2 hover:scale-[1.04] hover:shadow-2xl hover:ring-blue-300 ${
                     index !== 0 ? "hidden md:flex peer-checked:flex" : ""
                   }`}
                 >
-
                   <div className="relative h-72 overflow-hidden rounded-[1.5rem] bg-white shadow-sm">
                     <Image
                       src={kit.imagem}
@@ -1597,8 +1493,12 @@ const ingressosVendidosParaExibicao = ingressosVendidos;
                   </Link>
                 </article>
               );
-                  })}
-            <label htmlFor="toggle-kits-racao-mobile" className="col-span-full block cursor-pointer rounded-full bg-blue-600 px-6 py-4 text-center text-sm font-black uppercase tracking-wide text-white shadow-lg peer-checked:hidden md:hidden">
+            })}
+
+            <label
+              htmlFor="toggle-kits-racao-mobile"
+              className="col-span-full block cursor-pointer rounded-full bg-blue-600 px-6 py-4 text-center text-sm font-black uppercase tracking-wide text-white shadow-lg peer-checked:hidden md:hidden"
+            >
               Ver outras opções de kits
             </label>
           </div>
@@ -1607,7 +1507,6 @@ const ingressosVendidosParaExibicao = ingressosVendidos;
 
       <section className="px-4 pb-12">
         <div className="mx-auto max-w-6xl rounded-[2rem] bg-red-600 p-6 text-center text-white shadow-xl md:p-10">
-
           <p className="inline-flex rounded-full bg-white px-5 py-2 text-xs font-black uppercase tracking-wide text-red-600">
             Faça parte dessa missão
           </p>

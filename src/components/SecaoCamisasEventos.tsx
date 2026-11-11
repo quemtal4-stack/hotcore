@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useMemo, useState } from "react";
 
-const VALOR_PADRAO_CAMISA_EVENTO = 60;
+const VALOR_PADRAO_CAMISA_EVENTO = 69.90;
 const INGRESSOS_SIMBOLICOS_POR_CAMISA = 3;
 const KG_ALIMENTOS_POR_CAMISA = 3;
 
