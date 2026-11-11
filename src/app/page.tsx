@@ -10,7 +10,7 @@ import { TermometroImpacto } from "@/components/TermometroImpacto";
 import { TermometroRacao } from "@/components/TermometroRacao";
 import SecaoCamisasEventos from "@/components/SecaoCamisasEventos";
 
-const META_DOACAO_KG = 104000;
+const META_DOACAO_KG = 106000;
 const ALIMENTOS_ARRECADADOS_ATUAL_KG = 0;
 
 
@@ -18,7 +18,7 @@ const CHECKOUT_ALIMENTO_URL = "/checkout/alimentos";
 const CHECKOUT_RACAO_URL = "/checkout/racao";
 const CHECKOUT_LIVROS_URL = "/checkout/livros";
 
-const TOTAL_INGRESSOS_APRESENTACAO_DO_ECOSSISTEMA_HOT_DOGUERES = 23000;
+const TOTAL_INGRESSOS_APRESENTACAO_DO_ECOSSISTEMA_HOT_DOGUERES = 25000;
 const INGRESSOS_VENDIDOS_APRESENTACAO_DO_ECOSSISTEMA_HOT_DOGUERES = 0;
 const VALOR_INGRESSO_APRESENTACAO_DO_ECOSSISTEMA_HOT_DOGUERES = 20;
 
@@ -33,7 +33,7 @@ const MES_PRIMEIRA_ENTREGA_LIVROS = 0;
 
 const LOGOS = [
   {
-    nome: "Ecossistema Hot Dogueres",
+    nome: "ecossistema-hot-dogueres",
     imagem: "/logo-ecossistema-hot-dogueres.png",
   },
 ];
@@ -1038,10 +1038,11 @@ const ingressosVendidosParaExibicao = ingressosVendidos;
                 className="mt-5 flex w-full justify-center rounded-full bg-yellow-400 px-5 py-3 text-xs font-black uppercase tracking-wide text-gray-950 shadow-lg transition hover:bg-yellow-500"
               >
                 Ver ingresso
+               
               </Link>
             </article>
 
-           
+           <SecaoCamisasEventos />
           </div>
 
           <div className="mt-6 rounded-[2rem] bg-gray-950 p-5 text-white shadow-xl md:p-8">
