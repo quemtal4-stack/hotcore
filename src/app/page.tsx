@@ -896,50 +896,40 @@ export default function HomePage() {
               </Link>
             </article>
 
-            <article className="rounded-[2rem] bg-white p-5 shadow-xl ring-1 ring-yellow-200">
-              <p className="inline-flex rounded-full bg-yellow-400 px-4 py-2 text-xs font-black uppercase tracking-wide text-gray-950">
-                Segundo evento
-              </p>
+          <article className="rounded-[2rem] bg-white p-5 shadow-xl ring-1 ring-yellow-200">
+  <p className="inline-flex rounded-full bg-yellow-400 px-4 py-2 text-xs font-black uppercase tracking-wide text-gray-950">
+    Segundo evento
+  </p>
 
-              <h2 className="mt-4 text-2xl font-black leading-tight text-gray-950">
-                Hot Dogueres City Quest 2027
-              </h2>
+  <h2 className="mt-4 text-2xl font-black leading-tight text-gray-950">
+    Hot Dogueres City Quest 2027
+  </h2>
 
-              <p className="mt-3 text-sm leading-relaxed text-gray-700">
-                Uma gincana urbana em municípios de Sergipe, com desafios,
-                participação popular e metas solidárias por cidade.
-              </p>
+  <p className="mt-3 text-sm leading-relaxed text-gray-700">
+    Uma gincana urbana em municípios de Sergipe, com desafios, participação
+    popular e metas solidárias por cidade. Garanta seu ingresso e participe
+    dessa jornada do bem.
+  </p>
 
-              <div className="relative mt-5 flex h-72 items-center justify-center overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-gray-950 via-red-700 to-yellow-400 p-5 text-center text-white shadow-inner">
-                <div className="absolute left-[-80px] top-[-80px] h-56 w-56 rounded-full bg-white/20 blur-3xl" />
-                <div className="absolute bottom-[-100px] right-[-80px] h-64 w-64 rounded-full bg-black/30 blur-3xl" />
+  <div className="relative mt-5 h-72 overflow-hidden rounded-[1.5rem] bg-gray-50 shadow-inner">
+    <Image
+      src="/ingressos/hot-dogueres-city-quest-2027-01.png"
+      alt="Ingresso Hot Dogueres City Quest 2027"
+      fill
+      sizes="(max-width: 1024px) 100vw, 520px"
+      className="object-contain p-3"
+      unoptimized
+    />
+  </div>
 
-                <div className="relative z-10 mx-auto max-w-md">
-                  <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-white text-5xl shadow-xl">
-                    🗺️
-                  </div>
+  <Link
+    href="/cadastro?tipo=ingresso-solidario-colecionavel&produto=hot-dogueres-city-quest-2027-01&titulo=Hot%20Dogueres%20City%20Quest%202027%20-%201%C2%BA%20munic%C3%ADpio%20de%20Sergipe&ingressos=1&quantidadeTotal=1&kgAlimentos=1&valor=20"
+    className="mt-5 flex w-full justify-center rounded-full bg-yellow-400 px-5 py-3 text-xs font-black uppercase tracking-wide text-gray-950 shadow-lg transition hover:bg-yellow-500"
+  >
+    Comprar ingresso City Quest
+  </Link>
+</article>
 
-                  <p className="mt-5 inline-flex rounded-full bg-white/20 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-white">
-                    Ingresso oficial
-                  </p>
-
-                  <h3 className="mt-4 text-3xl font-black leading-tight">
-                    City Quest
-                  </h3>
-
-                  <p className="mt-3 text-sm font-bold leading-relaxed text-white/90">
-                    5 municípios • 25 mil ingressos em 2027
-                  </p>
-                </div>
-              </div>
-
-              <Link
-                href="/cadastro?tipo=ingresso-solidario-colecionavel&produto=hot-dogueres-city-quest-2027-01&titulo=Hot%20Dogueres%20City%20Quest%202027%20-%201%C2%BA%20munic%C3%ADpio%20de%20Sergipe&ingressos=1&quantidadeTotal=1&kgAlimentos=1&valor=20"
-                className="mt-5 flex w-full justify-center rounded-full bg-yellow-400 px-5 py-3 text-xs font-black uppercase tracking-wide text-gray-950 shadow-lg transition hover:bg-yellow-500"
-              >
-                Comprar ingresso City Quest
-              </Link>
-            </article>
 
             <SecaoCamisasEventos />
           </div>
