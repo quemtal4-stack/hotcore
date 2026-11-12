@@ -602,6 +602,72 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
         labelProxima="Ir para Nossa História"
       />
 
+      <aside className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-md rounded-[1.5rem] border-2 border-red-200 bg-white/95 p-4 text-gray-950 shadow-2xl backdrop-blur md:left-auto md:right-5 md:mx-0 md:w-80">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-600">
+              Resumo solidário
+            </p>
+
+            <h2 className="mt-1 text-lg font-black leading-tight">
+              Sua ajuda até agora
+            </h2>
+          </div>
+
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-600 text-2xl text-white shadow-lg">
+            ❤️
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <div className="rounded-2xl bg-red-50 p-3 text-center">
+            <p className="text-[10px] font-black uppercase text-red-600">
+              Alimentos
+            </p>
+
+            <p className="mt-1 text-xl font-black text-gray-950">
+              {kgAlimentosSelecionados.toLocaleString("pt-BR")} kg
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-blue-50 p-3 text-center">
+            <p className="text-[10px] font-black uppercase text-blue-600">
+              Ração
+            </p>
+
+            <p className="mt-1 text-xl font-black text-gray-950">
+              {kgRacaoSelecionados.toLocaleString("pt-BR")} kg
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-3 rounded-2xl bg-gray-950 p-3 text-center text-white">
+          <p className="text-[10px] font-black uppercase tracking-wide text-yellow-300">
+            Total selecionado
+          </p>
+
+          <p className="mt-1 text-2xl font-black">
+            {formatarMoeda(totalSolidarioSelecionado)}
+          </p>
+        </div>
+
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <Link
+            href="#kits-alimentos"
+            className="rounded-full bg-red-600 px-4 py-3 text-center text-[10px] font-black uppercase tracking-wide text-white shadow-md transition hover:bg-red-700"
+          >
+            Alimentos
+          </Link>
+
+          <Link
+            href="#kits-racao"
+            className="rounded-full bg-blue-600 px-4 py-3 text-center text-[10px] font-black uppercase tracking-wide text-white shadow-md transition hover:bg-blue-700"
+          >
+            Ração
+          </Link>
+        </div>
+      </aside>
+      
       <header className="sticky top-0 z-40 border-b border-red-100 bg-white/90 px-4 py-4 shadow-sm backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <Link
