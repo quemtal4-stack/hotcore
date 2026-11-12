@@ -120,7 +120,7 @@ const PLANOS: Record<string, Plano> = {
   eternizados: {
     id: "eternizados",
     nome: "Eternizados",
-    valor: "R$ 497,00",
+    valor: "R$ 499,90",
     recorrencia: "por ano",
     descricao:
       "Plano anual especial para quem quer caminhar junto com a Hot Dogueres por 12 meses e eternizar sua participação na campanha.",

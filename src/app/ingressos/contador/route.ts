@@ -4,7 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const META_INGRESSOS = 104000;
+const META_INGRESSOS = 102000;
 
 const TIPOS_INGRESSO = ["ingresso", "ingresso_evento", "ingresso_fixo"];
 

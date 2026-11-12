@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 
-const META_DOACAO_KG = 104000;
+const META_DOACAO_KG = 106000;
 
 const VALOR_INGRESSO_COLECIONAVEL = 20;
 const VALOR_SEXTO_INGRESSO = 80;

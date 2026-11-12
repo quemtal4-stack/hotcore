@@ -81,7 +81,7 @@ const PLANOS_CLUBE: PlanoClube[] = [
   {
     slug: "eternizados",
     nome: "Eternizados",
-    valor: 497,
+    valor: 499.9,
     recorrencia: "por ano",
     ciclo: "anual",
     descricao: "Plano anual Eternizados do Clube Hot Dogueres.",

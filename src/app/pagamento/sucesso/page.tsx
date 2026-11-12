@@ -93,7 +93,7 @@ function obterPlano(plano?: string | string[]) {
   ) {
     return {
       nome: "Eternizados",
-      valor: "R$ 497,00",
+      valor: "R$ 499,90",
       recorrencia: "por ano",
       descricao:
         "Plano anual para quem quer caminhar junto com a Hot Dogueres durante 12 meses e deixar sua participação eternizada na campanha.",
