@@ -15,7 +15,11 @@ type DadosCadastro = {
   total: number;
   tipo: string;
   nomeProduto: string;
+  produtoId?: string;
+  eventoId?: string;
+  municipio?: string;
   nomeIngressoEternizado?: string;
+  colecionarIngresso: boolean | null;
   modoAdminTeste?: boolean;
 };
 
@@ -53,6 +57,38 @@ function parametroAtivo(params: URLSearchParams, nome: string) {
   );
 }
 
+function obterParametroBooleanoOpcional(
+  params: URLSearchParams,
+  nome: string,
+): boolean | null {
+  const valor = params.get(nome)?.toLowerCase();
+
+  if (!valor) {
+    return null;
+  }
+
+  if (
+    valor === "sim" ||
+    valor === "true" ||
+    valor === "1" ||
+    valor === "yes"
+  ) {
+    return true;
+  }
+
+  if (
+    valor === "nao" ||
+    valor === "não" ||
+    valor === "false" ||
+    valor === "0" ||
+    valor === "no"
+  ) {
+    return false;
+  }
+
+  return null;
+}
+
 function limparNumero(valor: string) {
   return valor.replace(/\D/g, "");
 }
@@ -75,6 +111,10 @@ export default function CheckoutIngressosPage() {
       const modoAdminTeste =
         parametroAtivo(params, "admin") || parametroAtivo(params, "teste");
 
+      const colecionarParametro =
+        obterParametroBooleanoOpcional(params, "colecionar") ??
+        obterParametroBooleanoOpcional(params, "colecionarIngresso");
+
       if (dadosSalvos) {
         const dados = JSON.parse(dadosSalvos) as DadosCadastro;
 
@@ -96,6 +136,24 @@ export default function CheckoutIngressosPage() {
           dados.kgAlimentos,
         );
 
+        const eventoId =
+          params.get("evento") ||
+          params.get("eventoId") ||
+          dados.eventoId ||
+          "";
+
+        const produtoId =
+          params.get("produto") ||
+          params.get("produtoId") ||
+          dados.produtoId ||
+          eventoId ||
+          "";
+
+        const tituloParametro =
+          params.get("titulo") ||
+          dados.nomeProduto ||
+          "Ingresso Solidário";
+
         setDadosCadastro({
           ...dados,
           total: valorParametro > 0 ? valorParametro : dados.total,
@@ -115,19 +173,40 @@ export default function CheckoutIngressosPage() {
             dados.nomeIngressoEternizado ||
             params.get("nomeIngressoEternizado") ||
             "",
+          tipo:
+            params.get("tipo") ||
+            dados.tipo ||
+            "ingresso-solidario-colecionavel",
+          nomeProduto: tituloParametro,
+          produtoId,
+          eventoId,
+          municipio: params.get("municipio") || dados.municipio || "",
+          colecionarIngresso:
+            colecionarParametro !== null
+              ? colecionarParametro
+              : dados.colecionarIngresso ?? null,
           modoAdminTeste,
         });
 
         return;
       }
 
-      const tipo = params.get("tipo") || "ingresso-solidario-colecionavel";
+      const eventoId = params.get("evento") || params.get("eventoId") || "";
+      const produtoId =
+        params.get("produto") || params.get("produtoId") || eventoId || "";
+
+      const tipo =
+        params.get("tipo") ||
+        (eventoId ? "ingresso-evento" : "ingresso-solidario-colecionavel");
 
       const titulo =
         params.get("titulo") ||
-        (tipo === "hot-dog-day"
-          ? "Hot Dog Day"
-          : "Ingresso Solidário Colecionável");
+        params.get("nomeProduto") ||
+        (eventoId
+          ? "Ingresso Hot Dogueres City Quest"
+          : tipo === "hot-dog-day"
+            ? "Hot Dog Day"
+            : "Ingresso Solidário Colecionável");
 
       const valor = obterNumeroParametro(params, "valor", 20);
       const ingressos = obterNumeroParametro(params, "ingressos", 1);
@@ -151,7 +230,11 @@ export default function CheckoutIngressosPage() {
         total: valor,
         tipo,
         nomeProduto: titulo,
+        produtoId,
+        eventoId,
+        municipio: params.get("municipio") || "",
         nomeIngressoEternizado: params.get("nomeIngressoEternizado") || "",
+        colecionarIngresso: colecionarParametro,
         modoAdminTeste,
       });
     } catch {
@@ -172,6 +255,10 @@ export default function CheckoutIngressosPage() {
       return "Ingresso Hot Dog Day";
     }
 
+    if (dadosCadastro.eventoId || dadosCadastro.tipo === "ingresso-evento") {
+      return dadosCadastro.nomeProduto || "Ingresso de Evento Hot Dogueres";
+    }
+
     return dadosCadastro.sextoIngresso
       ? "Ingresso Solidário Colecionável + 6º Especial"
       : "Ingresso Solidário Colecionável";
@@ -179,6 +266,19 @@ export default function CheckoutIngressosPage() {
 
   function voltarParaCadastro() {
     window.history.back();
+  }
+
+  function atualizarColecionarIngresso(valor: boolean) {
+    setDadosCadastro((dadosAtuais) => {
+      if (!dadosAtuais) {
+        return dadosAtuais;
+      }
+
+      return {
+        ...dadosAtuais,
+        colecionarIngresso: valor,
+      };
+    });
   }
 
   function validarDadosAntesDoPagamento() {
@@ -208,6 +308,10 @@ export default function CheckoutIngressosPage() {
 
     if (!dadosCadastro.total || dadosCadastro.total <= 0) {
       return "Valor inválido para gerar o pagamento.";
+    }
+
+    if (dadosCadastro.colecionarIngresso === null) {
+      return "Escolha se você deseja colecionar este ingresso.";
     }
 
     return "";
@@ -241,7 +345,10 @@ export default function CheckoutIngressosPage() {
           telefone: dadosCadastro.telefone,
           cpf: dadosCadastro.cpf,
           tipo: dadosCadastro.tipo,
-          produto: dadosCadastro.nomeProduto,
+          produto: dadosCadastro.produtoId || dadosCadastro.nomeProduto,
+          produtoId: dadosCadastro.produtoId || "",
+          eventoId: dadosCadastro.eventoId || "",
+          municipio: dadosCadastro.municipio || "",
           titulo: resumoProduto,
           quantidade: dadosCadastro.quantidadeTotal,
           ingressos: dadosCadastro.ingressos,
@@ -251,6 +358,9 @@ export default function CheckoutIngressosPage() {
           valor: dadosCadastro.total,
           total: dadosCadastro.total,
           nomeIngressoEternizado: dadosCadastro.nomeIngressoEternizado || "",
+          colecionarIngresso: dadosCadastro.colecionarIngresso === true,
+          enviarParaColecao: dadosCadastro.colecionarIngresso === true,
+          permitirResgateColecaoDepois: true,
           admin: dadosCadastro.modoAdminTeste ? "true" : "false",
           teste: dadosCadastro.modoAdminTeste ? "true" : "false",
         }),
@@ -289,6 +399,9 @@ export default function CheckoutIngressosPage() {
         telefone: dadosCadastro.telefone,
         cpf: dadosCadastro.cpf,
         produto: resumoProduto,
+        produtoId: dadosCadastro.produtoId || "",
+        eventoId: dadosCadastro.eventoId || "",
+        municipio: dadosCadastro.municipio || "",
         tipo: dadosCadastro.tipo,
         quantidadeTotal: dadosCadastro.quantidadeTotal,
         ingressos: dadosCadastro.ingressos,
@@ -297,6 +410,9 @@ export default function CheckoutIngressosPage() {
         kgAlimentos: dadosCadastro.kgAlimentos,
         valor: dadosCadastro.total,
         nomeIngressoEternizado: dadosCadastro.nomeIngressoEternizado || "",
+        colecionarIngresso: dadosCadastro.colecionarIngresso === true,
+        enviarParaColecao: dadosCadastro.colecionarIngresso === true,
+        permitirResgateColecaoDepois: true,
         status: "pendente",
         criadoEm: new Date().toISOString(),
       };
@@ -425,6 +541,68 @@ export default function CheckoutIngressosPage() {
             </div>
           </div>
 
+          <div className="mt-8 rounded-3xl border-2 border-yellow-300 bg-yellow-50 p-6">
+            <p className="inline-flex rounded-full bg-yellow-400 px-4 py-2 text-xs font-black uppercase tracking-wide text-gray-950">
+              Colecionador
+            </p>
+
+            <h2 className="mt-4 text-2xl font-black text-gray-950">
+              Quer colecionar este ingresso?
+            </h2>
+
+            <p className="mt-3 text-sm font-bold leading-relaxed text-gray-700">
+              Se escolher sim, após o pagamento aprovado este ingresso será
+              enviado para a sua área do colecionador. Se escolher não, ele
+              continuará contando normalmente para as metas de ingressos e de
+              alimentos, mas não será colocado automaticamente na coleção.
+            </p>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => atualizarColecionarIngresso(true)}
+                className={`rounded-3xl border-2 p-5 text-left transition ${
+                  dadosCadastro.colecionarIngresso === true
+                    ? "border-green-600 bg-green-50 shadow-lg"
+                    : "border-gray-200 bg-white hover:border-green-300"
+                }`}
+              >
+                <span className="text-lg font-black text-green-700">
+                  Sim, quero colecionar
+                </span>
+
+                <span className="mt-2 block text-sm font-bold leading-relaxed text-gray-600">
+                  O ingresso será liberado na área do colecionador após a
+                  confirmação do pagamento.
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => atualizarColecionarIngresso(false)}
+                className={`rounded-3xl border-2 p-5 text-left transition ${
+                  dadosCadastro.colecionarIngresso === false
+                    ? "border-red-600 bg-red-50 shadow-lg"
+                    : "border-gray-200 bg-white hover:border-red-300"
+                }`}
+              >
+                <span className="text-lg font-black text-red-700">
+                  Não, só quero ajudar
+                </span>
+
+                <span className="mt-2 block text-sm font-bold leading-relaxed text-gray-600">
+                  Sua compra continuará ajudando as metas, mas o ingresso não
+                  entrará automaticamente na coleção.
+                </span>
+              </button>
+            </div>
+
+            <div className="mt-5 rounded-2xl bg-white p-4 text-sm font-bold leading-relaxed text-gray-700 shadow-sm">
+              Se depois você se arrepender, poderemos criar a opção de resgate
+              pela área do colecionador usando o CPF/e-mail da compra aprovada.
+            </div>
+          </div>
+
           {erro && (
             <div className="mt-6 rounded-2xl bg-red-50 p-4 text-sm font-bold text-red-600">
               {erro}
@@ -462,6 +640,13 @@ export default function CheckoutIngressosPage() {
               <strong className="text-right">{resumoProduto}</strong>
             </div>
 
+            {dadosCadastro.municipio && (
+              <div className="flex justify-between gap-4 text-gray-700">
+                <span>Município</span>
+                <strong className="text-right">{dadosCadastro.municipio}</strong>
+              </div>
+            )}
+
             <div className="flex justify-between gap-4 text-gray-700">
               <span>Quantidade total</span>
               <strong>{dadosCadastro.quantidadeTotal}</strong>
@@ -492,6 +677,17 @@ export default function CheckoutIngressosPage() {
                   <span>Doação abatida</span>
                   <strong>{dadosCadastro.kgAlimentos} kg</strong>
                 </div>
+
+                <div className="flex justify-between gap-4 text-gray-700">
+                  <span>Colecionar ingresso</span>
+                  <strong>
+                    {dadosCadastro.colecionarIngresso === null
+                      ? "Escolha obrigatória"
+                      : dadosCadastro.colecionarIngresso
+                        ? "Sim"
+                        : "Não"}
+                  </strong>
+                </div>
               </>
             )}
 
@@ -508,6 +704,18 @@ export default function CheckoutIngressosPage() {
                 {formatarMoeda(dadosCadastro.total)}
               </span>
             </div>
+          </div>
+
+          <div className="mt-6 rounded-3xl bg-green-50 p-5">
+            <p className="text-sm font-black uppercase tracking-wide text-green-700">
+              Impacto nas metas
+            </p>
+
+            <p className="mt-2 text-sm font-bold leading-relaxed text-gray-700">
+              Este pedido será enviado com a quantidade de ingressos e os quilos
+              de alimentos para que o sistema possa atualizar os termômetros
+              após o pagamento aprovado.
+            </p>
           </div>
 
           <div className="mt-6 rounded-3xl bg-yellow-50 p-5">

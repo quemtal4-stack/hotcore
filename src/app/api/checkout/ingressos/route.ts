@@ -9,30 +9,74 @@ const VALOR_INGRESSO_COLECIONAVEL = 20;
 const VALOR_SEXTO_INGRESSO = 80;
 const VALOR_HOT_DOG_DAY = 20;
 
-type TipoCompra = "ingresso-solidario-colecionavel" | "hot-dog-day";
+type TipoCompra =
+  | "ingresso-solidario-colecionavel"
+  | "ingresso-evento"
+  | "ingresso_evento"
+  | "hot-dog-day";
 
 type DadosCheckoutIngressos = {
   tipo?: unknown;
+
   nome?: unknown;
   nomeComprador?: unknown;
+
   email?: unknown;
   emailComprador?: unknown;
+
   telefone?: unknown;
   whatsapp?: unknown;
+
   cpf?: unknown;
+  cpfComprador?: unknown;
+
+  produto?: unknown;
+  produtoId?: unknown;
+
+  evento?: unknown;
+  eventoId?: unknown;
+  evento_id?: unknown;
+
+  municipio?: unknown;
+
+  titulo?: unknown;
+
   ingressos?: unknown;
   quantidade?: unknown;
   quantidadeTotal?: unknown;
+
   sextoIngresso?: unknown;
+  sexto_ingresso?: unknown;
+
   kgAlimentos?: unknown;
+  kg_alimentos?: unknown;
+
   valor?: unknown;
   total?: unknown;
-  produto?: unknown;
-  titulo?: unknown;
+
   ingressosSelecionados?: unknown;
+  ingressos_selecionados?: unknown;
+
   nomeIngressoEternizado?: unknown;
+  nome_ingresso_eternizado?: unknown;
+
+  colecionarIngresso?: unknown;
+  colecionar_ingresso?: unknown;
+  enviarParaColecao?: unknown;
+  enviar_para_colecao?: unknown;
+  permitirResgateColecaoDepois?: unknown;
+  permitir_resgate_colecao_depois?: unknown;
+
   admin?: unknown;
   teste?: unknown;
+};
+
+type ItemMercadoPago = {
+  id: string;
+  title: string;
+  quantity: number;
+  unit_price: number;
+  currency_id: "BRL";
 };
 
 function transformarErroEmTexto(error: unknown) {
@@ -69,8 +113,26 @@ function numeroSeguro(valor: unknown, padrao = 0) {
   return numero;
 }
 
+function inteiroSeguro(valor: unknown, padrao = 1) {
+  const numero = Math.floor(numeroSeguro(valor, padrao));
+
+  if (!Number.isFinite(numero) || numero < 1) {
+    return padrao;
+  }
+
+  return numero;
+}
+
 function limparNumero(valor: unknown) {
-  return String(valor || "").replace(/\D/g, "");
+  return textoSeguro(valor).replace(/\D/g, "");
+}
+
+function normalizarTexto(valor: unknown) {
+  return textoSeguro(valor)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
 }
 
 function booleanoSeguro(valor: unknown) {
@@ -78,7 +140,7 @@ function booleanoSeguro(valor: unknown) {
     return valor;
   }
 
-  const texto = String(valor || "").toLowerCase().trim();
+  const texto = normalizarTexto(valor);
 
   return (
     texto === "sim" ||
@@ -92,18 +154,179 @@ function validarEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-function limitarQuantidade(valor: unknown, minimo = 1, maximo = 999) {
-  const numero = Math.floor(numeroSeguro(valor, minimo));
-
-  if (!Number.isFinite(numero) || numero < minimo) {
-    return minimo;
-  }
-
-  return Math.min(numero, maximo);
+function criarExternalReference(tipo: string) {
+  return `${tipo}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-function criarExternalReference(tipo: TipoCompra) {
-  return `${tipo}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+function obterTipoCompra(dados: DadosCheckoutIngressos): TipoCompra {
+  const tipoRecebido = normalizarTexto(dados.tipo);
+
+  const eventoId =
+    textoSeguro(dados.eventoId) ||
+    textoSeguro(dados.evento_id) ||
+    textoSeguro(dados.evento);
+
+  if (tipoRecebido === "hot-dog-day") {
+    return "hot-dog-day";
+  }
+
+  if (
+    tipoRecebido === "ingresso-evento" ||
+    tipoRecebido === "ingresso_evento" ||
+    Boolean(eventoId)
+  ) {
+    return "ingresso_evento";
+  }
+
+  return "ingresso-solidario-colecionavel";
+}
+
+function obterQuantidadeIngressos(params: {
+  dados: DadosCheckoutIngressos;
+  ehHotDogDay: boolean;
+  ehIngressoEvento: boolean;
+}) {
+  const quantidadeRecebida =
+    numeroSeguro(params.dados.ingressos) ||
+    numeroSeguro(params.dados.quantidade) ||
+    numeroSeguro(params.dados.quantidadeTotal) ||
+    1;
+
+  const quantidade = Math.max(1, Math.floor(quantidadeRecebida));
+
+  if (params.ehHotDogDay || params.ehIngressoEvento) {
+    return quantidade;
+  }
+
+  return Math.min(quantidade, 5);
+}
+
+function obterQuantidadeTotal(params: {
+  dados: DadosCheckoutIngressos;
+  ingressos: number;
+  sextoIngresso: boolean;
+  ehHotDogDay: boolean;
+  ehIngressoEvento: boolean;
+}) {
+  const quantidadeTotalRecebida = numeroSeguro(params.dados.quantidadeTotal);
+
+  if (quantidadeTotalRecebida > 0) {
+    return Math.max(1, Math.floor(quantidadeTotalRecebida));
+  }
+
+  if (params.ehHotDogDay || params.ehIngressoEvento) {
+    return params.ingressos;
+  }
+
+  return params.ingressos + (params.sextoIngresso ? 1 : 0);
+}
+
+function obterKgAlimentos(params: {
+  dados: DadosCheckoutIngressos;
+  ingressos: number;
+  sextoIngresso: boolean;
+  ehHotDogDay: boolean;
+}) {
+  const kgRecebido =
+    numeroSeguro(params.dados.kgAlimentos) ||
+    numeroSeguro(params.dados.kg_alimentos);
+
+  if (kgRecebido > 0) {
+    return kgRecebido;
+  }
+
+  if (params.ehHotDogDay) {
+    return 0;
+  }
+
+  return params.ingressos + (params.sextoIngresso ? 3 : 0);
+}
+
+function obterTotal(params: {
+  dados: DadosCheckoutIngressos;
+  ingressos: number;
+  sextoIngresso: boolean;
+  quantidadeTotal: number;
+  ehHotDogDay: boolean;
+  ehIngressoEvento: boolean;
+}) {
+  const valorRecebido =
+    numeroSeguro(params.dados.valor) || numeroSeguro(params.dados.total);
+
+  if (valorRecebido > 0) {
+    return Number(valorRecebido.toFixed(2));
+  }
+
+  if (params.ehHotDogDay) {
+    return Number((params.ingressos * VALOR_HOT_DOG_DAY).toFixed(2));
+  }
+
+  if (params.ehIngressoEvento) {
+    return Number((params.quantidadeTotal * VALOR_INGRESSO_COLECIONAVEL).toFixed(2));
+  }
+
+  return Number(
+    (
+      params.ingressos * VALOR_INGRESSO_COLECIONAVEL +
+      (params.sextoIngresso ? VALOR_SEXTO_INGRESSO : 0)
+    ).toFixed(2),
+  );
+}
+
+function obterItemsMercadoPago(params: {
+  tipo: TipoCompra;
+  produto: string;
+  titulo: string;
+  ingressos: number;
+  sextoIngresso: boolean;
+  quantidadeTotal: number;
+  total: number;
+  modoAdmin: boolean;
+  ehHotDogDay: boolean;
+  ehIngressoEvento: boolean;
+}) {
+  const usarItemUnico =
+    params.modoAdmin ||
+    params.ehIngressoEvento ||
+    params.ehHotDogDay ||
+    params.total <= 0;
+
+  if (usarItemUnico) {
+    const quantidade = Math.max(1, params.quantidadeTotal);
+    const valorUnitario = Number((params.total / quantidade).toFixed(2));
+
+    return [
+      {
+        id: params.produto,
+        title: params.titulo,
+        quantity: quantidade,
+        unit_price: valorUnitario,
+        currency_id: "BRL" as const,
+      },
+    ];
+  }
+
+  const items: ItemMercadoPago[] = [
+    {
+      id: "ingresso-solidario-colecionavel",
+      title: "Ingresso Solidário Colecionável",
+      quantity: params.ingressos,
+      unit_price: VALOR_INGRESSO_COLECIONAVEL,
+      currency_id: "BRL",
+    },
+  ];
+
+  if (params.sextoIngresso) {
+    items.push({
+      id: "ingresso-eternizados-250-metros",
+      title: "Ingresso Especial Eternizados 250 Metros",
+      quantity: 1,
+      unit_price: VALOR_SEXTO_INGRESSO,
+      currency_id: "BRL",
+    });
+  }
+
+  return items;
 }
 
 async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
@@ -118,12 +341,9 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
     );
   }
 
-  const tipo: TipoCompra =
-    textoSeguro(dados.tipo) === "hot-dog-day"
-      ? "hot-dog-day"
-      : "ingresso-solidario-colecionavel";
-
+  const tipo = obterTipoCompra(dados);
   const ehHotDogDay = tipo === "hot-dog-day";
+  const ehIngressoEvento = tipo === "ingresso_evento";
 
   const nome =
     textoSeguro(dados.nome) ||
@@ -136,7 +356,8 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
   const telefone =
     textoSeguro(dados.telefone) || textoSeguro(dados.whatsapp);
 
-  const cpf = limparNumero(dados.cpf);
+  const cpf =
+    limparNumero(dados.cpf) || limparNumero(dados.cpfComprador);
 
   if (!nome.trim()) {
     return NextResponse.json(
@@ -168,48 +389,75 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
   if (!ehHotDogDay && cpf.length !== 11) {
     return NextResponse.json(
       {
-        error: "CPF do comprador é obrigatório para ingressos colecionáveis.",
+        error: "CPF do comprador é obrigatório para ingressos.",
       },
       { status: 400 },
     );
   }
 
-  const ingressos = limitarQuantidade(
-    dados.ingressos || dados.quantidade || dados.quantidadeTotal || 1,
-    1,
-    ehHotDogDay ? 999 : 5,
-  );
+  const eventoId =
+    textoSeguro(dados.eventoId) ||
+    textoSeguro(dados.evento_id) ||
+    textoSeguro(dados.evento);
+
+  const municipio = textoSeguro(dados.municipio);
+
+  const produto =
+    textoSeguro(dados.produtoId) ||
+    textoSeguro(dados.produto) ||
+    eventoId ||
+    (ehHotDogDay
+      ? "hot-dog-day"
+      : ehIngressoEvento
+        ? "ingresso-evento"
+        : "ingresso-solidario-colecionavel");
+
+  const titulo =
+    textoSeguro(dados.titulo) ||
+    (ehHotDogDay
+      ? "Ingresso Hot Dog Day"
+      : ehIngressoEvento
+        ? "Ingresso de Evento Hot Dogueres"
+        : "Ingresso Solidário Colecionável");
+
+  const ingressos = obterQuantidadeIngressos({
+    dados,
+    ehHotDogDay,
+    ehIngressoEvento,
+  });
 
   const sextoIngresso =
-    !ehHotDogDay && ingressos >= 5 && booleanoSeguro(dados.sextoIngresso);
+    !ehHotDogDay &&
+    !ehIngressoEvento &&
+    ingressos >= 5 &&
+    (booleanoSeguro(dados.sextoIngresso) ||
+      booleanoSeguro(dados.sexto_ingresso));
 
-  const quantidadeTotal = ehHotDogDay
-    ? ingressos
-    : ingressos + (sextoIngresso ? 1 : 0);
+  const quantidadeTotal = obterQuantidadeTotal({
+    dados,
+    ingressos,
+    sextoIngresso,
+    ehHotDogDay,
+    ehIngressoEvento,
+  });
 
-  const kgAlimentos = ehHotDogDay
-    ? 0
-    : numeroSeguro(dados.kgAlimentos) || ingressos + (sextoIngresso ? 3 : 0);
+  const kgAlimentos = obterKgAlimentos({
+    dados,
+    ingressos,
+    sextoIngresso,
+    ehHotDogDay,
+  });
 
-  const modoAdmin =
-    booleanoSeguro(dados.admin) || booleanoSeguro(dados.teste);
+  const total = obterTotal({
+    dados,
+    ingressos,
+    sextoIngresso,
+    quantidadeTotal,
+    ehHotDogDay,
+    ehIngressoEvento,
+  });
 
-  const valorParametro =
-    numeroSeguro(dados.valor) || numeroSeguro(dados.total);
-
-  const totalCalculado = ehHotDogDay
-    ? ingressos * VALOR_HOT_DOG_DAY
-    : ingressos * VALOR_INGRESSO_COLECIONAVEL +
-      (sextoIngresso ? VALOR_SEXTO_INGRESSO : 0);
-
-  const total = Number(
-    (modoAdmin && valorParametro > 0
-      ? valorParametro
-      : totalCalculado
-    ).toFixed(2),
-  );
-
-  if (total <= 0) {
+  if (!total || total <= 0) {
     return NextResponse.json(
       {
         error: "Valor inválido para gerar o pagamento.",
@@ -218,6 +466,30 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
     );
   }
 
+  const modoAdmin =
+    booleanoSeguro(dados.admin) || booleanoSeguro(dados.teste);
+
+  const colecionarIngresso =
+    !ehHotDogDay &&
+    (booleanoSeguro(dados.colecionarIngresso) ||
+      booleanoSeguro(dados.colecionar_ingresso) ||
+      booleanoSeguro(dados.enviarParaColecao) ||
+      booleanoSeguro(dados.enviar_para_colecao));
+
+  const permitirResgateColecaoDepois =
+    !ehHotDogDay &&
+    (booleanoSeguro(dados.permitirResgateColecaoDepois) ||
+      booleanoSeguro(dados.permitir_resgate_colecao_depois) ||
+      !colecionarIngresso);
+
+  const ingressosSelecionados =
+    textoSeguro(dados.ingressosSelecionados) ||
+    textoSeguro(dados.ingressos_selecionados);
+
+  const nomeIngressoEternizado =
+    textoSeguro(dados.nomeIngressoEternizado) ||
+    textoSeguro(dados.nome_ingresso_eternizado);
+
   const siteUrl = (
     process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000"
   ).replace(/\/$/, "");
@@ -225,22 +497,6 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
   const usarAutoReturn = siteUrl.startsWith("https://");
 
   const externalReference = criarExternalReference(tipo);
-
-  const tituloPadrao = ehHotDogDay
-    ? "Ingresso Hot Dog Day"
-    : sextoIngresso
-      ? "Ingresso Solidário Colecionável + 6º Especial"
-      : "Ingresso Solidário Colecionável";
-
-  const titulo = textoSeguro(dados.titulo, tituloPadrao);
-
-  const produto = textoSeguro(
-    dados.produto,
-    ehHotDogDay ? "hot-dog-day" : "ingresso-solidario-colecionavel",
-  );
-
-  const ingressosSelecionados = textoSeguro(dados.ingressosSelecionados);
-  const nomeIngressoEternizado = textoSeguro(dados.nomeIngressoEternizado);
 
   const paramsSucesso = new URLSearchParams({
     tipo,
@@ -251,7 +507,17 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
     quantidadeTotal: String(quantidadeTotal),
     kgAlimentos: String(kgAlimentos),
     external_reference: externalReference,
+    colecionar: colecionarIngresso ? "sim" : "nao",
   });
+
+  if (eventoId) {
+    paramsSucesso.set("evento", eventoId);
+    paramsSucesso.set("eventoId", eventoId);
+  }
+
+  if (municipio) {
+    paramsSucesso.set("municipio", municipio);
+  }
 
   if (nomeIngressoEternizado) {
     paramsSucesso.set("nomeIngressoEternizado", nomeIngressoEternizado);
@@ -264,8 +530,20 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
     externalReference,
 
     tipo,
+    categoria: tipo,
+
     produto,
+    produto_id: produto,
+    produtoId: produto,
+
     titulo,
+
+    evento_id: eventoId || null,
+    eventoId: eventoId || null,
+
+    municipio: municipio || null,
+    nome_evento: municipio || null,
+    nomeEvento: municipio || null,
 
     nome,
     nomeComprador: nome,
@@ -299,55 +577,45 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
 
     valor: total,
     totalPedido: total,
+    valor_total: total,
 
     ingressos_selecionados: ingressosSelecionados,
     ingressosSelecionados,
 
-    eh_ingresso_colecionavel: !ehHotDogDay,
+    colecionar_ingresso: colecionarIngresso,
+    colecionarIngresso,
+
+    enviar_para_colecao: colecionarIngresso,
+    enviarParaColecao: colecionarIngresso,
+
+    permitir_resgate_colecao_depois: permitirResgateColecaoDepois,
+    permitirResgateColecaoDepois,
+
+    /*
+      Este campo controla somente se o webhook deve criar/atualizar
+      automaticamente a Área do Colecionador.
+
+      Mesmo quando false, a compra continua contando nos termômetros,
+      porque tipo, quantidade, kg_alimentos e status pago ficam salvos no pedido.
+    */
+    eh_ingresso_colecionavel: colecionarIngresso,
+
     modo_admin: modoAdmin,
+    modoAdmin,
   };
 
-  const items =
-    modoAdmin && valorParametro > 0
-      ? [
-          {
-            id: produto,
-            title: `${titulo} - Teste Admin`,
-            quantity: 1,
-            unit_price: total,
-            currency_id: "BRL" as const,
-          },
-        ]
-      : ehHotDogDay
-        ? [
-            {
-              id: "hot-dog-day",
-              title: titulo,
-              quantity: ingressos,
-              unit_price: VALOR_HOT_DOG_DAY,
-              currency_id: "BRL" as const,
-            },
-          ]
-        : [
-            {
-              id: "ingresso-solidario-colecionavel",
-              title: "Ingresso Solidário Colecionável",
-              quantity: ingressos,
-              unit_price: VALOR_INGRESSO_COLECIONAVEL,
-              currency_id: "BRL" as const,
-            },
-            ...(sextoIngresso
-              ? [
-                  {
-                    id: "ingresso-eternizados-250-metros",
-                    title: "Ingresso Especial Eternizados 250 Metros",
-                    quantity: 1,
-                    unit_price: VALOR_SEXTO_INGRESSO,
-                    currency_id: "BRL" as const,
-                  },
-                ]
-              : []),
-          ];
+  const items = obterItemsMercadoPago({
+    tipo,
+    produto,
+    titulo,
+    ingressos,
+    sextoIngresso,
+    quantidadeTotal,
+    total,
+    modoAdmin,
+    ehHotDogDay,
+    ehIngressoEvento,
+  });
 
   const client = new MercadoPagoConfig({
     accessToken,
@@ -415,26 +683,18 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
 
   const { error: erroPedido } = await supabaseAdmin.from("pedidos").insert({
     external_reference: externalReference,
-
-    preference_id: result.id ? String(result.id) : null,
     mercado_pago_preference_id: result.id ? String(result.id) : null,
     mercado_pago_init_point: initPoint,
-
-    payment_id: null,
     mercado_pago_payment_id: null,
 
-    status: "aguardando_pagamento",
-
     tipo,
-    produto,
     categoria: tipo,
+    produto: titulo,
 
     nome_comprador: nome,
     email_comprador: email,
     whatsapp: telefone,
-
     cpf,
-    cpf_comprador: cpf,
 
     quantidade: quantidadeTotal,
     valor_unitario: valorUnitarioMedio,
@@ -443,17 +703,12 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
     total_pedido: total,
     valor_total: total,
 
-    forma_entrega: "retirada",
     modalidade_entrega: "retirada",
     retirada_no_local: true,
+    servico_frete: "Retirada",
+    prazo_frete: "Retirada conforme organização do evento",
 
-    kg_alimentos: kgAlimentos,
-
-    plano: null,
-    evento_id: null,
-    nome_evento: null,
-    ano_colecao: null,
-    ingresso_modelo_id: null,
+    status: "aguardando_pagamento",
 
     metadata,
 
@@ -492,12 +747,22 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
     init_point: initPoint,
     sandbox_init_point: result.sandbox_init_point,
     url: initPoint,
+    checkoutUrl: initPoint,
 
     preferenceId: result.id,
     externalReference,
     external_reference: externalReference,
 
+    tipo,
+    produto,
+    titulo,
+
+    eventoId,
+    evento_id: eventoId,
+    municipio,
+
     total,
+    valor: total,
     quantidadeTotal,
     quantidade_total: quantidadeTotal,
 
@@ -507,6 +772,15 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
 
     kgAlimentos,
     kg_alimentos: kgAlimentos,
+
+    colecionarIngresso,
+    colecionar_ingresso: colecionarIngresso,
+
+    enviarParaColecao: colecionarIngresso,
+    enviar_para_colecao: colecionarIngresso,
+
+    permitirResgateColecaoDepois,
+    permitir_resgate_colecao_depois: permitirResgateColecaoDepois,
 
     modoAdmin,
     modo_admin: modoAdmin,
