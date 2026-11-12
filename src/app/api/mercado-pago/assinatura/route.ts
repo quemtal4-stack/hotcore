@@ -41,7 +41,7 @@ const PLANOS_CLUBE = {
   },
   eternizado: {
     nome: "Eternizados",
-    valor: 497,
+    valor: 499.9,
     periodo: "anual",
     frequency: 12,
     frequency_type: "months",

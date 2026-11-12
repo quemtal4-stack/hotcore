@@ -4,11 +4,11 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const META_INGRESSOS = 100000;
-const META_INGRESSOS_COMUNS = 98000;
+const META_INGRESSOS = 102000;
+const META_INGRESSOS_COMUNS = 100000;
 const LIMITE_INGRESSOS_ETERNIZADOS = 2000;
-const META_ALIMENTOS_KG = 104000;
-const META_EVENTO_ATUAL = 23000;
+const META_ALIMENTOS_KG = 106000;
+const META_EVENTO_ATUAL = 25000;
 
 const TIPOS_INGRESSO = ["ingresso", "ingresso_evento", "ingresso_fixo"];
 
@@ -426,13 +426,13 @@ export async function GET() {
 
       regra: {
         ingressos_comuns:
-          "98.000 ingressos comuns x 1 kg = 98 toneladas de alimentos",
+          "100.000 ingressos comuns x 1 kg = 100 toneladas de alimentos",
         ingressos_eternizados:
           "2.000 ingressos eternizados x 3 kg = 6 toneladas de alimentos",
         limite_eternizados:
           "Máximo de 2.000 ingressos eternizados na meta geral",
         ciclo_evento:
-          "O evento atual pode ter controle próprio de 23.000 ingressos, mas o termômetro geral continua acumulando até 100.000 ingressos.",
+          "O evento atual pode ter controle próprio de 25.000 ingressos, mas o termômetro geral continua acumulando até 102.000 ingressos.",
         ingressos_simbolicos:
           "Ingressos simbólicos só somam no termômetro de alimentos quando o pedido não for de ração.",
         kits_alimentacao:
@@ -450,9 +450,9 @@ export async function GET() {
         clube_guardiao:
           "Guardião: R$ 89,90 por mês = 3 kg de alimento por pagamento aprovado",
         clube_eternizados:
-          "Eternizados: R$ 497,00 por ano = 14 kg de alimentos ou uma cesta básica por pagamento aprovado",
+          "Eternizados: R$ 499,90 por ano = 14 kg de alimentos ou uma cesta básica por pagamento aprovado",
         meta_total:
-          "100.000 ingressos no total: 98.000 comuns + 2.000 eternizados = 104 toneladas de alimentos, separadas da meta de 50 toneladas de ração.",
+          "102.000 ingressos no total: 100.000 comuns + 2.000 eternizados = 106 toneladas de alimentos, separadas da meta de 50 toneladas de ração.",
       },
     });
   } catch (error) {

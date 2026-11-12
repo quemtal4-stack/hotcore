@@ -4,8 +4,8 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const META_INGRESSOS = 100000;
-const META_INGRESSOS_COMUNS = 98000;
+const META_INGRESSOS = 102000;
+const META_INGRESSOS_COMUNS = 100000;
 const LIMITE_INGRESSOS_ETERNIZADOS = 2000;
 
 const TIPOS_INGRESSO = ["ingresso", "ingresso_evento", "ingresso_fixo"];
@@ -241,8 +241,8 @@ export async function GET() {
       excedentes,
 
       regra: {
-        total: "Meta geral de 100.000 ingressos.",
-        comuns: "Até 98.000 ingressos comuns entram na meta geral.",
+        total: "Meta geral de 102.000 ingressos.",
+        comuns: "Até 100.000 ingressos comuns entram na meta geral.",
         eternizados:
           "Até 2.000 ingressos eternizados entram na meta geral.",
         alimentos:

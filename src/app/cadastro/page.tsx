@@ -7,7 +7,7 @@ const VALOR_SEXTO_INGRESSO = 80;
 const VALOR_HOT_DOG_DAY = 20;
 const MIN_INGRESSOS = 1;
 const QUANTIDADE_PARA_LIBERAR_SEXTO = 5;
-const ANO_COLECAO_PADRAO = 2028;
+const ANO_COLECAO_PADRAO = 2027;
 const ANOS_COLECAO_SUPORTADOS = [2027, 2028] as const;
 
 type TipoCompra = "ingresso-solidario-colecionavel" | "hot-dog-day";
