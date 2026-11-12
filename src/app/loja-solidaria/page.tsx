@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import SetasNavegacao from "@/components/SetasNavegacao";
+import SecaoIngressosHistoricosLojaSolidaria from "@/components/SecaoIngressosHistoricosLojaSolidaria";
 
 const IMAGENS_INGRESSOS = [
   { titulo: "Ingresso Colecionável 01", imagem: "/loja-solidaria/ingressos/ingresso-01.png" },
@@ -942,6 +943,8 @@ export default function LojaSolidariaPage() {
             </a>
           </div>
         </section>
+
+<SecaoIngressosHistoricosLojaSolidaria />
 
         <section className="bg-white px-4 py-12">
           <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">
