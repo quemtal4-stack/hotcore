@@ -15,12 +15,428 @@ const IMAGENS_INGRESSOS = [
   { titulo: "Ingresso Colecionável 06", imagem: "/loja-solidaria/ingressos/ingresso-06.png" },
   { titulo: "Ingresso Colecionável 07", imagem: "/loja-solidaria/ingressos/ingresso-07.png" },
 ];
-
-const INGRESSO_APRESENTACAO_DO_ECOSSISTEMA_HOT_DOGUERES = {
-  titulo: "Apresentação Do Ecossistema Hot Dogueres 2026",
-  imagem: "/loja-solidaria/ingressos/apresentacao-do-ecossistema-hot-dogueres-2026.png",
+type ProdutoHistorico = {
+  id: string;
+  titulo: string;
+  subtitulo: string;
+  imagem?: string;
+  dataLiberacao: string;
+  precoMembro: number;
+  precoNaoMembro: number;
+  alimentosKg: number;
+  href: string;
+  checkoutAtivo: boolean;
 };
 
+type AlbumMemorias = {
+  id: string;
+  titulo: string;
+  subtitulo: string;
+  status: string;
+  imagem?: string;
+};
+
+function criarDataLocal(dataIso: string) {
+  const [ano, mes, dia] = dataIso.split("-").map(Number);
+  return new Date(ano, mes - 1, dia, 0, 0, 0);
+}
+
+function formatarDataCurta(dataIso: string) {
+  return criarDataLocal(dataIso).toLocaleDateString("pt-BR");
+}
+
+const INGRESSOS_EVENTOS_HISTORICOS: ProdutoHistorico[] = [
+  {
+    id: "feira-pets-day-01",
+    titulo: "Feira Pets Day 01",
+    subtitulo: "Ingresso histórico de evento",
+    dataLiberacao: "2027-01-02",
+    precoMembro: 20,
+    precoNaoMembro: 25,
+    alimentosKg: 1,
+    href: "/checkout/ingressos-historicos?produto=feira-pets-day-01",
+    checkoutAtivo: false,
+  },
+  {
+    id: "feira-pets-day-02",
+    titulo: "Feira Pets Day 02",
+    subtitulo: "Ingresso histórico de evento",
+    dataLiberacao: "2027-01-02",
+    precoMembro: 20,
+    precoNaoMembro: 25,
+    alimentosKg: 1,
+    href: "/checkout/ingressos-historicos?produto=feira-pets-day-02",
+    checkoutAtivo: false,
+  },
+  {
+    id: "festival-hot-dogueres-01",
+    titulo: "Festival Hot Dogueres 01",
+    subtitulo: "Ingresso histórico de festival",
+    dataLiberacao: "2027-01-02",
+    precoMembro: 20,
+    precoNaoMembro: 25,
+    alimentosKg: 1,
+    href: "/checkout/ingressos-historicos?produto=festival-hot-dogueres-01",
+    checkoutAtivo: false,
+  },
+  {
+    id: "corrida-solidaria-01",
+    titulo: "Corrida Solidária 01",
+    subtitulo: "Ingresso histórico esportivo",
+    dataLiberacao: "2027-01-02",
+    precoMembro: 20,
+    precoNaoMembro: 25,
+    alimentosKg: 1,
+    href: "/checkout/ingressos-historicos?produto=corrida-solidaria-01",
+    checkoutAtivo: false,
+  },
+  {
+    id: "corrida-solidaria-02",
+    titulo: "Corrida Solidária 02",
+    subtitulo: "Ingresso histórico esportivo",
+    dataLiberacao: "2027-01-02",
+    precoMembro: 20,
+    precoNaoMembro: 25,
+    alimentosKg: 1,
+    href: "/checkout/ingressos-historicos?produto=corrida-solidaria-02",
+    checkoutAtivo: false,
+  },
+  {
+    id: "adventure-race-01",
+    titulo: "Adventure Race 01",
+    subtitulo: "Ingresso histórico de aventura",
+    dataLiberacao: "2027-01-02",
+    precoMembro: 20,
+    precoNaoMembro: 25,
+    alimentosKg: 1,
+    href: "/checkout/ingressos-historicos?produto=adventure-race-01",
+    checkoutAtivo: false,
+  },
+  {
+    id: "evento-especial-07",
+    titulo: "Evento Especial 07",
+    subtitulo: "Modelo reservado para próximo ingresso",
+    dataLiberacao: "2027-01-02",
+    precoMembro: 20,
+    precoNaoMembro: 25,
+    alimentosKg: 1,
+    href: "/checkout/ingressos-historicos?produto=evento-especial-07",
+    checkoutAtivo: false,
+  },
+  {
+    id: "evento-especial-08",
+    titulo: "Evento Especial 08",
+    subtitulo: "Modelo reservado para próximo ingresso",
+    dataLiberacao: "2027-01-02",
+    precoMembro: 20,
+    precoNaoMembro: 25,
+    alimentosKg: 1,
+    href: "/checkout/ingressos-historicos?produto=evento-especial-08",
+    checkoutAtivo: false,
+  },
+];
+
+const INGRESSOS_FIXOS_2027: ProdutoHistorico[] = Array.from({ length: 6 }, (_, index) => {
+  const numero = index + 1;
+
+  return {
+    id: `ingresso-fixo-2027-${String(numero).padStart(2, "0")}`,
+    titulo: `Ingresso Fixo 2027.${String(numero).padStart(2, "0")}`,
+    subtitulo: "Coleção fixa anual 2027",
+    dataLiberacao: "2028-01-01",
+    precoMembro: 20,
+    precoNaoMembro: 25,
+    alimentosKg: 1,
+    href: `/checkout/ingressos-historicos?produto=ingresso-fixo-2027-${String(numero).padStart(2, "0")}`,
+    checkoutAtivo: false,
+  };
+});
+
+const INGRESSOS_CITY_QUEST: ProdutoHistorico[] = [
+  {
+    id: "city-quest-itabaiana",
+    titulo: "City Quest Itabaiana",
+    subtitulo: "Primeiro ingresso histórico City Quest",
+    dataLiberacao: "2027-01-02",
+    precoMembro: 20,
+    precoNaoMembro: 25,
+    alimentosKg: 1,
+    href: "/checkout/ingressos-historicos?produto=city-quest-itabaiana",
+    checkoutAtivo: false,
+  },
+  {
+    id: "city-quest-02",
+    titulo: "City Quest 02",
+    subtitulo: "Modelo reservado para próxima cidade",
+    dataLiberacao: "2027-01-02",
+    precoMembro: 20,
+    precoNaoMembro: 25,
+    alimentosKg: 1,
+    href: "/checkout/ingressos-historicos?produto=city-quest-02",
+    checkoutAtivo: false,
+  },
+  {
+    id: "city-quest-03",
+    titulo: "City Quest 03",
+    subtitulo: "Modelo reservado para próxima cidade",
+    dataLiberacao: "2027-01-02",
+    precoMembro: 20,
+    precoNaoMembro: 25,
+    alimentosKg: 1,
+    href: "/checkout/ingressos-historicos?produto=city-quest-03",
+    checkoutAtivo: false,
+  },
+  {
+    id: "city-quest-04",
+    titulo: "City Quest 04",
+    subtitulo: "Modelo reservado para próxima cidade",
+    dataLiberacao: "2027-01-02",
+    precoMembro: 20,
+    precoNaoMembro: 25,
+    alimentosKg: 1,
+    href: "/checkout/ingressos-historicos?produto=city-quest-04",
+    checkoutAtivo: false,
+  },
+  {
+    id: "city-quest-05",
+    titulo: "City Quest 05",
+    subtitulo: "Modelo reservado para próxima cidade",
+    dataLiberacao: "2027-01-02",
+    precoMembro: 20,
+    precoNaoMembro: 25,
+    alimentosKg: 1,
+    href: "/checkout/ingressos-historicos?produto=city-quest-05",
+    checkoutAtivo: false,
+  },
+  {
+    id: "city-quest-06",
+    titulo: "City Quest 06",
+    subtitulo: "Modelo reservado para próxima cidade",
+    dataLiberacao: "2027-01-02",
+    precoMembro: 20,
+    precoNaoMembro: 25,
+    alimentosKg: 1,
+    href: "/checkout/ingressos-historicos?produto=city-quest-06",
+    checkoutAtivo: false,
+  },
+];
+
+const ALBUNS_HOT_DOGUERES: AlbumMemorias[] = [
+  {
+    id: "album-fisico-premium",
+    titulo: "Álbum Físico Premium",
+    subtitulo: "Álbum colecionável para guardar as memórias dos próximos anos.",
+    status: "Pré-venda em breve",
+  },
+  {
+    id: "album-digital-2027",
+    titulo: "Álbum Digital 2027",
+    subtitulo: "Primeira parte da coleção digital Hot Dogueres.",
+    status: "Em breve",
+  },
+  {
+    id: "album-digital-2028",
+    titulo: "Álbum Digital 2028",
+    subtitulo: "Segunda parte da coleção digital Hot Dogueres.",
+    status: "Em breve",
+  },
+  {
+    id: "album-digital-2029",
+    titulo: "Álbum Digital 2029",
+    subtitulo: "Terceira parte da coleção digital Hot Dogueres.",
+    status: "Em breve",
+  },
+];
+
+function CardIngressoHistorico({ produto, hoje }: { produto: ProdutoHistorico; hoje: Date }) {
+  const liberadoPorData = hoje >= criarDataLocal(produto.dataLiberacao);
+  const compraAtiva = liberadoPorData && produto.checkoutAtivo;
+
+  const statusTexto = compraAtiva
+    ? "Disponível"
+    : liberadoPorData
+      ? "Aguardando conexão"
+      : `Bloqueado até ${formatarDataCurta(produto.dataLiberacao)}`;
+
+  const statusClasse = compraAtiva
+    ? "bg-green-100 text-green-800"
+    : liberadoPorData
+      ? "bg-yellow-100 text-yellow-800"
+      : "bg-gray-200 text-gray-700";
+
+  return (
+    <div className="flex h-full flex-col rounded-3xl border-2 border-red-100 bg-white p-4 shadow-lg transition hover:-translate-y-1 hover:shadow-xl">
+      <div className="relative h-56 overflow-hidden rounded-2xl bg-[#fff7e8]">
+        {produto.imagem ? (
+          <Image
+            src={produto.imagem}
+            alt={produto.titulo}
+            fill
+            sizes="(max-width: 768px) 100vw, 320px"
+            className="object-contain p-3"
+            unoptimized
+          />
+        ) : (
+          <div className="flex h-full flex-col items-center justify-center p-5 text-center">
+            <p className="text-6xl">🎟️</p>
+            <p className="mt-3 text-xs font-black uppercase tracking-wide text-red-600">
+              Modelo em breve
+            </p>
+          </div>
+        )}
+
+        <div className={`absolute left-3 top-3 rounded-full px-3 py-1 text-[10px] font-black uppercase shadow ${statusClasse}`}>
+          {statusTexto}
+        </div>
+      </div>
+
+      <div className="flex flex-1 flex-col">
+        <h3 className="mt-4 text-center text-lg font-black text-red-700">
+          {produto.titulo}
+        </h3>
+
+        <p className="mt-2 text-center text-sm font-semibold leading-relaxed text-gray-700">
+          {produto.subtitulo}
+        </p>
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-2xl bg-green-50 p-3 text-center">
+            <p className="text-[10px] font-black uppercase text-green-700">Membro</p>
+            <p className="mt-1 text-xl font-black text-green-700">
+              {formatarMoeda(produto.precoMembro)}
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-red-50 p-3 text-center">
+            <p className="text-[10px] font-black uppercase text-red-700">Não membro</p>
+            <p className="mt-1 text-xl font-black text-red-700">
+              {formatarMoeda(produto.precoNaoMembro)}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4 rounded-2xl bg-[#fff7e8] p-3 text-center">
+          <p className="text-xs font-black uppercase text-gray-500">Impacto solidário</p>
+          <p className="mt-1 text-sm font-bold text-green-700">
+            Cada ingresso representa {produto.alimentosKg} kg de alimento.
+          </p>
+        </div>
+
+        <div className="mt-auto pt-5">
+          {compraAtiva ? (
+            <div className="grid gap-3">
+              <Link
+                href={`${produto.href}&tipo=membro`}
+                className="rounded-full bg-green-600 px-5 py-3 text-center text-sm font-black text-white shadow-md transition hover:bg-green-700"
+              >
+                Comprar como membro
+              </Link>
+
+              <Link
+                href={`${produto.href}&tipo=nao-membro`}
+                className="rounded-full bg-red-600 px-5 py-3 text-center text-sm font-black text-white shadow-md transition hover:bg-red-700"
+              >
+                Comprar sem ser membro
+              </Link>
+            </div>
+          ) : (
+            <div className="grid gap-3">
+              <button
+                type="button"
+                disabled
+                className="cursor-not-allowed rounded-full bg-gray-300 px-5 py-3 text-center text-sm font-black text-gray-600"
+              >
+                Membro — bloqueado
+              </button>
+
+              <button
+                type="button"
+                disabled
+                className="cursor-not-allowed rounded-full bg-gray-300 px-5 py-3 text-center text-sm font-black text-gray-600"
+              >
+                Não membro — bloqueado
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SecaoIngressosHistoricos({
+  titulo,
+  descricao,
+  produtos,
+  hoje,
+}: {
+  titulo: string;
+  descricao: string;
+  produtos: ProdutoHistorico[];
+  hoje: Date;
+}) {
+  return (
+    <div className="mt-12">
+      <div className="mb-6 text-center">
+        <h3 className="text-2xl font-black text-red-700 md:text-4xl">
+          {titulo}
+        </h3>
+
+        <p className="mx-auto mt-3 max-w-3xl font-medium leading-relaxed text-gray-800">
+          {descricao}
+        </p>
+      </div>
+
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {produtos.map((produto) => (
+          <CardIngressoHistorico key={produto.id} produto={produto} hoje={hoje} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CardAlbumMemorias({ album }: { album: AlbumMemorias }) {
+  return (
+    <div className="flex h-full flex-col rounded-3xl border-2 border-yellow-200 bg-white p-4 text-center shadow-lg transition hover:-translate-y-1 hover:shadow-xl">
+      <div className="relative h-52 overflow-hidden rounded-2xl bg-gradient-to-br from-yellow-100 via-white to-red-50">
+        {album.imagem ? (
+          <Image
+            src={album.imagem}
+            alt={album.titulo}
+            fill
+            sizes="(max-width: 768px) 100vw, 320px"
+            className="object-contain p-3"
+            unoptimized
+          />
+        ) : (
+          <div className="flex h-full flex-col items-center justify-center p-5">
+            <p className="text-6xl">📖</p>
+            <p className="mt-3 text-xs font-black uppercase tracking-wide text-yellow-700">
+              {album.status}
+            </p>
+          </div>
+        )}
+      </div>
+
+      <h3 className="mt-4 text-lg font-black text-red-700">
+        {album.titulo}
+      </h3>
+
+      <p className="mt-2 flex-1 text-sm font-semibold leading-relaxed text-gray-700">
+        {album.subtitulo}
+      </p>
+
+      <button
+        type="button"
+        disabled
+        className="mt-5 cursor-not-allowed rounded-full bg-yellow-300 px-5 py-3 text-sm font-black text-gray-800"
+      >
+        Pré-venda em breve
+      </button>
+    </div>
+  );
+}
 const CHECKOUT_ALIMENTO_URL = "/checkout/alimentos";
 const CHECKOUT_RACAO_URL = "/checkout/racao";
 
@@ -965,72 +1381,120 @@ export default function LojaSolidariaPage() {
           </div>
         </section>
 
-        <section id="ingressos" className="mx-auto max-w-6xl px-4 py-14">
-          <div className="mb-8 text-center">
-            <h2 className="text-3xl font-black text-red-700 md:text-5xl">Ingressos Colecionáveis</h2>
+       <section id="ingressos" className="mx-auto max-w-6xl px-4 py-14">
+  <div className="mb-8 text-center">
+    <span className="inline-flex rounded-full bg-yellow-100 px-5 py-2 text-sm font-black uppercase tracking-wide text-yellow-800">
+      Coleção oficial Hot Dogueres
+    </span>
 
-            <p className="mx-auto mt-4 max-w-3xl text-lg font-medium text-gray-800">
-              Os ingressos colecionáveis fazem parte da campanha Hot Dogueres. Por serem digitais/colecionáveis, não
-              precisam de impressão em estoque.
-            </p>
-          </div>
+    <h2 className="mt-4 text-3xl font-black text-red-700 md:text-5xl">
+      Ingressos Históricos
+    </h2>
 
-          <div className="mx-auto max-w-3xl">
-            <CarrosselImagens itens={IMAGENS_INGRESSOS} altura="h-[420px] md:h-[560px]" corAtiva="bg-red-600" />
-          </div>
+    <p className="mx-auto mt-4 max-w-4xl text-lg font-medium leading-relaxed text-gray-800">
+      Os ingressos históricos são modelos colecionáveis de eventos que já saíram do destaque principal.
+      Eles ficam bloqueados na loja até o evento passar e depois poderão ser comprados por colecionadores.
+    </p>
+  </div>
 
-          <div className="mx-auto mt-10 max-w-xl rounded-3xl border-4 border-red-600 bg-white p-6 text-center shadow-xl">
-            <h3 className="text-2xl font-black text-red-700">Ingresso Solidário Hot Dogueres</h3>
+  <div className="grid gap-8 lg:grid-cols-[1fr_0.85fr] lg:items-center">
+    <div>
+      <CarrosselImagens
+        itens={IMAGENS_INGRESSOS}
+        altura="h-[420px] md:h-[560px]"
+        corAtiva="bg-red-600"
+      />
+    </div>
 
-            <p className="mt-3 font-medium leading-relaxed text-gray-800">
-              Entrada para participar do festival, com cultura, diversão, gastronomia e solidariedade.
-            </p>
+    <div className="rounded-[2rem] border-4 border-red-600 bg-white p-6 text-center shadow-xl">
+      <span className="inline-flex rounded-full bg-red-100 px-4 py-2 text-xs font-black uppercase tracking-wide text-red-700">
+        Em breve na loja
+      </span>
 
-            <Link
-              href="/#ingressos"
-              className="mt-6 block rounded-full bg-red-600 px-6 py-3 text-center text-sm font-black text-white shadow-md transition hover:bg-red-700"
-            >
-              Ver ingressos na página inicial
-            </Link>
-          </div>
+      <h3 className="mt-4 text-3xl font-black leading-tight text-red-700">
+        Ingressos que viram memória, coleção e alimento
+      </h3>
 
-          <div className="mx-auto mt-12 max-w-3xl rounded-3xl border-4 border-yellow-400 bg-white p-6 shadow-xl">
-            <div className="grid gap-6 md:grid-cols-2 md:items-center">
-              <div className="relative h-80 overflow-hidden rounded-3xl bg-[#fff7e8]">
-                <Image
-                  src={INGRESSO_APRESENTACAO_DO_ECOSSISTEMA_HOT_DOGUERES.imagem}
-                  alt={INGRESSO_APRESENTACAO_DO_ECOSSISTEMA_HOT_DOGUERES.titulo}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 400px"
-                  className="object-contain p-4"
-                  unoptimized
-                />
-              </div>
+      <p className="mt-4 font-medium leading-relaxed text-gray-800">
+        Quando um evento sai da página inicial, o ingresso deixa de ser destaque e entra aqui como item histórico.
+        Assim, quem conheceu o ecossistema depois ainda poderá completar sua coleção.
+      </p>
 
-              <div className="text-center md:text-left">
-                <span className="rounded-full bg-yellow-100 px-4 py-2 text-xs font-black text-yellow-800">
-                  Apresentação do Ecossistema Hot Dogueres 2026
-                </span>
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <div className="rounded-2xl bg-green-50 p-4">
+          <p className="text-xs font-black uppercase text-green-700">Membros</p>
+          <p className="mt-1 text-3xl font-black text-green-700">R$ 20</p>
+        </div>
 
-                <h3 className="mt-4 text-2xl font-black text-red-700">
-                  {INGRESSO_APRESENTACAO_DO_ECOSSISTEMA_HOT_DOGUERES.titulo}
-                </h3>
+        <div className="rounded-2xl bg-red-50 p-4">
+          <p className="text-xs font-black uppercase text-red-700">Não membros</p>
+          <p className="mt-1 text-3xl font-black text-red-700">R$ 25</p>
+        </div>
+      </div>
 
-                <p className="mt-3 font-medium leading-relaxed text-gray-800">
-                  Um ingresso especial para ações, eventos e campanhas voltadas ao Dia das Crianças no universo Hot
-                  Dogueres.
-                </p>
+      <div className="mt-6 rounded-2xl bg-[#fff7e8] p-4">
+        <p className="text-sm font-black uppercase tracking-wide text-gray-600">
+          Regra da coleção
+        </p>
 
-                <Link
-                  href="/colecionaveis/hot-dog-day"
-                  className="mt-6 block rounded-full bg-yellow-400 px-6 py-3 text-center text-sm font-black text-gray-950 shadow-md transition hover:bg-yellow-500"
-                >
-                  Comprar Ingresso Especial
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
+        <p className="mt-2 text-sm font-bold leading-relaxed text-gray-800">
+          O ingresso só será liberado na loja depois que o evento passar. Os ingressos fixos de 2027
+          entram na loja apenas em 2028.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        disabled
+        className="mt-6 w-full cursor-not-allowed rounded-full bg-gray-300 px-6 py-3 text-sm font-black text-gray-600"
+      >
+        Compra bloqueada até a conexão oficial
+      </button>
+    </div>
+  </div>
+
+  <div className="mt-12 rounded-[2rem] border-4 border-yellow-400 bg-white p-6 text-center shadow-xl">
+    <span className="inline-flex rounded-full bg-yellow-100 px-5 py-2 text-sm font-black uppercase tracking-wide text-yellow-800">
+      Em breve
+    </span>
+
+    <h3 className="mt-4 text-3xl font-black text-red-700 md:text-4xl">
+      Álbum Hot Dogueres — Memórias que Alimentam
+    </h3>
+
+    <p className="mx-auto mt-4 max-w-4xl font-medium leading-relaxed text-gray-800">
+      Um álbum premium para organizar os ingressos colecionáveis, contar a história de cada evento e
+      estimular os colecionadores a completarem sua jornada dentro do ecossistema Hot Dogueres.
+    </p>
+
+    <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {ALBUNS_HOT_DOGUERES.map((album) => (
+        <CardAlbumMemorias key={album.id} album={album} />
+      ))}
+    </div>
+  </div>
+
+  <SecaoIngressosHistoricos
+    titulo="Ingressos Eventos"
+    descricao="Ingressos históricos de feiras, festivais, corridas, ações especiais e eventos oficiais Hot Dogueres."
+    produtos={INGRESSOS_EVENTOS_HISTORICOS}
+    hoje={hoje}
+  />
+
+  <SecaoIngressosHistoricos
+    titulo="Ingressos Fixos"
+    descricao="Coleção fixa anual. Os ingressos de 2027 ficarão bloqueados e entrarão na loja somente em 2028."
+    produtos={INGRESSOS_FIXOS_2027}
+    hoje={hoje}
+  />
+
+  <SecaoIngressosHistoricos
+    titulo="Ingressos City Quest"
+    descricao="Coleção especial City Quest, começando por Itabaiana e abrindo novos modelos conforme as próximas cidades entrarem no projeto."
+    produtos={INGRESSOS_CITY_QUEST}
+    hoje={hoje}
+  />
+</section>
 
         <section id="livros" className="bg-white px-4 py-14">
           <div className="mx-auto max-w-6xl">
