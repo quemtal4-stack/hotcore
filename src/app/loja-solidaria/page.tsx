@@ -6,437 +6,6 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import SetasNavegacao from "@/components/SetasNavegacao";
 import SecaoIngressosHistoricosLojaSolidaria from "@/components/SecaoIngressosHistoricosLojaSolidaria";
 
-const IMAGENS_INGRESSOS = [
-  { titulo: "Ingresso Colecionável 01", imagem: "/loja-solidaria/ingressos/ingresso-01.png" },
-  { titulo: "Ingresso Colecionável 02", imagem: "/loja-solidaria/ingressos/ingresso-02.png" },
-  { titulo: "Ingresso Colecionável 03", imagem: "/loja-solidaria/ingressos/ingresso-03.png" },
-  { titulo: "Ingresso Colecionável 04", imagem: "/loja-solidaria/ingressos/ingresso-04.png" },
-  { titulo: "Ingresso Colecionável 05", imagem: "/loja-solidaria/ingressos/ingresso-05.png" },
-  { titulo: "Ingresso Colecionável 06", imagem: "/loja-solidaria/ingressos/ingresso-06.png" },
-  { titulo: "Ingresso Colecionável 07", imagem: "/loja-solidaria/ingressos/ingresso-07.png" },
-];
-type ProdutoHistorico = {
-  id: string;
-  titulo: string;
-  subtitulo: string;
-  imagem?: string;
-  dataLiberacao: string;
-  precoMembro: number;
-  precoNaoMembro: number;
-  alimentosKg: number;
-  href: string;
-  checkoutAtivo: boolean;
-};
-
-type AlbumMemorias = {
-  id: string;
-  titulo: string;
-  subtitulo: string;
-  status: string;
-  imagem?: string;
-};
-
-function criarDataLocal(dataIso: string) {
-  const [ano, mes, dia] = dataIso.split("-").map(Number);
-  return new Date(ano, mes - 1, dia, 0, 0, 0);
-}
-
-function formatarDataCurta(dataIso: string) {
-  return criarDataLocal(dataIso).toLocaleDateString("pt-BR");
-}
-
-const INGRESSOS_EVENTOS_HISTORICOS: ProdutoHistorico[] = [
-  {
-    id: "feira-pets-day-01",
-    titulo: "Feira Pets Day 01",
-    subtitulo: "Ingresso histórico de evento",
-    dataLiberacao: "2027-01-02",
-    precoMembro: 20,
-    precoNaoMembro: 25,
-    alimentosKg: 1,
-    href: "/checkout/ingressos-historicos?produto=feira-pets-day-01",
-    checkoutAtivo: false,
-  },
-  {
-    id: "feira-pets-day-02",
-    titulo: "Feira Pets Day 02",
-    subtitulo: "Ingresso histórico de evento",
-    dataLiberacao: "2027-01-02",
-    precoMembro: 20,
-    precoNaoMembro: 25,
-    alimentosKg: 1,
-    href: "/checkout/ingressos-historicos?produto=feira-pets-day-02",
-    checkoutAtivo: false,
-  },
-  {
-    id: "festival-hot-dogueres-01",
-    titulo: "Festival Hot Dogueres 01",
-    subtitulo: "Ingresso histórico de festival",
-    dataLiberacao: "2027-01-02",
-    precoMembro: 20,
-    precoNaoMembro: 25,
-    alimentosKg: 1,
-    href: "/checkout/ingressos-historicos?produto=festival-hot-dogueres-01",
-    checkoutAtivo: false,
-  },
-  {
-    id: "corrida-solidaria-01",
-    titulo: "Corrida Solidária 01",
-    subtitulo: "Ingresso histórico esportivo",
-    dataLiberacao: "2027-01-02",
-    precoMembro: 20,
-    precoNaoMembro: 25,
-    alimentosKg: 1,
-    href: "/checkout/ingressos-historicos?produto=corrida-solidaria-01",
-    checkoutAtivo: false,
-  },
-  {
-    id: "corrida-solidaria-02",
-    titulo: "Corrida Solidária 02",
-    subtitulo: "Ingresso histórico esportivo",
-    dataLiberacao: "2027-01-02",
-    precoMembro: 20,
-    precoNaoMembro: 25,
-    alimentosKg: 1,
-    href: "/checkout/ingressos-historicos?produto=corrida-solidaria-02",
-    checkoutAtivo: false,
-  },
-  {
-    id: "adventure-race-01",
-    titulo: "Adventure Race 01",
-    subtitulo: "Ingresso histórico de aventura",
-    dataLiberacao: "2027-01-02",
-    precoMembro: 20,
-    precoNaoMembro: 25,
-    alimentosKg: 1,
-    href: "/checkout/ingressos-historicos?produto=adventure-race-01",
-    checkoutAtivo: false,
-  },
-  {
-    id: "evento-especial-07",
-    titulo: "Evento Especial 07",
-    subtitulo: "Modelo reservado para próximo ingresso",
-    dataLiberacao: "2027-01-02",
-    precoMembro: 20,
-    precoNaoMembro: 25,
-    alimentosKg: 1,
-    href: "/checkout/ingressos-historicos?produto=evento-especial-07",
-    checkoutAtivo: false,
-  },
-  {
-    id: "evento-especial-08",
-    titulo: "Evento Especial 08",
-    subtitulo: "Modelo reservado para próximo ingresso",
-    dataLiberacao: "2027-01-02",
-    precoMembro: 20,
-    precoNaoMembro: 25,
-    alimentosKg: 1,
-    href: "/checkout/ingressos-historicos?produto=evento-especial-08",
-    checkoutAtivo: false,
-  },
-];
-
-const INGRESSOS_FIXOS_2027: ProdutoHistorico[] = Array.from({ length: 6 }, (_, index) => {
-  const numero = index + 1;
-
-  return {
-    id: `ingresso-fixo-2027-${String(numero).padStart(2, "0")}`,
-    titulo: `Ingresso Fixo 2027.${String(numero).padStart(2, "0")}`,
-    subtitulo: "Coleção fixa anual 2027",
-    dataLiberacao: "2028-01-01",
-    precoMembro: 20,
-    precoNaoMembro: 25,
-    alimentosKg: 1,
-    href: `/checkout/ingressos-historicos?produto=ingresso-fixo-2027-${String(numero).padStart(2, "0")}`,
-    checkoutAtivo: false,
-  };
-});
-
-const INGRESSOS_CITY_QUEST: ProdutoHistorico[] = [
-  {
-    id: "city-quest-itabaiana",
-    titulo: "City Quest Itabaiana",
-    subtitulo: "Primeiro ingresso histórico City Quest",
-    dataLiberacao: "2027-01-02",
-    precoMembro: 20,
-    precoNaoMembro: 25,
-    alimentosKg: 1,
-    href: "/checkout/ingressos-historicos?produto=city-quest-itabaiana",
-    checkoutAtivo: false,
-  },
-  {
-    id: "city-quest-02",
-    titulo: "City Quest 02",
-    subtitulo: "Modelo reservado para próxima cidade",
-    dataLiberacao: "2027-01-02",
-    precoMembro: 20,
-    precoNaoMembro: 25,
-    alimentosKg: 1,
-    href: "/checkout/ingressos-historicos?produto=city-quest-02",
-    checkoutAtivo: false,
-  },
-  {
-    id: "city-quest-03",
-    titulo: "City Quest 03",
-    subtitulo: "Modelo reservado para próxima cidade",
-    dataLiberacao: "2027-01-02",
-    precoMembro: 20,
-    precoNaoMembro: 25,
-    alimentosKg: 1,
-    href: "/checkout/ingressos-historicos?produto=city-quest-03",
-    checkoutAtivo: false,
-  },
-  {
-    id: "city-quest-04",
-    titulo: "City Quest 04",
-    subtitulo: "Modelo reservado para próxima cidade",
-    dataLiberacao: "2027-01-02",
-    precoMembro: 20,
-    precoNaoMembro: 25,
-    alimentosKg: 1,
-    href: "/checkout/ingressos-historicos?produto=city-quest-04",
-    checkoutAtivo: false,
-  },
-  {
-    id: "city-quest-05",
-    titulo: "City Quest 05",
-    subtitulo: "Modelo reservado para próxima cidade",
-    dataLiberacao: "2027-01-02",
-    precoMembro: 20,
-    precoNaoMembro: 25,
-    alimentosKg: 1,
-    href: "/checkout/ingressos-historicos?produto=city-quest-05",
-    checkoutAtivo: false,
-  },
-  {
-    id: "city-quest-06",
-    titulo: "City Quest 06",
-    subtitulo: "Modelo reservado para próxima cidade",
-    dataLiberacao: "2027-01-02",
-    precoMembro: 20,
-    precoNaoMembro: 25,
-    alimentosKg: 1,
-    href: "/checkout/ingressos-historicos?produto=city-quest-06",
-    checkoutAtivo: false,
-  },
-];
-
-const ALBUNS_HOT_DOGUERES: AlbumMemorias[] = [
-  {
-    id: "album-fisico-premium",
-    titulo: "Álbum Físico Premium",
-    subtitulo: "Álbum colecionável para guardar as memórias dos próximos anos.",
-    status: "Pré-venda em breve",
-  },
-  {
-    id: "album-digital-2027",
-    titulo: "Álbum Digital 2027",
-    subtitulo: "Primeira parte da coleção digital Hot Dogueres.",
-    status: "Em breve",
-  },
-  {
-    id: "album-digital-2028",
-    titulo: "Álbum Digital 2028",
-    subtitulo: "Segunda parte da coleção digital Hot Dogueres.",
-    status: "Em breve",
-  },
-  {
-    id: "album-digital-2029",
-    titulo: "Álbum Digital 2029",
-    subtitulo: "Terceira parte da coleção digital Hot Dogueres.",
-    status: "Em breve",
-  },
-];
-
-function CardIngressoHistorico({ produto, hoje }: { produto: ProdutoHistorico; hoje: Date }) {
-  const liberadoPorData = hoje >= criarDataLocal(produto.dataLiberacao);
-  const compraAtiva = liberadoPorData && produto.checkoutAtivo;
-
-  const statusTexto = compraAtiva
-    ? "Disponível"
-    : liberadoPorData
-      ? "Aguardando conexão"
-      : `Bloqueado até ${formatarDataCurta(produto.dataLiberacao)}`;
-
-  const statusClasse = compraAtiva
-    ? "bg-green-100 text-green-800"
-    : liberadoPorData
-      ? "bg-yellow-100 text-yellow-800"
-      : "bg-gray-200 text-gray-700";
-
-  return (
-    <div className="flex h-full flex-col rounded-3xl border-2 border-red-100 bg-white p-4 shadow-lg transition hover:-translate-y-1 hover:shadow-xl">
-      <div className="relative h-56 overflow-hidden rounded-2xl bg-[#fff7e8]">
-        {produto.imagem ? (
-          <Image
-            src={produto.imagem}
-            alt={produto.titulo}
-            fill
-            sizes="(max-width: 768px) 100vw, 320px"
-            className="object-contain p-3"
-            unoptimized
-          />
-        ) : (
-          <div className="flex h-full flex-col items-center justify-center p-5 text-center">
-            <p className="text-6xl">🎟️</p>
-            <p className="mt-3 text-xs font-black uppercase tracking-wide text-red-600">
-              Modelo em breve
-            </p>
-          </div>
-        )}
-
-        <div className={`absolute left-3 top-3 rounded-full px-3 py-1 text-[10px] font-black uppercase shadow ${statusClasse}`}>
-          {statusTexto}
-        </div>
-      </div>
-
-      <div className="flex flex-1 flex-col">
-        <h3 className="mt-4 text-center text-lg font-black text-red-700">
-          {produto.titulo}
-        </h3>
-
-        <p className="mt-2 text-center text-sm font-semibold leading-relaxed text-gray-700">
-          {produto.subtitulo}
-        </p>
-
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-2xl bg-green-50 p-3 text-center">
-            <p className="text-[10px] font-black uppercase text-green-700">Membro</p>
-            <p className="mt-1 text-xl font-black text-green-700">
-              {formatarMoeda(produto.precoMembro)}
-            </p>
-          </div>
-
-          <div className="rounded-2xl bg-red-50 p-3 text-center">
-            <p className="text-[10px] font-black uppercase text-red-700">Não membro</p>
-            <p className="mt-1 text-xl font-black text-red-700">
-              {formatarMoeda(produto.precoNaoMembro)}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-4 rounded-2xl bg-[#fff7e8] p-3 text-center">
-          <p className="text-xs font-black uppercase text-gray-500">Impacto solidário</p>
-          <p className="mt-1 text-sm font-bold text-green-700">
-            Cada ingresso representa {produto.alimentosKg} kg de alimento.
-          </p>
-        </div>
-
-        <div className="mt-auto pt-5">
-          {compraAtiva ? (
-            <div className="grid gap-3">
-              <Link
-                href={`${produto.href}&tipo=membro`}
-                className="rounded-full bg-green-600 px-5 py-3 text-center text-sm font-black text-white shadow-md transition hover:bg-green-700"
-              >
-                Comprar como membro
-              </Link>
-
-              <Link
-                href={`${produto.href}&tipo=nao-membro`}
-                className="rounded-full bg-red-600 px-5 py-3 text-center text-sm font-black text-white shadow-md transition hover:bg-red-700"
-              >
-                Comprar sem ser membro
-              </Link>
-            </div>
-          ) : (
-            <div className="grid gap-3">
-              <button
-                type="button"
-                disabled
-                className="cursor-not-allowed rounded-full bg-gray-300 px-5 py-3 text-center text-sm font-black text-gray-600"
-              >
-                Membro — bloqueado
-              </button>
-
-              <button
-                type="button"
-                disabled
-                className="cursor-not-allowed rounded-full bg-gray-300 px-5 py-3 text-center text-sm font-black text-gray-600"
-              >
-                Não membro — bloqueado
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SecaoIngressosHistoricos({
-  titulo,
-  descricao,
-  produtos,
-  hoje,
-}: {
-  titulo: string;
-  descricao: string;
-  produtos: ProdutoHistorico[];
-  hoje: Date;
-}) {
-  return (
-    <div className="mt-12">
-      <div className="mb-6 text-center">
-        <h3 className="text-2xl font-black text-red-700 md:text-4xl">
-          {titulo}
-        </h3>
-
-        <p className="mx-auto mt-3 max-w-3xl font-medium leading-relaxed text-gray-800">
-          {descricao}
-        </p>
-      </div>
-
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {produtos.map((produto) => (
-          <CardIngressoHistorico key={produto.id} produto={produto} hoje={hoje} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function CardAlbumMemorias({ album }: { album: AlbumMemorias }) {
-  return (
-    <div className="flex h-full flex-col rounded-3xl border-2 border-yellow-200 bg-white p-4 text-center shadow-lg transition hover:-translate-y-1 hover:shadow-xl">
-      <div className="relative h-52 overflow-hidden rounded-2xl bg-gradient-to-br from-yellow-100 via-white to-red-50">
-        {album.imagem ? (
-          <Image
-            src={album.imagem}
-            alt={album.titulo}
-            fill
-            sizes="(max-width: 768px) 100vw, 320px"
-            className="object-contain p-3"
-            unoptimized
-          />
-        ) : (
-          <div className="flex h-full flex-col items-center justify-center p-5">
-            <p className="text-6xl">📖</p>
-            <p className="mt-3 text-xs font-black uppercase tracking-wide text-yellow-700">
-              {album.status}
-            </p>
-          </div>
-        )}
-      </div>
-
-      <h3 className="mt-4 text-lg font-black text-red-700">
-        {album.titulo}
-      </h3>
-
-      <p className="mt-2 flex-1 text-sm font-semibold leading-relaxed text-gray-700">
-        {album.subtitulo}
-      </p>
-
-      <button
-        type="button"
-        disabled
-        className="mt-5 cursor-not-allowed rounded-full bg-yellow-300 px-5 py-3 text-sm font-black text-gray-800"
-      >
-        Pré-venda em breve
-      </button>
-    </div>
-  );
-}
 const CHECKOUT_ALIMENTO_URL = "/checkout/alimentos";
 const CHECKOUT_RACAO_URL = "/checkout/racao";
 
@@ -629,9 +198,17 @@ function CardKitComQuantidade({
       </p>
 
       <div className="mt-4 rounded-2xl bg-[#fff7e8] p-4 text-center">
-        <p className="text-[10px] font-black uppercase text-gray-500">Valor do kit</p>
-        <p className={`mt-1 text-2xl font-black ${cores.valor}`}>{kit.valor}</p>
-        <p className="mt-1 text-xs font-bold text-gray-600">{kit.quantidade}</p>
+        <p className="text-[10px] font-black uppercase text-gray-500">
+          Valor do kit
+        </p>
+
+        <p className={`mt-1 text-2xl font-black ${cores.valor}`}>
+          {kit.valor}
+        </p>
+
+        <p className="mt-1 text-xs font-bold text-gray-600">
+          {kit.quantidade}
+        </p>
       </div>
 
       <div className="mt-4 flex items-center justify-center gap-3">
@@ -657,8 +234,14 @@ function CardKitComQuantidade({
       </div>
 
       <div className="mt-4 rounded-2xl bg-gray-50 p-4 text-center">
-        <p className="text-[10px] font-black uppercase text-gray-500">Total selecionado</p>
-        <p className="mt-1 text-lg font-black text-gray-950">{formatarMoeda(totalValor)}</p>
+        <p className="text-[10px] font-black uppercase text-gray-500">
+          Total selecionado
+        </p>
+
+        <p className="mt-1 text-lg font-black text-gray-950">
+          {formatarMoeda(totalValor)}
+        </p>
+
         <p className="mt-1 text-xs font-bold text-green-700">{totalKg} kg</p>
       </div>
 
@@ -698,11 +281,6 @@ const CAMISAS_INFANTIS_JORNADA = Array.from({ length: 8 }, (_, index) => ({
   titulo: `Camisa Infantil A Jornada Hot Dogueres ${String(index + 1).padStart(2, "0")}`,
   imagem: `/loja-solidaria/camisas/jornada-infantil-${String(index + 1).padStart(2, "0")}.png`,
 }));
-
-type ItemCarrossel = {
-  titulo: string;
-  imagem: string;
-};
 
 type ProdutoImagem = {
   titulo: string;
@@ -779,62 +357,6 @@ function statusPreVenda(livro: LivroPreVenda, hoje: Date) {
   return "ativa";
 }
 
-function CarrosselImagens({
-  itens,
-  altura = "h-[380px]",
-  corAtiva = "bg-red-600",
-}: {
-  itens: ItemCarrossel[];
-  altura?: string;
-  corAtiva?: string;
-}) {
-  const [indiceAtual, setIndiceAtual] = useState(0);
-
-  const itemAtual = itens[indiceAtual];
-
-  useEffect(() => {
-    const intervalo = window.setInterval(() => {
-      setIndiceAtual((valorAtual) => {
-        return (valorAtual + 1) % itens.length;
-      });
-    }, 5000);
-
-    return () => {
-      window.clearInterval(intervalo);
-    };
-  }, [itens.length]);
-
-  return (
-    <div className="w-full">
-      <div className={`relative ${altura} overflow-hidden rounded-[2rem] bg-white shadow-xl ring-1 ring-red-100`}>
-        <Image
-          key={itemAtual.imagem}
-          src={itemAtual.imagem}
-          alt={itemAtual.titulo}
-          fill
-          sizes="(max-width: 768px) 100vw, 700px"
-          className="object-contain p-4 transition-all duration-500"
-          unoptimized
-        />
-      </div>
-
-      <div className="mt-4 flex justify-center gap-2">
-        {itens.map((item, index) => (
-          <button
-            key={item.imagem}
-            type="button"
-            onClick={() => setIndiceAtual(index)}
-            className={`h-3 rounded-full transition ${
-              indiceAtual === index ? `w-10 ${corAtiva}` : "w-3 bg-gray-300 hover:bg-gray-400"
-            }`}
-            aria-label={`Ir para ${item.titulo}`}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function CardCamisa({
   produto,
   observacao,
@@ -909,7 +431,9 @@ function CardCamisa({
       </div>
 
       <div className="flex flex-1 flex-col">
-        <h3 className="mt-4 text-center text-lg font-black text-red-700">{produto.titulo}</h3>
+        <h3 className="mt-4 text-center text-lg font-black text-red-700">
+          {produto.titulo}
+        </h3>
 
         {observacao && (
           <p className="mt-2 text-center text-sm font-semibold leading-relaxed text-gray-700">
@@ -918,7 +442,9 @@ function CardCamisa({
         )}
 
         <div className="mt-5">
-          <p className="mb-3 text-sm font-black text-gray-800">Escolha o tamanho:</p>
+          <p className="mb-3 text-sm font-black text-gray-800">
+            Escolha o tamanho:
+          </p>
 
           <div className="flex flex-wrap gap-2">
             {TAMANHOS_CAMISA.map((tamanho) => (
@@ -968,7 +494,8 @@ function CardCamisa({
         </div>
 
         <div className="mt-5 rounded-2xl bg-green-100 p-4 text-sm font-bold text-green-800">
-          Após o pagamento, você receberá a confirmação do pedido e a previsão de entrega da camisa.
+          Após o pagamento, você receberá a confirmação do pedido e a previsão
+          de entrega da camisa.
         </div>
 
         {tamanhoSelecionado ? (
@@ -1004,7 +531,12 @@ function GradeCamisas({
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {produtos.map((produto) => (
-        <CardCamisa key={produto.imagem} produto={produto} observacao={observacao} destaque={destaque} />
+        <CardCamisa
+          key={produto.imagem}
+          produto={produto}
+          observacao={observacao}
+          destaque={destaque}
+        />
       ))}
     </div>
   );
@@ -1044,24 +576,30 @@ function CardLivro({ livro, hoje }: { livro: LivroPreVenda; hoje: Date }) {
         {statusTexto}
       </div>
 
-      <h3 className="mt-3 text-center text-lg font-black text-red-700">{livro.titulo}</h3>
+      <h3 className="mt-3 text-center text-lg font-black text-red-700">
+        {livro.titulo}
+      </h3>
 
       <div className="mt-4 space-y-2 rounded-2xl bg-[#fff7e8] p-4 text-sm font-semibold text-gray-800">
         <p>
-          <span className="font-black text-red-700">Abre:</span> {formatarData(livro.inicio)}
+          <span className="font-black text-red-700">Abre:</span>{" "}
+          {formatarData(livro.inicio)}
         </p>
 
         <p>
-          <span className="font-black text-red-700">Fecha:</span> {formatarData(livro.fechamento)}
+          <span className="font-black text-red-700">Fecha:</span>{" "}
+          {formatarData(livro.fechamento)}
         </p>
 
         <p>
-          <span className="font-black text-red-700">Entrega:</span> {formatarData(livro.entrega)}
+          <span className="font-black text-red-700">Entrega:</span>{" "}
+          {formatarData(livro.entrega)}
         </p>
       </div>
 
       <p className="mt-3 text-center text-xs font-semibold leading-relaxed text-gray-600">
-        Produto em pré-venda. Livros não incluem doação de alimentos, pois o custo de produção é alto e o lucro é mínimo.
+        Produto em pré-venda. Livros não incluem doação de alimentos, pois o
+        custo de produção é alto e o lucro é mínimo.
       </p>
 
       <button
@@ -1089,9 +627,13 @@ function SecaoLivros({
   return (
     <div className="mt-10">
       <div className="mb-8 text-center">
-        <h3 className="text-2xl font-black text-red-700 md:text-4xl">{titulo}</h3>
+        <h3 className="text-2xl font-black text-red-700 md:text-4xl">
+          {titulo}
+        </h3>
 
-        <p className="mx-auto mt-3 max-w-3xl font-medium leading-relaxed text-gray-800">{descricao}</p>
+        <p className="mx-auto mt-3 max-w-3xl font-medium leading-relaxed text-gray-800">
+          {descricao}
+        </p>
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -1118,7 +660,10 @@ function FormularioProjetoEspecial() {
   }
 
   return (
-    <form onSubmit={enviar} className="mx-auto mt-8 max-w-xl space-y-3 rounded-2xl bg-white/15 p-5 text-left">
+    <form
+      onSubmit={enviar}
+      className="mx-auto mt-8 max-w-xl space-y-3 rounded-2xl bg-white/15 p-5 text-left"
+    >
       <input
         value={nome}
         onChange={(event) => setNome(event.target.value)}
@@ -1126,6 +671,7 @@ function FormularioProjetoEspecial() {
         required
         className="w-full rounded-full px-5 py-3 text-sm font-bold text-gray-900 outline-none"
       />
+
       <input
         value={contato}
         onChange={(event) => setContato(event.target.value)}
@@ -1133,6 +679,7 @@ function FormularioProjetoEspecial() {
         required
         className="w-full rounded-full px-5 py-3 text-sm font-bold text-gray-900 outline-none"
       />
+
       <textarea
         value={mensagem}
         onChange={(event) => setMensagem(event.target.value)}
@@ -1141,6 +688,7 @@ function FormularioProjetoEspecial() {
         rows={4}
         className="w-full rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 outline-none"
       />
+
       <button
         type="submit"
         className="w-full rounded-full bg-yellow-400 px-6 py-3 text-sm font-black text-gray-950 shadow-md transition hover:bg-yellow-500"
@@ -1160,32 +708,39 @@ function CardCartoonLojaSolidaria() {
 
         <div className="relative grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-center">
           <div className="mx-auto w-full max-w-xs sm:max-w-md">
-  <div className="relative mx-auto rounded-[2rem] border-4 border-gray-950 bg-white p-5 shadow-xl">
-    <div className="absolute left-1/2 -top-5 -translate-x-1/2 rotate-0 rounded-2xl bg-red-600 px-4 py-2 text-sm font-black text-white shadow-lg">
-      Loja Solidária
-    </div>
+            <div className="relative mx-auto rounded-[2rem] border-4 border-gray-950 bg-white p-5 shadow-xl">
+              <div className="absolute left-1/2 -top-5 -translate-x-1/2 rotate-0 rounded-2xl bg-red-600 px-4 py-2 text-sm font-black text-white shadow-lg">
+                Loja Solidária
+              </div>
 
-    <div className="mx-auto rounded-[1.5rem] bg-[#fff7e8] p-5">
-      <div className="mx-auto grid max-w-xs grid-cols-2 justify-center gap-4 sm:max-w-none">
-
+              <div className="mx-auto rounded-[1.5rem] bg-[#fff7e8] p-5">
+                <div className="mx-auto grid max-w-xs grid-cols-2 justify-center gap-4 sm:max-w-none">
                   <div className="rounded-3xl border-4 border-red-500 bg-white p-5 text-center shadow-md">
                     <p className="text-5xl">🎟️</p>
-                    <p className="mt-2 text-sm font-black text-red-700">Ingressos</p>
+                    <p className="mt-2 text-sm font-black text-red-700">
+                      Ingressos
+                    </p>
                   </div>
 
                   <div className="rounded-3xl border-4 border-yellow-400 bg-white p-5 text-center shadow-md">
                     <p className="text-5xl">📚</p>
-                    <p className="mt-2 text-sm font-black text-yellow-700">Livros</p>
+                    <p className="mt-2 text-sm font-black text-yellow-700">
+                      Livros
+                    </p>
                   </div>
 
                   <div className="rounded-3xl border-4 border-green-500 bg-white p-5 text-center shadow-md">
                     <p className="text-5xl">👕</p>
-                    <p className="mt-2 text-sm font-black text-green-700">Camisas</p>
+                    <p className="mt-2 text-sm font-black text-green-700">
+                      Camisas
+                    </p>
                   </div>
 
                   <div className="rounded-3xl border-4 border-orange-400 bg-white p-5 text-center shadow-md">
                     <p className="text-5xl">🥫</p>
-                    <p className="mt-2 text-sm font-black text-orange-700">Kits</p>
+                    <p className="mt-2 text-sm font-black text-orange-700">
+                      Kits
+                    </p>
                   </div>
                 </div>
 
@@ -1193,6 +748,7 @@ function CardCartoonLojaSolidaria() {
                   <p className="text-sm font-black uppercase tracking-wide text-yellow-300">
                     Cada compra ajuda uma causa
                   </p>
+
                   <p className="mt-1 text-2xl font-black">Comprar também é doar</p>
                 </div>
               </div>
@@ -1208,33 +764,42 @@ function CardCartoonLojaSolidaria() {
               Universo Hot Dogueres
             </span>
 
-            <h2 className="mt-5 text-4xl font-black leading-tight text-red-700 md:text-6xl">Loja Solidária</h2>
+            <h2 className="mt-5 text-4xl font-black leading-tight text-red-700 md:text-6xl">
+              Loja Solidária
+            </h2>
 
             <p className="mt-5 text-lg font-semibold leading-relaxed text-gray-800 md:text-xl">
-              Ingressos colecionáveis, livros em pré-venda, camisas especiais e kits solidários reunidos em uma
-              experiência divertida, colorida e com impacto social.
+              Ingressos colecionáveis, livros em pré-venda, camisas especiais e
+              kits solidários reunidos em uma experiência divertida, colorida e
+              com impacto social.
             </p>
 
             <div className="mt-7 grid gap-3 sm:grid-cols-3">
               <div className="rounded-3xl bg-white p-4 text-center shadow-md ring-1 ring-red-100">
                 <p className="text-3xl font-black text-red-600">🎟️</p>
-                <p className="mt-1 text-xs font-black uppercase text-gray-600">Colecionáveis</p>
+                <p className="mt-1 text-xs font-black uppercase text-gray-600">
+                  Colecionáveis
+                </p>
               </div>
 
               <div className="rounded-3xl bg-white p-4 text-center shadow-md ring-1 ring-yellow-100">
                 <p className="text-3xl font-black text-yellow-600">📦</p>
-                <p className="mt-1 text-xs font-black uppercase text-gray-600">Pré-venda</p>
+                <p className="mt-1 text-xs font-black uppercase text-gray-600">
+                  Pré-venda
+                </p>
               </div>
 
               <div className="rounded-3xl bg-white p-4 text-center shadow-md ring-1 ring-green-100">
                 <p className="text-3xl font-black text-green-600">🤝</p>
-                <p className="mt-1 text-xs font-black uppercase text-gray-600">Impacto social</p>
+                <p className="mt-1 text-xs font-black uppercase text-gray-600">
+                  Impacto social
+                </p>
               </div>
             </div>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a
-                href="#ingressos"
+                href="#ingressos-historicos"
                 className="rounded-full bg-red-600 px-7 py-4 text-center text-sm font-black uppercase tracking-wide text-white shadow-lg transition hover:-translate-y-1 hover:bg-red-700"
               >
                 Ver produtos
@@ -1256,7 +821,6 @@ function CardCartoonLojaSolidaria() {
 
 export default function LojaSolidariaPage() {
   const [hoje, setHoje] = useState(new Date());
-
   const [quantidadesAlimentos, setQuantidadesAlimentos] = useState<Record<string, number>>({});
   const [quantidadesRacao, setQuantidadesRacao] = useState<Record<string, number>>({});
 
@@ -1333,178 +897,86 @@ export default function LojaSolidariaPage() {
           </h1>
 
           <p className="mt-6 max-w-3xl text-lg font-medium leading-relaxed text-gray-800 md:text-xl">
-            Aqui você encontra ingressos colecionáveis, livros, camisas, kits de alimentação, kits de ração e
-            produtos especiais do universo Hot Dogueres.
+            Aqui você encontra ingressos colecionáveis, livros, camisas, kits de
+            alimentação, kits de ração e produtos especiais do universo Hot
+            Dogueres.
           </p>
 
           <p className="mt-3 max-w-3xl text-base font-semibold leading-relaxed text-gray-700 md:text-lg">
-            Livros e camisas trabalham com pré-venda. Os kits solidários possuem impacto direto nas ações sociais.
+            Livros e camisas trabalham com pré-venda. Os kits solidários possuem
+            impacto direto nas ações sociais.
           </p>
 
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <a href="#ingressos" className="rounded-full bg-red-600 px-7 py-3 text-sm font-black text-white shadow-md transition hover:bg-red-700">
+            <a
+              href="#ingressos-historicos"
+              className="rounded-full bg-red-600 px-7 py-3 text-sm font-black text-white shadow-md transition hover:bg-red-700"
+            >
               Ingressos
             </a>
 
-            <a href="#livros" className="rounded-full bg-yellow-400 px-7 py-3 text-sm font-black text-gray-950 shadow-md transition hover:bg-yellow-500">
+            <a
+              href="#livros"
+              className="rounded-full bg-yellow-400 px-7 py-3 text-sm font-black text-gray-950 shadow-md transition hover:bg-yellow-500"
+            >
               Livros
             </a>
 
-            <a href="#camisas" className="rounded-full bg-red-600 px-7 py-3 text-sm font-black text-white shadow-md transition hover:bg-red-700">
+            <a
+              href="#camisas"
+              className="rounded-full bg-red-600 px-7 py-3 text-sm font-black text-white shadow-md transition hover:bg-red-700"
+            >
               Camisas
             </a>
 
-            <a href="#kits" className="rounded-full bg-green-600 px-7 py-3 text-sm font-black text-white shadow-md transition hover:bg-green-700">
+            <a
+              href="#kits"
+              className="rounded-full bg-green-600 px-7 py-3 text-sm font-black text-white shadow-md transition hover:bg-green-700"
+            >
               Kits Solidários
             </a>
           </div>
         </section>
 
-<SecaoIngressosHistoricosLojaSolidaria />
+        <SecaoIngressosHistoricosLojaSolidaria />
 
         <section className="bg-white px-4 py-12">
           <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">
             <div className="rounded-3xl border-4 border-red-600 bg-[#fff7e8] p-6 text-center shadow-lg">
               <h2 className="text-3xl font-black text-red-700">106 toneladas</h2>
-              <p className="mt-2 font-bold text-gray-800">Meta de alimentos arrecadados</p>
+              <p className="mt-2 font-bold text-gray-800">
+                Meta de alimentos arrecadados
+              </p>
             </div>
 
             <div className="rounded-3xl border-4 border-yellow-400 bg-[#fff7e8] p-6 text-center shadow-lg">
               <h2 className="text-3xl font-black text-yellow-600">Pré-venda</h2>
-              <p className="mt-2 font-bold text-gray-800">Livros e camisas vendidos por encomenda</p>
+              <p className="mt-2 font-bold text-gray-800">
+                Livros e camisas vendidos por encomenda
+              </p>
             </div>
 
             <div className="rounded-3xl border-4 border-green-600 bg-[#fff7e8] p-6 text-center shadow-lg">
               <h2 className="text-3xl font-black text-green-700">Kits</h2>
-              <p className="mt-2 font-bold text-gray-800">Alimentação, ração e ações sociais</p>
+              <p className="mt-2 font-bold text-gray-800">
+                Alimentação, ração e ações sociais
+              </p>
             </div>
           </div>
         </section>
 
-       <section id="ingressos" className="mx-auto max-w-6xl px-4 py-14">
-  <div className="mb-8 text-center">
-    <span className="inline-flex rounded-full bg-yellow-100 px-5 py-2 text-sm font-black uppercase tracking-wide text-yellow-800">
-      Coleção oficial Hot Dogueres
-    </span>
-
-    <h2 className="mt-4 text-3xl font-black text-red-700 md:text-5xl">
-      Ingressos Históricos
-    </h2>
-
-    <p className="mx-auto mt-4 max-w-4xl text-lg font-medium leading-relaxed text-gray-800">
-      Os ingressos históricos são modelos colecionáveis de eventos que já saíram do destaque principal.
-      Eles ficam bloqueados na loja até o evento passar e depois poderão ser comprados por colecionadores.
-    </p>
-  </div>
-
-  <div className="grid gap-8 lg:grid-cols-[1fr_0.85fr] lg:items-center">
-    <div>
-      <CarrosselImagens
-        itens={IMAGENS_INGRESSOS}
-        altura="h-[420px] md:h-[560px]"
-        corAtiva="bg-red-600"
-      />
-    </div>
-
-    <div className="rounded-[2rem] border-4 border-red-600 bg-white p-6 text-center shadow-xl">
-      <span className="inline-flex rounded-full bg-red-100 px-4 py-2 text-xs font-black uppercase tracking-wide text-red-700">
-        Em breve na loja
-      </span>
-
-      <h3 className="mt-4 text-3xl font-black leading-tight text-red-700">
-        Ingressos que viram memória, coleção e alimento
-      </h3>
-
-      <p className="mt-4 font-medium leading-relaxed text-gray-800">
-        Quando um evento sai da página inicial, o ingresso deixa de ser destaque e entra aqui como item histórico.
-        Assim, quem conheceu o ecossistema depois ainda poderá completar sua coleção.
-      </p>
-
-      <div className="mt-6 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-2xl bg-green-50 p-4">
-          <p className="text-xs font-black uppercase text-green-700">Membros</p>
-          <p className="mt-1 text-3xl font-black text-green-700">R$ 20</p>
-        </div>
-
-        <div className="rounded-2xl bg-red-50 p-4">
-          <p className="text-xs font-black uppercase text-red-700">Não membros</p>
-          <p className="mt-1 text-3xl font-black text-red-700">R$ 25</p>
-        </div>
-      </div>
-
-      <div className="mt-6 rounded-2xl bg-[#fff7e8] p-4">
-        <p className="text-sm font-black uppercase tracking-wide text-gray-600">
-          Regra da coleção
-        </p>
-
-        <p className="mt-2 text-sm font-bold leading-relaxed text-gray-800">
-          O ingresso só será liberado na loja depois que o evento passar. Os ingressos fixos de 2027
-          entram na loja apenas em 2028.
-        </p>
-      </div>
-
-      <button
-        type="button"
-        disabled
-        className="mt-6 w-full cursor-not-allowed rounded-full bg-gray-300 px-6 py-3 text-sm font-black text-gray-600"
-      >
-        Compra bloqueada até a conexão oficial
-      </button>
-    </div>
-  </div>
-
-  <div className="mt-12 rounded-[2rem] border-4 border-yellow-400 bg-white p-6 text-center shadow-xl">
-    <span className="inline-flex rounded-full bg-yellow-100 px-5 py-2 text-sm font-black uppercase tracking-wide text-yellow-800">
-      Em breve
-    </span>
-
-    <h3 className="mt-4 text-3xl font-black text-red-700 md:text-4xl">
-      Álbum Hot Dogueres — Memórias que Alimentam
-    </h3>
-
-    <p className="mx-auto mt-4 max-w-4xl font-medium leading-relaxed text-gray-800">
-      Um álbum premium para organizar os ingressos colecionáveis, contar a história de cada evento e
-      estimular os colecionadores a completarem sua jornada dentro do ecossistema Hot Dogueres.
-    </p>
-
-    <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-      {ALBUNS_HOT_DOGUERES.map((album) => (
-        <CardAlbumMemorias key={album.id} album={album} />
-      ))}
-    </div>
-  </div>
-
-  <SecaoIngressosHistoricos
-    titulo="Ingressos Eventos"
-    descricao="Ingressos históricos de feiras, festivais, corridas, ações especiais e eventos oficiais Hot Dogueres."
-    produtos={INGRESSOS_EVENTOS_HISTORICOS}
-    hoje={hoje}
-  />
-
-  <SecaoIngressosHistoricos
-    titulo="Ingressos Fixos"
-    descricao="Coleção fixa anual. Os ingressos de 2027 ficarão bloqueados e entrarão na loja somente em 2028."
-    produtos={INGRESSOS_FIXOS_2027}
-    hoje={hoje}
-  />
-
-  <SecaoIngressosHistoricos
-    titulo="Ingressos City Quest"
-    descricao="Coleção especial City Quest, começando por Itabaiana e abrindo novos modelos conforme as próximas cidades entrarem no projeto."
-    produtos={INGRESSOS_CITY_QUEST}
-    hoje={hoje}
-  />
-</section>
-
         <section id="livros" className="bg-white px-4 py-14">
           <div className="mx-auto max-w-6xl">
             <div className="text-center">
-              <h2 className="text-3xl font-black text-red-700 md:text-5xl">Livros em Pré-venda</h2>
+              <h2 className="text-3xl font-black text-red-700 md:text-5xl">
+                Livros em Pré-venda
+              </h2>
 
               <p className="mx-auto mt-4 max-w-4xl text-lg font-medium leading-relaxed text-gray-800">
-                Todas as capas aparecem na loja, mas a compra só fica liberada no período correto de pré-venda. O
-                ritmo usado é: abre todo dia 10, fecha dia 20 do mês seguinte e entrega dia 12 do mês posterior ao
-                fechamento.
+                Todas as capas aparecem na loja, mas a compra só fica liberada
+                no período correto de pré-venda. O ritmo usado é: abre todo dia
+                10, fecha dia 20 do mês seguinte e entrega dia 12 do mês
+                posterior ao fechamento.
               </p>
             </div>
 
@@ -1526,16 +998,20 @@ export default function LojaSolidariaPage() {
 
         <section id="camisas" className="mx-auto max-w-6xl px-4 py-14">
           <div className="mb-8 text-center">
-            <h2 className="text-3xl font-black text-red-700 md:text-5xl">Camisas em Pré-venda</h2>
+            <h2 className="text-3xl font-black text-red-700 md:text-5xl">
+              Camisas em Pré-venda
+            </h2>
 
             <p className="mx-auto mt-4 max-w-4xl text-lg font-medium leading-relaxed text-gray-800">
-              As camisas serão feitas por pré-venda. Elas não incluem doação de alimentos, porque o custo de
-              produção é alto e o lucro é mínimo.
+              As camisas serão feitas por pré-venda. Elas não incluem doação de
+              alimentos, porque o custo de produção é alto e o lucro é mínimo.
             </p>
           </div>
 
           <div className="rounded-3xl bg-white p-6 shadow-xl">
-            <h3 className="text-center text-2xl font-black text-red-700">Camisas dos Eventos Oficiais</h3>
+            <h3 className="text-center text-2xl font-black text-red-700">
+              Camisas dos Eventos Oficiais
+            </h3>
 
             <p className="mx-auto mt-3 max-w-3xl text-center font-medium leading-relaxed text-gray-800">
               Modelos oficiais ligados aos eventos Hot Dogueres.
@@ -1551,11 +1027,14 @@ export default function LojaSolidariaPage() {
           </div>
 
           <div className="mt-10 rounded-3xl bg-white p-6 shadow-xl">
-            <h3 className="text-center text-2xl font-black text-red-700">Camisas para Eventos Esportivos</h3>
+            <h3 className="text-center text-2xl font-black text-red-700">
+              Camisas para Eventos Esportivos
+            </h3>
 
             <p className="mx-auto mt-3 max-w-4xl text-center font-medium leading-relaxed text-gray-800">
-              Essas camisas serão criadas de acordo com cada instituição ajudada. Exemplo: na Avosos, pode ser feito
-              um concurso de desenho entre as crianças, e o desenho vencedor será estampado na camisa.
+              Essas camisas serão criadas de acordo com cada instituição
+              ajudada. Exemplo: na Avosos, pode ser feito um concurso de desenho
+              entre as crianças, e o desenho vencedor será estampado na camisa.
             </p>
 
             <div className="mt-8">
@@ -1568,10 +1047,13 @@ export default function LojaSolidariaPage() {
           </div>
 
           <div className="mt-10 rounded-3xl bg-white p-6 shadow-xl">
-            <h3 className="text-center text-2xl font-black text-red-700">Camisas Gamer</h3>
+            <h3 className="text-center text-2xl font-black text-red-700">
+              Camisas Gamer
+            </h3>
 
             <p className="mx-auto mt-3 max-w-3xl text-center font-medium leading-relaxed text-gray-800">
-              Linha gamer Hot Dogueres, com 8 modelos disponíveis para pré-venda.
+              Linha gamer Hot Dogueres, com 8 modelos disponíveis para
+              pré-venda.
             </p>
 
             <div className="mt-8">
@@ -1589,7 +1071,8 @@ export default function LojaSolidariaPage() {
             </h3>
 
             <p className="mx-auto mt-3 max-w-3xl text-center font-medium leading-relaxed text-gray-800">
-              Linha infantil inspirada na Jornada Hot Dogueres, com 8 modelos para a criançada.
+              Linha infantil inspirada na Jornada Hot Dogueres, com 8 modelos
+              para a criançada.
             </p>
 
             <div className="mt-8">
@@ -1605,19 +1088,25 @@ export default function LojaSolidariaPage() {
         <section id="kits" className="bg-white px-4 py-14">
           <div className="mx-auto max-w-6xl">
             <div className="mb-8 text-center">
-              <h2 className="text-3xl font-black text-red-700 md:text-5xl">Kits Solidários</h2>
+              <h2 className="text-3xl font-black text-red-700 md:text-5xl">
+                Kits Solidários
+              </h2>
 
               <p className="mx-auto mt-4 max-w-4xl text-lg font-medium leading-relaxed text-gray-800">
-                Os kits são produtos com impacto direto nas ações sociais. Aqui entram os kits de alimentação, kits
-                de ração e projetos especiais ligados a corridas e instituições.
+                Os kits são produtos com impacto direto nas ações sociais. Aqui
+                entram os kits de alimentação, kits de ração e projetos
+                especiais ligados a corridas e instituições.
               </p>
             </div>
 
             <div className="rounded-3xl border-4 border-green-600 bg-[#fff7e8] p-6 shadow-xl">
-              <h3 className="text-center text-2xl font-black text-green-700">Kits Alimentação</h3>
+              <h3 className="text-center text-2xl font-black text-green-700">
+                Kits Alimentação
+              </h3>
 
               <p className="mx-auto mt-3 max-w-3xl text-center font-medium leading-relaxed text-gray-800">
-                Kits voltados para arrecadação e apoio alimentar nas campanhas solidárias Hot Dogueres.
+                Kits voltados para arrecadação e apoio alimentar nas campanhas
+                solidárias Hot Dogueres.
               </p>
 
               <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -1634,10 +1123,13 @@ export default function LojaSolidariaPage() {
             </div>
 
             <div className="mt-10 rounded-3xl border-4 border-blue-600 bg-[#fff7e8] p-6 shadow-xl">
-              <h3 className="text-center text-2xl font-black text-blue-700">Kits Ração</h3>
+              <h3 className="text-center text-2xl font-black text-blue-700">
+                Kits Ração
+              </h3>
 
               <p className="mx-auto mt-3 max-w-3xl text-center font-medium leading-relaxed text-gray-800">
-                Kits voltados para apoio a animais, protetores e campanhas de arrecadação de ração.
+                Kits voltados para apoio a animais, protetores e campanhas de
+                arrecadação de ração.
               </p>
 
               <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -1654,10 +1146,13 @@ export default function LojaSolidariaPage() {
             </div>
 
             <div className="mt-10 rounded-3xl bg-red-700 p-8 text-center text-white shadow-xl">
-              <h3 className="text-2xl font-black md:text-4xl">Kits de Corrida e Projetos Especiais</h3>
+              <h3 className="text-2xl font-black md:text-4xl">
+                Kits de Corrida e Projetos Especiais
+              </h3>
 
               <p className="mx-auto mt-4 max-w-4xl text-lg font-medium leading-relaxed">
-                Nos projetos de corrida e ações especiais, o valor arrecadado será dividido da seguinte forma:
+                Nos projetos de corrida e ações especiais, o valor arrecadado
+                será dividido da seguinte forma:
               </p>
 
               <div className="mt-8 grid gap-4 md:grid-cols-3">
@@ -1678,11 +1173,13 @@ export default function LojaSolidariaPage() {
               </div>
 
               <p className="mx-auto mt-6 max-w-3xl font-semibold leading-relaxed">
-                Além disso, quem quiser também poderá doar brinquedos, livros e outros itens de apoio às campanhas.
+                Além disso, quem quiser também poderá doar brinquedos, livros e
+                outros itens de apoio às campanhas.
               </p>
 
               <p className="mx-auto mt-6 max-w-xl text-sm font-bold text-yellow-200">
-                Sem preço fixo porque o valor depende do projeto. Conte pra gente o que você quer apoiar:
+                Sem preço fixo porque o valor depende do projeto. Conte pra
+                gente o que você quer apoiar:
               </p>
 
               <FormularioProjetoEspecial />
