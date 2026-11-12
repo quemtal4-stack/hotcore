@@ -6,7 +6,22 @@ type IngressoHistorico = {
   subtitulo: string;
   categoria: "Eventos" | "Fixos" | "City Quest";
   imagem: string;
+  precoMembro?: number;
+  precoNaoMembro?: number;
+  alimentosKg?: number;
+  especial?: boolean;
 };
+
+const PRECO_HISTORICO_MEMBRO = 20;
+const PRECO_HISTORICO_NAO_MEMBRO = 25;
+const PRECO_INGRESSO_ETERNIZADOS = 80;
+
+function formatarMoeda(valor: number) {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(valor);
+}
 
 type AlbumHistorico = {
   id: string;
@@ -113,11 +128,15 @@ const INGRESSOS_FIXOS: IngressoHistorico[] = [
     imagem: "/loja-solidaria/ingressos-historicos/fixo-2027-05.png",
   },
   {
-    id: "fixo-2027-06",
-    titulo: "Ingresso Fixo 2027 — 06",
-    subtitulo: "Coleção fixa anual do Ecossistema Hot Dogueres",
+    id: "fixo-2027-eternizados",
+    titulo: "Ingresso Fixo 2027 — Eternizados",
+    subtitulo: "Sexto ingresso fixo especial da coleção anual",
     categoria: "Fixos",
     imagem: "/loja-solidaria/ingressos-historicos/fixo-2027-06.png",
+    precoMembro: PRECO_INGRESSO_ETERNIZADOS,
+    precoNaoMembro: PRECO_INGRESSO_ETERNIZADOS,
+    alimentosKg: 3,
+    especial: true,
   },
 ];
 
@@ -203,10 +222,15 @@ const ALBUNS_HOT_DOGUERES: AlbumHistorico[] = [
 ];
 
 function CardIngressoHistorico({ ingresso }: { ingresso: IngressoHistorico }) {
+  const precoMembro = ingresso.precoMembro ?? PRECO_HISTORICO_MEMBRO;
+  const precoNaoMembro =
+    ingresso.precoNaoMembro ?? PRECO_HISTORICO_NAO_MEMBRO;
+  const alimentosKg = ingresso.alimentosKg ?? 1;
+
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-[2rem] bg-white p-4 shadow-lg ring-1 ring-red-100 transition duration-300 hover:-translate-y-1 hover:shadow-2xl hover:ring-red-300">
       <div className="absolute right-4 top-4 z-10 rounded-full bg-gray-950 px-3 py-1 text-[10px] font-black uppercase tracking-wide text-white shadow-md">
-        Em breve
+        Bloqueado
       </div>
 
       <div className="relative h-56 overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-red-50 via-yellow-50 to-white shadow-inner">
@@ -232,15 +256,60 @@ function CardIngressoHistorico({ ingresso }: { ingresso: IngressoHistorico }) {
         {ingresso.subtitulo}
       </p>
 
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <div className="rounded-2xl bg-green-50 p-3 text-center ring-1 ring-green-100">
+          <p className="text-[10px] font-black uppercase tracking-wide text-green-700">
+            Membro
+          </p>
+
+          <p className="mt-1 text-xl font-black text-green-700">
+            {formatarMoeda(precoMembro)}
+          </p>
+        </div>
+
+        <div className="rounded-2xl bg-red-50 p-3 text-center ring-1 ring-red-100">
+          <p className="text-[10px] font-black uppercase tracking-wide text-red-700">
+            Não membro
+          </p>
+
+          <p className="mt-1 text-xl font-black text-red-700">
+            {formatarMoeda(precoNaoMembro)}
+          </p>
+        </div>
+      </div>
+
       <div className="mt-4 rounded-2xl bg-yellow-50 p-4 text-center ring-1 ring-yellow-100">
         <p className="text-[10px] font-black uppercase tracking-wide text-yellow-700">
           Ingresso histórico
         </p>
 
         <p className="mt-1 text-xs font-bold leading-relaxed text-gray-700">
-          Após sair do destaque, poderá voltar para coleção com valor progressivo
-          e impacto solidário.
+          {ingresso.especial
+            ? "Ingresso especial Eternizados. Valor único de R$ 80,00 por ser o sexto ingresso fixo da coleção."
+            : "Após o evento terminar, poderá ser liberado para coleção com impacto solidário."}
         </p>
+
+        <p className="mt-2 text-xs font-black text-green-700">
+          Impacto previsto: {alimentosKg} kg de alimento
+        </p>
+      </div>
+
+      <div className="mt-auto grid gap-3 pt-5">
+        <button
+          type="button"
+          disabled
+          className="cursor-not-allowed rounded-full bg-gray-300 px-5 py-3 text-center text-sm font-black text-gray-600"
+        >
+          Comprar como membro — bloqueado
+        </button>
+
+        <button
+          type="button"
+          disabled
+          className="cursor-not-allowed rounded-full bg-gray-300 px-5 py-3 text-center text-sm font-black text-gray-600"
+        >
+          Comprar sem ser membro — bloqueado
+        </button>
       </div>
     </article>
   );
@@ -365,9 +434,9 @@ export default function SecaoIngressosHistoricosLojaSolidaria() {
           <p className="mx-auto mt-5 max-w-4xl text-base font-bold leading-relaxed text-white/80 md:text-lg">
             Em breve, os ingressos que já saíram do destaque principal poderão
             voltar para a Loja Solidária como peças históricas colecionáveis.
-            Assim, novos participantes poderão completar sua coleção, enquanto
-            cada compra continua ajudando a transformar solidariedade em
-            alimento.
+            Os ingressos históricos comuns terão valor de R$ 20,00 para membros
+            e R$ 25,00 para não membros. O sexto ingresso fixo Eternizados terá
+            valor especial de R$ 80,00.
           </p>
 
           <div className="mx-auto mt-7 max-w-4xl rounded-[2rem] bg-white/10 p-5 text-left ring-1 ring-white/10">
@@ -380,9 +449,9 @@ export default function SecaoIngressosHistoricosLojaSolidaria() {
             </h3>
 
             <p className="mt-3 text-sm font-bold leading-relaxed text-white/75">
-              A ideia é reunir os ingressos históricos em uma experiência
-              colecionável oficial, acessível pelo site da Hot Dogueres, com
-              versões físicas e digitais planejadas por ano.
+              As compras continuam bloqueadas até a integração oficial com
+              checkout e termômetros de ingressos e alimentos. Quando a conexão
+              estiver pronta, os botões poderão ser liberados.
             </p>
           </div>
         </div>
