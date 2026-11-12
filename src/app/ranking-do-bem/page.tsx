@@ -646,7 +646,6 @@ function CardRegraPontuacao({
 function CardImagemRanking() {
   return (
     <section className="px-4 py-10 md:py-14">
-
       <div className="mx-auto grid max-w-6xl overflow-hidden rounded-[2.5rem] bg-gray-950 text-white shadow-2xl ring-1 ring-gray-800 lg:grid-cols-[1fr_0.95fr]">
         <div className="flex flex-col justify-center p-6 md:p-10">
           <p className="inline-flex w-fit rounded-full bg-yellow-400 px-5 py-2 text-xs font-black uppercase tracking-[0.2em] text-gray-950">
@@ -683,32 +682,21 @@ function CardImagemRanking() {
           </div>
         </div>
 
-        <div className="relative min-h-[320px] bg-gradient-to-br from-red-600 via-yellow-400 to-green-500 md:min-h-[420px]">
+        <div className="relative flex min-h-[320px] items-center justify-center overflow-hidden bg-gradient-to-br from-red-600 via-yellow-400 to-green-500 md:min-h-[420px]">
           <Image
             src="/images/ranking-do-bem-cartoon.png"
             alt="Imagem representando o Ranking do Bem Hot Dogueres"
             fill
-            className="object-cover"
+            className="object-contain object-center p-3 md:p-5"
             sizes="(max-width: 1024px) 100vw, 560px"
             priority
           />
-
-                  <div className="relative min-h-[320px] bg-gradient-to-br from-red-600 via-yellow-400 to-green-500 md:min-h-[420px]">
-          <Image
-            src="/images/ranking-do-bem-cartoon.png"
-            alt="Imagem representando o Ranking do Bem Hot Dogueres"
-            fill
-            className="object-cover"
-            sizes="(max-width: 1024px) 100vw, 560px"
-            priority
-          />
-        </div>
-
         </div>
       </div>
     </section>
   );
 }
+
 
 export default async function RankingDoBemPage({
   searchParams,
