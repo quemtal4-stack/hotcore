@@ -949,7 +949,7 @@ export default function LojaSolidariaPage() {
         <section className="bg-white px-4 py-12">
           <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">
             <div className="rounded-3xl border-4 border-red-600 bg-[#fff7e8] p-6 text-center shadow-lg">
-              <h2 className="text-3xl font-black text-red-700">104 toneladas</h2>
+              <h2 className="text-3xl font-black text-red-700">106 toneladas</h2>
               <p className="mt-2 font-bold text-gray-800">Meta de alimentos arrecadados</p>
             </div>
 
