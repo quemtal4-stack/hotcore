@@ -1007,21 +1007,15 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
         </div>
       </section>
 
-   <div id="ingressos" className="scroll-mt-28 px-4 pb-8">
-  <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
-    <div className="min-w-0">
-      <SecaoIngressosColecionaveis />
-    </div>
+      <div id="ingressos" className="scroll-mt-28 space-y-8 px-4 pb-8">
+        <SecaoIngressosEventos
+          kgDoados={kgAlimentosTermometro}
+          metaKg={META_DOACAO_KG}
+          ingressosVendidos={ingressosVendidosParaExibicao}
+        />
 
-    <div className="order-first lg:sticky lg:top-36 lg:order-last lg:self-start">
-      <SecaoIngressosEventos
-        kgDoados={kgAlimentosTermometro}
-        metaKg={META_DOACAO_KG}
-        ingressosVendidos={ingressosVendidosParaExibicao}
-      />
-    </div>
-  </div>
-</div>
+        <SecaoIngressosColecionaveis />
+      </div>
 
       <section id="livros" className="scroll-mt-28 px-4 pb-8">
         <div className="mx-auto max-w-6xl translate-x-2 overflow-hidden rounded-[2rem] border-4 border-red-600 bg-white p-5 shadow-2xl sm:translate-x-3 md:p-6 lg:translate-x-0">
