@@ -16,6 +16,7 @@ const PRECO_HISTORICO_MEMBRO = 20;
 const PRECO_HISTORICO_NAO_MEMBRO = 25;
 const PRECO_INGRESSO_ETERNIZADOS = 80;
 const PRECO_INGRESSO_ETERNIZADOS_NAO_MEMBRO = 85;
+
 function formatarMoeda(valor: number) {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
@@ -134,7 +135,7 @@ const INGRESSOS_FIXOS: IngressoHistorico[] = [
     categoria: "Fixos",
     imagem: "/loja-solidaria/ingressos-historicos/fixo-2027-06.png",
     precoMembro: PRECO_INGRESSO_ETERNIZADOS,
-    precoNaoMembro: PRECO_INGRESSO_ETERNIZADOS,
+    precoNaoMembro: PRECO_INGRESSO_ETERNIZADOS_NAO_MEMBRO,
     alimentosKg: 3,
     especial: true,
   },
@@ -285,7 +286,7 @@ function CardIngressoHistorico({ ingresso }: { ingresso: IngressoHistorico }) {
 
         <p className="mt-1 text-xs font-bold leading-relaxed text-gray-700">
           {ingresso.especial
-            ? "Ingresso especial Eternizados. Valor para membro de R$ 80,00 e 85,00 para nao membro por ser o sexto ingresso fixo da coleção."
+            ? "Ingresso especial Eternizados. Valor de R$ 80,00 para membro e R$ 85,00 para não membro por ser o sexto ingresso fixo da coleção."
             : "Após o evento terminar, poderá ser liberado para coleção com impacto solidário."}
         </p>
 
@@ -435,8 +436,9 @@ export default function SecaoIngressosHistoricosLojaSolidaria() {
             Em breve, os ingressos que já saíram do destaque principal poderão
             voltar para a Loja Solidária como peças históricas colecionáveis.
             Os ingressos históricos comuns terão valor de R$ 20,00 para membros
-            e R$ 25,00 para não membros. O sexto ingresso para membro Eternizados terá
-            valor especial de R$ 80,00 e para não membros de R$ 85,00.
+            e R$ 25,00 para não membros. O sexto ingresso para membro
+            Eternizados terá valor especial de R$ 80,00 e para não membros de
+            R$ 85,00.
           </p>
 
           <div className="mx-auto mt-7 max-w-4xl rounded-[2rem] bg-white/10 p-5 text-left ring-1 ring-white/10">
