@@ -513,9 +513,24 @@ export default function HomePage() {
     Record<string, number>
   >({});
 
-  const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
+const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
     return total + (quantidadesAlimentos[kit.id] || 0) * kit.pesoKg;
   }, 0);
+
+  const kgRacaoSelecionados = KITS_RACAO.reduce((total, kit) => {
+    return total + (quantidadesRacao[kit.id] || 0) * kit.pesoKg;
+  }, 0);
+
+  const valorAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
+    return total + (quantidadesAlimentos[kit.id] || 0) * kit.valorNumero;
+  }, 0);
+
+  const valorRacaoSelecionados = KITS_RACAO.reduce((total, kit) => {
+    return total + (quantidadesRacao[kit.id] || 0) * kit.valorNumero;
+  }, 0);
+
+  const totalSolidarioSelecionado =
+    valorAlimentosSelecionados + valorRacaoSelecionados;
 
   const kgAlimentosTermometro =
     ALIMENTOS_ARRECADADOS_ATUAL_KG +
@@ -525,6 +540,7 @@ export default function HomePage() {
   const ingressosVendidosParaExibicao = ingressosVendidos;
 
   const patrocinador = PATROCINADORES[patrocinadorAtual];
+
 
   function mostrarTempo(valor: number) {
     return contadorCarregado ? valor : "--";
