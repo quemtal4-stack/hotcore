@@ -3,6 +3,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import SetasNavegacao from "@/components/SetasNavegacao";
 
+const NOME_ALBUM = "Álbum Hot Dogueres — Memórias que Alimentam";
+
 export const metadata: Metadata = {
   title: "Clube de Membros | Hot Dogueres",
   description:
@@ -10,211 +12,239 @@ export const metadata: Metadata = {
 };
 
 export default function ClubeDeMembrosPage() {
- const planos = [
-  {
-    nome: "Apoiador",
-    preco: "R$ 19,90",
-    periodo: "/mês",
-    destaque: false,
-    descricao:
-      "Para quem quer apoiar a Hot Dogueres, receber benefícios básicos e ajudar quem mais precisa.",
-    impacto: "A Hot Dogueres doa 1 kg de alimento por mês em nome deste membro.",
-    beneficios: [
-      "Participação no Clube de Membros Hot Dogueres.",
-      "Desconto exclusivo na Hot Dogueres.",
-      "Desconto no livro infantil.",
-      "Desconto na trilogia A História do Hot Dog.",
-      "Participação em sorteios e campanhas.",
-      "Acesso a novidades e bastidores da marca.",
-      "Nome na lista de apoiadores, mediante autorização.",
-      "Contribui para a meta anual de 106 toneladas de alimentos.",
-      "Também ajuda ações voltadas a famílias em vulnerabilidade e animais de rua.",
-    ],
-    botao: "Quero ser Apoiador",
-    href: "/clube/cadastro?plano=apoiador",
-  },
-  {
-    nome: "Lenda Solidária",
-    preco: "R$ 29,90",
-    periodo: "/mês",
-    destaque: false,
-    descricao:
-      "Para quem gosta de estar presente nos eventos, participar da comunidade e viver a experiência Hot Dogueres de perto.",
-    impacto: "A Hot Dogueres doa 1 kg de alimento por mês em nome deste membro.",
-    beneficios: [
-      "Todos os benefícios do Plano Apoiador.",
-      "Crachá digital de Membro Lenda Solidária.",
-      "Identificação especial como membro presente nos eventos.",
-      "Prioridade em informações sobre calendário, ações e campanhas.",
-      "Participação em grupos, listas ou comunicações exclusivas do clube, quando disponíveis.",
-      "Prioridade em experiências presenciais gratuitas, quando houver limite de vagas.",
-      "Reconhecimento como membro ativo da comunidade Hot Dogueres.",
-      "Benefícios voltados para quem acompanha os eventos de perto.",
-      "Contribui para a meta anual de 106 toneladas de alimentos.",
-    ],
-    botao: "Quero ser Lenda Solidária",
-    href: "/clube/cadastro?plano=lendario",
-
-  },
-  {
-    nome: "Fundador",
-    preco: "R$ 39,90",
-    periodo: "/mês",
-    destaque: true,
-    descricao:
-      "Para quem quer participar mais de perto da construção da Hot Dogueres e ter acesso a benefícios especiais.",
-    impacto: "A Hot Dogueres doa 1 kg de alimento por mês em nome deste membro.",
-    beneficios: [
-      "Todos os benefícios do Plano Apoiador.",
-      "Desconto maior na Hot Dogueres.",
-      "Jogo A História do Hot Dog liberado gratuitamente para jogar.",
-      "Ingresso colecionável em eventos selecionados.",
-      "Hot dog do evento, quando disponível.",
-      "Prioridade em campanhas, novidades e eventos.",
-      "Participação em sorteios exclusivos.",
-      "Acesso a conteúdos especiais da marca.",
-      "Participação em enquetes e decisões simbólicas do ecossistema, quando houver.",
-      "Futuramente, acesso online a transmissões e bastidores dos eventos, quando houver estrutura disponível.",
-      "Contribui para a meta anual de 106 toneladas de alimentos.",
-    ],
-    botao: "Quero ser Fundador",
-    href: "/clube/cadastro?plano=fundador",
-  },
-  {
-    nome: "Colecionador",
-    preco: "R$ 59,90",
-    periodo: "/mês",
-    destaque: false,
-    descricao:
-      "Para quem ama o universo Hot Dogueres e quer colecionar ingressos digitais especiais da marca.",
-    impacto: "A Hot Dogueres doa 1 kg de alimento por mês em nome deste membro.",
-    beneficios: [
-      "Todos os benefícios do Plano Fundador.",
-      "Recebe os ingressos colecionáveis digitais dos eventos Hot Dogueres.",
-      "Recebe um ingresso colecionável super especial exclusivo para membros Colecionadores.",
-      "Ingresso especial personalizado com o nome do membro, quando aplicável.",
-      "Acesso antecipado a novidades de colecionáveis.",
-      "Participação em campanhas especiais ligadas à Área do Colecionador.",
-      "Nome na lista de membros colecionadores, mediante autorização.",
-      "Benefícios pensados para quem acompanha a história e quer guardar cada fase da marca.",
-      "Contribui para a meta anual de 106 toneladas de alimentos.",
-    ],
-    botao: "Quero ser Colecionador",
-    href: "/clube/cadastro?plano=colecionador",
-  },
-  {
-    nome: "Guardião",
-    preco: "R$ 89,90",
-    periodo: "/mês",
-    destaque: false,
-    descricao:
-      "Para quem quer gerar um impacto social maior todos os meses e fortalecer diretamente as ações solidárias.",
-    impacto: "A Hot Dogueres doa 3 kg de alimentos por mês em nome deste membro.",
-    beneficios: [
-      "Todos os benefícios do Plano Fundador.",
-      "Impacto solidário ampliado com 3 kg de alimentos por mês.",
-      "Reconhecimento como Guardião da campanha de alimentos.",
-      "Nome em destaque nas ações solidárias, mediante autorização.",
-      "Prioridade em campanhas sociais e convites especiais.",
-      "Participação em sorteios exclusivos do Clube.",
-      "Ingresso colecionável em eventos selecionados.",
-      "Acesso a conteúdos especiais sobre o impacto social da Hot Dogueres.",
-      "Plano ideal para quem quer ajudar mais famílias ao longo do ano.",
-      "Contribui de forma reforçada para a meta anual de 106 toneladas de alimentos.",
-    ],
-    botao: "Quero ser Guardião",
-    href: "/clube/cadastro?plano=guardiao",
-  },
-  {
-    nome: "Eternizado",
-    preco: "R$ 499,90",
-    periodo: "/ano",
-    destaque: false,
-    descricao:
-      "Para quem quer deixar seu nome marcado na história da Hot Dogueres e apoiar uma causa com propósito.",
-    impacto:
-      "No plano anual, a Hot Dogueres viabiliza 1 cesta básica em nome deste membro.",
-    beneficios: [
-      "Todos os benefícios do Plano Fundador.",
-      "Jogo A História do Hot Dog liberado gratuitamente para jogar.",
-      "Livro digital gratuito.",
-      "Desconto especial no livro físico.",
-      "Desconto especial na trilogia A História do Hot Dog.",
-      "Camisa oficial do evento ou da Hot Dogueres.",
-      "Ingresso colecionável especial.",
-      "Certificado de Membro Eternizado.",
-      "Nome na galeria de membros eternizados, mediante autorização.",
-      "Hot dog do evento, quando disponível.",
-      "Prioridade máxima em campanhas, novidades e eventos.",
-      "Futuramente, acesso online a transmissões e bastidores dos eventos, quando houver estrutura disponível.",
-      "Uma cesta básica anual será destinada a uma família em situação de vulnerabilidade.",
-      "Parte da assinatura também contribui com ações voltadas a animais de rua.",
-    ],
-    botao: "Quero ser Eternizado",
-    href: "/clube/cadastro?plano=eternizado",
-  },
-];
-
+  const planos = [
+    {
+      nome: "Apoiador",
+      preco: "R$ 19,90",
+      periodo: "/mês",
+      destaque: false,
+      descricao:
+        "Para quem quer fazer parte da comunidade Hot Dogueres, apoiar a causa todos os meses e começar sua jornada no clube.",
+      impacto:
+        "A Hot Dogueres doa 1 kg de alimento por mês em nome deste membro.",
+      beneficios: [
+        "Participação no Clube de Membros Hot Dogueres.",
+        "Ajuda mensal equivalente a 1 kg de alimento para ações sociais.",
+        `Acesso ao ${NOME_ALBUM} em versão digital.`,
+        "Desconto exclusivo na Hot Dogueres, quando disponível.",
+        "Desconto no livro infantil, quando disponível.",
+        "Nome na lista de apoiadores, mediante autorização.",
+        "Recebe novidades importantes do clube, campanhas e eventos.",
+        "Participa de uma comunidade que ajuda a alimentar famílias, sonhos e histórias.",
+        "Contribui para a meta anual de 106 toneladas de alimentos.",
+        "Também ajuda ações voltadas a famílias em vulnerabilidade e animais de rua.",
+      ],
+      botao: "Quero ser Apoiador",
+      href: "/clube/cadastro?plano=apoiador",
+    },
+    {
+      nome: "Lenda Solidária",
+      preco: "R$ 29,90",
+      periodo: "/mês",
+      destaque: false,
+      descricao:
+        "Para quem gosta de acompanhar os eventos, participar da comunidade e ser reconhecido como presença ativa na história Hot Dogueres.",
+      impacto:
+        "A Hot Dogueres doa 1 kg de alimento por mês em nome deste membro.",
+      beneficios: [
+        "Todos os benefícios do Plano Apoiador.",
+        "Ajuda mensal equivalente a 1 kg de alimento para ações sociais.",
+        "Desconto nos ingressos históricos, quando disponíveis.",
+        "Crachá digital de Membro Lenda Solidária.",
+        "Identificação especial como membro presente nos eventos.",
+        "Numeração especial para membros em ações colecionáveis, quando aplicável.",
+        "Prioridade em informações sobre calendário, ações e campanhas.",
+        "Acesso a bastidores selecionados dos eventos, quando disponíveis.",
+        "Reconhecimento como membro ativo da comunidade Hot Dogueres.",
+        "Contribui para a meta anual de 106 toneladas de alimentos.",
+      ],
+      botao: "Quero ser Lenda Solidária",
+      href: "/clube/cadastro?plano=lendario",
+    },
+    {
+      nome: "Fundador",
+      preco: "R$ 39,90",
+      periodo: "/mês",
+      destaque: true,
+      descricao:
+        "Para quem quer carregar o selo de quem ajudou a construir essa fase da Hot Dogueres desde o começo.",
+      impacto:
+        "A Hot Dogueres doa 1 kg de alimento por mês em nome deste membro.",
+      beneficios: [
+        "Todos os benefícios do Plano Lenda Solidária.",
+        "Ajuda mensal equivalente a 1 kg de alimento para ações sociais.",
+        `Selo especial de Fundador no ${NOME_ALBUM}.`,
+        "Jogo A História do Hot Dog liberado gratuitamente para jogar, quando disponível.",
+        "Ingresso colecionável em eventos selecionados, quando aplicável.",
+        "Hot dog do evento, quando disponível.",
+        "Participação em enquetes e decisões simbólicas do ecossistema, quando houver.",
+        "Acesso a conteúdos especiais da marca.",
+        "Possibilidade de visitas acompanhadas a instituições apoiadas, quando houver agenda.",
+        "Participação futura em bonificações oficiais sem sorteio, conforme regulamento.",
+        "As bonificações poderão considerar presença em eventos, tempo de clube e participação em campanhas.",
+        "Contribui para a meta anual de 106 toneladas de alimentos.",
+      ],
+      botao: "Quero ser Fundador",
+      href: "/clube/cadastro?plano=fundador",
+    },
+    {
+      nome: "Colecionador",
+      preco: "R$ 59,90",
+      periodo: "/mês",
+      destaque: false,
+      descricao:
+        "Para quem ama guardar cada fase da Hot Dogueres, colecionar memórias e fazer parte da história digital da marca.",
+      impacto:
+        "A Hot Dogueres doa 1 kg de alimento por mês em nome deste membro.",
+      beneficios: [
+        "Todos os benefícios do Plano Fundador.",
+        "Ajuda mensal equivalente a 1 kg de alimento para ações sociais.",
+        `Acesso ao ${NOME_ALBUM} em versão digital.`,
+        "Descontos maiores em produtos colecionáveis, quando disponíveis.",
+        "Desconto na compra do álbum físico.",
+        "Desconto no álbum premium, quando disponível.",
+        "Recebe os ingressos colecionáveis digitais dos eventos Hot Dogueres.",
+        "Recebe um ingresso colecionável super especial exclusivo para membros Colecionadores.",
+        "Ingresso especial personalizado com o nome do membro, quando aplicável.",
+        "Acesso antecipado a novidades de colecionáveis.",
+        "Participação em campanhas especiais ligadas à Área do Colecionador.",
+        "Nome na lista de membros colecionadores, mediante autorização.",
+        "Prioridade em bonificações ligadas a colecionáveis, álbuns e experiências presenciais, conforme regulamento.",
+        "Contribui para a meta anual de 106 toneladas de alimentos.",
+      ],
+      botao: "Quero ser Colecionador",
+      href: "/clube/cadastro?plano=colecionador",
+    },
+    {
+      nome: "Guardião",
+      preco: "R$ 89,90",
+      periodo: "/mês",
+      destaque: false,
+      descricao:
+        "Para quem quer gerar um impacto social maior todos os meses e ser lembrado como guardião da campanha.",
+      impacto:
+        "A Hot Dogueres doa 3 kg de alimentos por mês em nome deste membro.",
+      beneficios: [
+        "Todos os benefícios do Plano Fundador.",
+        "Impacto solidário ampliado com 3 kg de alimentos por mês.",
+        "Reconhecimento como Guardião da campanha de alimentos.",
+        `Prioridade na compra do álbum físico ${NOME_ALBUM}, quando disponível.`,
+        "Desconto no álbum premium, quando disponível.",
+        "Nome em destaque nas ações solidárias, mediante autorização.",
+        "Prioridade em campanhas sociais e convites especiais.",
+        "Ingresso colecionável em eventos selecionados.",
+        "Acesso a conteúdos especiais sobre o impacto social da Hot Dogueres.",
+        "Possibilidade de visitas acompanhadas a instituições apoiadas, quando houver agenda.",
+        "Plano ideal para quem quer ajudar mais famílias ao longo do ano.",
+        "Prioridade ampliada em bonificações presenciais, ações solidárias e reconhecimentos especiais, conforme regulamento.",
+        "Contribui de forma reforçada para a meta anual de 106 toneladas de alimentos.",
+      ],
+      botao: "Quero ser Guardião",
+      href: "/clube/cadastro?plano=guardiao",
+    },
+    {
+      nome: "Eternizado",
+      preco: "R$ 499,90",
+      periodo: "/ano",
+      destaque: false,
+      descricao:
+        "Para quem quer eternizar o nome na história social da Hot Dogueres e apoiar uma causa com propósito durante o ano.",
+      impacto:
+        "No plano anual, a Hot Dogueres viabiliza 1 cesta básica em nome deste membro.",
+      beneficios: [
+        "Todos os benefícios principais dos Planos Fundador, Colecionador e Guardião.",
+        "Doação anual equivalente a uma cesta básica destinada a uma família em vulnerabilidade.",
+        `Nome em página especial do ${NOME_ALBUM}, mediante autorização.`,
+        "Certificado de Membro Eternizado.",
+        "Ingresso colecionável especial.",
+        "Camisa oficial do evento ou da Hot Dogueres, quando disponível.",
+        "Livro digital gratuito, quando disponível.",
+        "Desconto especial no livro físico.",
+        "Hot dog do evento, quando disponível.",
+        "Prioridade máxima em campanhas, novidades, ações especiais e eventos.",
+        "Prioridade máxima em bonificações oficiais do Clube, especialmente ligadas a presença em eventos, história da marca e reconhecimento público, conforme regulamento.",
+        "Reconhecimento como membro eternizado da história Hot Dogueres.",
+        "Uma cesta básica anual será destinada a uma família em situação de vulnerabilidade.",
+        "Parte da assinatura também contribui com ações voltadas a animais de rua.",
+      ],
+      botao: "Quero ser Eternizado",
+      href: "/clube/cadastro?plano=eternizado",
+    },
+  ];
 
   const impactos = [
-  "Meta anual: 106 toneladas de alimentos",
-  "Apoiador: 1 kg de alimento por mês",
-  "Lenda Solidária: 1 kg de alimento por mês",
-  "Fundador: 1 kg de alimento por mês",
-  "Colecionador: 1 kg de alimento por mês",
-  "Guardião: 3 kg de alimentos por mês",
-  "Eternizado: 1 cesta básica anual",
-  "Feiras de Tecnologia: entrada solidária de 1 kg de alimento",
-  "Famílias ajudadas: em breve",
-  "Animais de rua apoiados: em breve",
-];
+    "Meta anual: 106 toneladas de alimentos",
+    "Apoiador: 1 kg de alimento por mês",
+    "Lenda Solidária: 1 kg de alimento por mês",
+    "Fundador: 1 kg de alimento por mês",
+    "Colecionador: 1 kg de alimento por mês",
+    "Guardião: 3 kg de alimentos por mês",
+    "Eternizado: 1 cesta básica anual",
+    "Feiras de Tecnologia: entrada solidária de 1 kg de alimento",
+    "Famílias ajudadas: em breve",
+    "Animais de rua apoiados: em breve",
+  ];
 
-
-const beneficiosGerais = [
-  "Descontos na Hot Dogueres",
-  "Sorteios exclusivos",
-  "Acesso a novidades",
-  "Bastidores da marca",
-  "Ingresso colecionável",
-  "Ingresso colecionável especial para membros Colecionadores",
-  "Crachá digital de membro",
-  "Reconhecimento na comunidade, mediante autorização",
-  "Hot dog do evento, quando disponível",
-  "Jogo liberado a partir do Plano Fundador",
-  "Livro digital gratuito no Plano Eternizado",
-  "Desconto no livro físico",
-  "Camisa oficial em plano especial",
-  "Certificado de membro",
-  "Apoio mensal com alimentos",
-  "Apoio a famílias vulneráveis",
-  "Apoio a animais de rua",
-  "Futuro acesso online aos eventos",
-  "Participação em campanhas e ações especiais",
-  "Contribuição para a meta de 106 toneladas",
-];
+  const beneficiosGerais = [
+    "Acesso ao álbum digital",
+    "Desconto no álbum físico, quando disponível",
+    "Desconto no álbum premium, quando disponível",
+    "Nome em página especial do álbum no Plano Eternizado",
+    "Selo especial no álbum para membros Fundadores",
+    "Descontos na Hot Dogueres",
+    "Desconto em ingressos históricos",
+    "Acesso a novidades",
+    "Bastidores da marca",
+    "Ingresso colecionável",
+    "Ingresso colecionável especial para membros Colecionadores",
+    "Crachá digital de membro",
+    "Reconhecimento na comunidade, mediante autorização",
+    "Hot dog do evento, quando disponível",
+    "Jogo liberado a partir do Plano Fundador",
+    "Livro digital gratuito no Plano Eternizado",
+    "Desconto no livro físico",
+    "Camisa oficial em plano especial",
+    "Certificado de membro",
+    "Apoio mensal com alimentos",
+    "Apoio a famílias vulneráveis",
+    "Apoio a animais de rua",
+    "Futuro acesso online aos eventos",
+    "Participação em campanhas e ações especiais",
+    "Bonificações oficiais sem sorteio a partir do Plano Fundador",
+    "Contribuição para a meta de 106 toneladas",
+  ];
 
   const destaquesClube = [
-  {
-    icone: "🥫",
-    titulo: "Alimento todo mês",
-    texto: "Cada plano contribui com alimentos que entram na meta solidária anual.",
-  },
-  {
-    icone: "🎟️",
-    titulo: "Colecionáveis",
-    texto: "Ingressos digitais, itens especiais e experiências ligadas ao universo Hot Dogueres.",
-  },
-  {
-    icone: "🎮",
-    titulo: "Universo exclusivo",
-    texto: "Jogo, livros, bastidores, novidades e conteúdos especiais para membros.",
-  },
-  {
-    icone: "❤️",
-    titulo: "Impacto real",
-    texto: "O clube fortalece ações para famílias, crianças, animais e projetos sociais.",
-  },
-];
+    {
+      icone: "🥫",
+      titulo: "Alimento todo mês",
+      texto: "Cada plano contribui com alimentos que entram na meta solidária anual.",
+    },
+    {
+      icone: "🎟️",
+      titulo: "Colecionáveis",
+      texto: "Ingressos digitais, itens especiais e experiências ligadas ao universo Hot Dogueres.",
+    },
+    {
+      icone: "📖",
+      titulo: "Álbum de memórias",
+      texto: `${NOME_ALBUM} guarda ingressos, eventos, membros e histórias solidárias.`,
+    },
+    {
+      icone: "❤️",
+      titulo: "Impacto real",
+      texto: "O clube fortalece ações para famílias, crianças, animais e projetos sociais.",
+    },
+  ];
+
+  const regrasBonificacoes = [
+    "As bonificações oficiais não são sorteios.",
+    "Podem começar a partir do Plano Fundador.",
+    "Poderão considerar tempo de clube, presença em eventos e participação em campanhas.",
+    "Algumas bonificações poderão exigir presença física em eventos oficiais.",
+    "Cada ação deverá ter regulamento próprio antes de ser divulgada.",
+    "O pagamento em dia pode ser critério, mas não garante automaticamente uma bonificação.",
+  ];
 
   return (
     <>
@@ -350,14 +380,13 @@ const beneficiosGerais = [
       </style>
 
       <SetasNavegacao
-  anterior="/ranking-do-bem"
-  proxima="/area-do-colecionador"
-  labelAnterior="Voltar para Ranking do Bem"
-  labelProxima="Ir para Área do Colecionador"
-/>
+        anterior="/ranking-do-bem"
+        proxima="/area-do-colecionador"
+        labelAnterior="Voltar para Ranking do Bem"
+        labelProxima="Ir para Área do Colecionador"
+      />
 
       <main className="min-h-screen overflow-x-hidden bg-[#FFF8E7] text-[#000000]">
-
         <section className="relative overflow-hidden px-6 py-10 md:px-10 lg:px-16">
           <div className="absolute inset-0 bg-[linear-gradient(90deg,#FFE27A_0%,#FFF1B8_30%,#FFB347_48%,#291B43_62%,#080A1F_100%)]" />
 
@@ -381,11 +410,8 @@ const beneficiosGerais = [
           <div className="absolute right-[22%] top-[35%] h-52 w-52 rounded-full bg-[#FF6A00]/25 blur-3xl" />
 
           <div className="relative mx-auto max-w-[1500px]">
-          
-
             <div className="relative mt-10 min-h-[1000px] md:min-h-[940px] lg:min-h-[850px]">
               <div className="pointer-events-auto absolute left-[-70px] top-[500px] z-10 hidden sm:block sm:left-[-50px] sm:top-[440px] md:left-[-20px] md:top-[360px] lg:left-[-60px] lg:top-[170px] xl:left-[-80px]">
-
                 <button
                   type="button"
                   aria-label="Ampliar herói Hot Dogueres"
@@ -409,8 +435,7 @@ const beneficiosGerais = [
                 </button>
               </div>
 
-             <div className="pointer-events-auto absolute right-[-120px] top-[560px] z-10 hidden sm:block sm:right-[-140px] sm:top-[470px] md:right-[-150px] md:top-[380px] lg:right-[-250px] lg:top-[150px] xl:right-[-330px] xl:top-[150px] 2xl:right-[-390px]">
-
+              <div className="pointer-events-auto absolute right-[-120px] top-[560px] z-10 hidden sm:block sm:right-[-140px] sm:top-[470px] md:right-[-150px] md:top-[380px] lg:right-[-250px] lg:top-[150px] xl:right-[-330px] xl:top-[150px] 2xl:right-[-390px]">
                 <button
                   type="button"
                   aria-label="Ampliar vilão robô Hot Dogueres"
@@ -454,75 +479,75 @@ const beneficiosGerais = [
                   </p>
 
                   <p className="mt-5 text-lg font-black text-[#FFE99A] md:text-xl">
-                    Toda aventura tem um herói. Todo herói tem um desafio.
+                    Mais do que um clube, uma comunidade que alimenta histórias.
                   </p>
 
-             <div className="mt-7 rounded-[1.8rem] border border-[#FFE99A]/40 bg-white/10 p-4 shadow-2xl backdrop-blur-md md:p-5">
-  <div className="rounded-[1.5rem] bg-[#FFF1B8] p-5 text-[#000000] shadow-xl md:p-6">
-    <p className="text-xs font-black uppercase tracking-[0.25em] text-[#E11D2E]">
-      O que o clube movimenta
-    </p>
+                  <div className="mt-7 rounded-[1.8rem] border border-[#FFE99A]/40 bg-white/10 p-4 shadow-2xl backdrop-blur-md md:p-5">
+                    <div className="rounded-[1.5rem] bg-[#FFF1B8] p-5 text-[#000000] shadow-xl md:p-6">
+                      <p className="text-xs font-black uppercase tracking-[0.25em] text-[#E11D2E]">
+                        O que o clube movimenta
+                      </p>
 
-    <h2 className="mt-3 text-2xl font-black leading-tight md:text-3xl">
-      Benefícios para membros e alimento para quem precisa.
-    </h2>
+                      <h2 className="mt-3 text-2xl font-black leading-tight md:text-3xl">
+                        Benefícios para membros e alimento para quem precisa.
+                      </h2>
 
-    <p className="mt-3 text-sm font-bold leading-relaxed text-[#000000]/75 md:text-base">
-      Ao entrar para o Clube de Membros Hot Dogueres, você participa de uma
-      comunidade que ajuda a construir eventos, histórias, jogos, livros,
-      colecionáveis e ações sociais.
-    </p>
+                      <p className="mt-3 text-sm font-bold leading-relaxed text-[#000000]/75 md:text-base">
+                        Ao entrar para o Clube de Membros Hot Dogueres, você
+                        participa de uma comunidade que ajuda a construir
+                        eventos, histórias, jogos, livros, colecionáveis, álbuns
+                        e ações sociais.
+                      </p>
 
-    <div className="mt-6 grid gap-3 sm:grid-cols-2">
-      {destaquesClube.map((item) => (
-        <div
-          key={item.titulo}
-          className="rounded-2xl border border-[#E11D2E]/15 bg-white p-4 text-left shadow-md transition hover:-translate-y-1 hover:shadow-xl"
-        >
-          <div className="flex items-start gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#FFE99A] text-3xl shadow">
-              {item.icone}
-            </div>
+                      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                        {destaquesClube.map((item) => (
+                          <div
+                            key={item.titulo}
+                            className="rounded-2xl border border-[#E11D2E]/15 bg-white p-4 text-left shadow-md transition hover:-translate-y-1 hover:shadow-xl"
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#FFE99A] text-3xl shadow">
+                                {item.icone}
+                              </div>
 
-            <div>
-              <h3 className="text-base font-black text-[#000000]">
-                {item.titulo}
-              </h3>
+                              <div>
+                                <h3 className="text-base font-black text-[#000000]">
+                                  {item.titulo}
+                                </h3>
 
-              <p className="mt-1 text-xs font-bold leading-relaxed text-[#000000]/70">
-                {item.texto}
-              </p>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
+                                <p className="mt-1 text-xs font-bold leading-relaxed text-[#000000]/70">
+                                  {item.texto}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
 
-    <div className="mt-6 grid gap-3 md:grid-cols-3">
-      <div className="rounded-2xl bg-[#E11D2E] p-4 text-center text-white shadow-lg">
-        <p className="text-2xl font-black">104t</p>
-        <p className="mt-1 text-xs font-black uppercase tracking-wide">
-          Meta anual
-        </p>
-      </div>
+                      <div className="mt-6 grid gap-3 md:grid-cols-3">
+                        <div className="rounded-2xl bg-[#E11D2E] p-4 text-center text-white shadow-lg">
+                          <p className="text-2xl font-black">106t</p>
+                          <p className="mt-1 text-xs font-black uppercase tracking-wide">
+                            Meta anual
+                          </p>
+                        </div>
 
-      <div className="rounded-2xl bg-[#000000] p-4 text-center text-[#FFE99A] shadow-lg">
-        <p className="text-2xl font-black">Todo mês</p>
-        <p className="mt-1 text-xs font-black uppercase tracking-wide">
-          Apoio recorrente
-        </p>
-      </div>
+                        <div className="rounded-2xl bg-[#000000] p-4 text-center text-[#FFE99A] shadow-lg">
+                          <p className="text-2xl font-black">Todo mês</p>
+                          <p className="mt-1 text-xs font-black uppercase tracking-wide">
+                            Apoio recorrente
+                          </p>
+                        </div>
 
-      <div className="rounded-2xl bg-[#FFE99A] p-4 text-center text-[#000000] shadow-lg">
-        <p className="text-2xl font-black">Comunidade</p>
-        <p className="mt-1 text-xs font-black uppercase tracking-wide">
-          Membros com propósito
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
+                        <div className="rounded-2xl bg-[#FFE99A] p-4 text-center text-[#000000] shadow-lg">
+                          <p className="text-2xl font-black">Memória</p>
+                          <p className="mt-1 text-xs font-black uppercase tracking-wide">
+                            Álbum e coleção
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
                   <div className="mt-6 flex flex-col justify-center gap-4 sm:flex-row">
                     <a
@@ -575,13 +600,72 @@ const beneficiosGerais = [
                 <p>
                   Cada assinatura ajuda famílias em estado de vulnerabilidade,
                   animais de rua e contribui para que a Hot Dogueres continue
-                  criando eventos, livros, jogos e experiências para a
+                  criando eventos, livros, jogos, álbuns e experiências para a
                   comunidade.
                 </p>
 
                 <p className="font-black text-[#E11D2E]">
                   Na Hot Dogueres, o apoio de cada membro ajuda a transformar
                   uma ideia simples em uma história grande.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="px-6 py-16 md:px-10 lg:px-16">
+          <div className="mx-auto max-w-6xl rounded-[2rem] border border-[#E11D2E]/20 bg-white p-8 shadow-2xl md:p-10">
+            <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+              <div>
+                <p className="text-sm font-black uppercase tracking-[0.25em] text-[#E11D2E]">
+                  Álbum oficial
+                </p>
+
+                <h2 className="mt-3 text-3xl font-black leading-tight text-[#000000] md:text-5xl">
+                  {NOME_ALBUM}
+                </h2>
+              </div>
+
+              <div className="space-y-4 text-base font-bold leading-relaxed text-[#000000]/80 md:text-lg">
+                <p>
+                  O álbum será uma forma de guardar a trajetória da Hot
+                  Dogueres, seus eventos, campanhas, membros, ingressos
+                  históricos e ações solidárias.
+                </p>
+
+                <p>
+                  Cada plano entra nessa memória de um jeito: acesso digital,
+                  selos, descontos, prioridade, página especial e reconhecimento
+                  para quem ajuda a construir essa história.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-8 grid gap-4 md:grid-cols-3">
+              <div className="rounded-3xl bg-[#FFF1B8] p-5 shadow-md">
+                <p className="text-3xl">📱</p>
+                <h3 className="mt-3 text-xl font-black">Álbum digital</h3>
+                <p className="mt-2 text-sm font-bold leading-relaxed text-[#000000]/70">
+                  Acesso inicial para membros acompanharem memórias, ingressos
+                  e registros da comunidade.
+                </p>
+              </div>
+
+              <div className="rounded-3xl bg-[#FFF1B8] p-5 shadow-md">
+                <p className="text-3xl">📖</p>
+                <h3 className="mt-3 text-xl font-black">Álbum físico</h3>
+                <p className="mt-2 text-sm font-bold leading-relaxed text-[#000000]/70">
+                  Planos superiores podem ter descontos e prioridade na compra
+                  quando estiver disponível.
+                </p>
+              </div>
+
+              <div className="rounded-3xl bg-[#FFF1B8] p-5 shadow-md">
+                <p className="text-3xl">🏅</p>
+                <h3 className="mt-3 text-xl font-black">Selos e nomes</h3>
+                <p className="mt-2 text-sm font-bold leading-relaxed text-[#000000]/70">
+                  Fundadores, colecionadores, guardiões e eternizados podem ter
+                  reconhecimentos especiais no álbum.
                 </p>
               </div>
             </div>
@@ -601,12 +685,12 @@ const beneficiosGerais = [
 
               <p className="mx-auto mt-5 max-w-3xl text-lg leading-relaxed text-[#000000]/80">
                 Todos os planos ajudam a fortalecer a Hot Dogueres, apoiar ações
-                sociais e construir uma comunidade com propósito.
+                sociais, construir colecionáveis e guardar memórias com
+                propósito.
               </p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-
               {planos.map((plano) => (
                 <article
                   key={plano.nome}
@@ -658,15 +742,16 @@ const beneficiosGerais = [
                         {plano.periodo}
                       </span>
                     </div>
-<div
-  className={`mt-5 rounded-2xl p-4 text-sm font-black leading-relaxed ${
-    plano.destaque
-      ? "bg-white/15 text-[#FFE99A]"
-      : "bg-white text-[#E11D2E]"
-  }`}
->
-  {plano.impacto}
-</div>
+
+                    <div
+                      className={`mt-5 rounded-2xl p-4 text-sm font-black leading-relaxed ${
+                        plano.destaque
+                          ? "bg-white/15 text-[#FFE99A]"
+                          : "bg-white text-[#E11D2E]"
+                      }`}
+                    >
+                      {plano.impacto}
+                    </div>
 
                     <ul className="mt-8 space-y-3">
                       {plano.beneficios.map((beneficio) => (
@@ -692,17 +777,16 @@ const beneficiosGerais = [
                     </ul>
                   </div>
 
-               <Link
-  href={plano.href}
-  className={`mt-8 rounded-full px-6 py-3 text-center text-sm font-black uppercase tracking-wide shadow-lg transition hover:scale-105 ${
-    plano.destaque
-      ? "bg-[#FFE99A] text-[#000000] hover:bg-[#FFE27A]"
-      : "bg-[#E11D2E] text-white hover:bg-[#B11226]"
-  }`}
->
-  {plano.botao}
-</Link>
-
+                  <Link
+                    href={plano.href}
+                    className={`mt-8 rounded-full px-6 py-3 text-center text-sm font-black uppercase tracking-wide shadow-lg transition hover:scale-105 ${
+                      plano.destaque
+                        ? "bg-[#FFE99A] text-[#000000] hover:bg-[#FFE27A]"
+                        : "bg-[#E11D2E] text-white hover:bg-[#B11226]"
+                    }`}
+                  >
+                    {plano.botao}
+                  </Link>
                 </article>
               ))}
             </div>
@@ -729,8 +813,7 @@ const beneficiosGerais = [
               </p>
             </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
               {impactos.map((impacto) => (
                 <div
                   key={impacto}
@@ -747,6 +830,52 @@ const beneficiosGerais = [
               Os números serão atualizados conforme as ações forem realizadas
               pelo Clube de Membros Hot Dogueres.
             </p>
+          </div>
+        </section>
+
+        <section className="px-6 py-16 md:px-10 lg:px-16">
+          <div className="mx-auto max-w-6xl rounded-[2rem] border border-[#E11D2E]/20 bg-[#FFF1B8] p-8 shadow-2xl md:p-12">
+            <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+              <div>
+                <p className="text-sm font-black uppercase tracking-[0.25em] text-[#000000]">
+                  Bonificações oficiais
+                </p>
+
+                <h2 className="mt-3 text-3xl font-black text-[#000000] md:text-5xl">
+                  Reconhecimento sem sorteio, com critérios claros.
+                </h2>
+              </div>
+
+              <div className="space-y-5 text-lg leading-relaxed text-[#000000]">
+                <p>
+                  Para deixar o clube mais justo e evitar complicações com
+                  sorteios, futuras premiações e reconhecimentos poderão
+                  acontecer como bonificações oficiais.
+                </p>
+
+                <p>
+                  Essas bonificações poderão considerar presença em eventos,
+                  tempo de participação, histórico como membro, engajamento em
+                  campanhas e regras específicas divulgadas previamente.
+                </p>
+
+                <p className="font-black text-[#E11D2E]">
+                  Bonificação não é sorteio. Cada ação deverá ter regulamento
+                  próprio antes de ser anunciada.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {regrasBonificacoes.map((regra) => (
+                <div
+                  key={regra}
+                  className="rounded-2xl bg-white p-5 text-sm font-black leading-relaxed text-[#000000] shadow-lg"
+                >
+                  {regra}
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -839,6 +968,8 @@ const beneficiosGerais = [
                   Alimento para famílias.
                   <br />
                   Cuidado para animais de rua.
+                  <br />
+                  Memórias no álbum.
                   <br />
                   Força para nossos eventos e projetos.
                 </p>
