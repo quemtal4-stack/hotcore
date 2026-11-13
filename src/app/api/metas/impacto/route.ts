@@ -8,30 +8,42 @@ const META_INGRESSOS = 102000;
 const META_INGRESSOS_COMUNS = 100000;
 const LIMITE_INGRESSOS_ETERNIZADOS = 2000;
 const META_ALIMENTOS_KG = 106000;
-const META_EVENTO_ATUAL = 25000;
-
-const TIPOS_INGRESSO = ["ingresso", "ingresso_evento", "ingresso_fixo"];
 
 type PedidoMeta = {
+  status?: string | null;
   tipo?: string | null;
   categoria?: string | null;
+  produto?: string | null;
   plano?: string | null;
   quantidade?: number | string | null;
   metadata?: Record<string, unknown> | null;
 };
 
 function textoSeguro(valor: unknown, padrao = "") {
-  if (typeof valor === "string") return valor.trim();
-  if (typeof valor === "number" && Number.isFinite(valor)) return String(valor);
+  if (typeof valor === "string") {
+    return valor.trim();
+  }
+
+  if (typeof valor === "number" && Number.isFinite(valor)) {
+    return String(valor);
+  }
+
   return padrao;
 }
 
 function numeroSeguro(valor: unknown, padrao = 0) {
-  if (typeof valor === "number" && Number.isFinite(valor)) return valor;
+  if (typeof valor === "number" && Number.isFinite(valor)) {
+    return valor;
+  }
+
   if (typeof valor === "string") {
     const numero = Number(valor);
-    if (Number.isFinite(numero)) return numero;
+
+    if (Number.isFinite(numero)) {
+      return numero;
+    }
   }
+
   return padrao;
 }
 
@@ -42,176 +54,302 @@ function normalizarTexto(valor: unknown) {
     .replace(/[\u0300-\u036f]/g, "");
 }
 
-function contemEternizado(valor: unknown) {
-  return normalizarTexto(valor).includes("eternizado");
-}
-
-function contemKit(valor: unknown) {
+function contem(valor: unknown, termos: string[]) {
   const texto = normalizarTexto(valor);
-  return texto.includes("kit") || texto.includes("combo");
+
+  return termos.some((termo) => texto.includes(normalizarTexto(termo)));
 }
 
-function contemIngressoOficial(valor: unknown) {
-  const texto = normalizarTexto(valor);
-  return (
-    texto.includes("ingresso") ||
-    texto.includes("apresentacao-do-ecossistema-hot-dogueres") ||
-    texto.includes("gastronomia-que-salva-vidas") ||
-    texto.includes("hot-dogueres-pequenas-acoes")
-  );
-}
-
-function contemRacao(valor: unknown) {
-  const texto = normalizarTexto(valor);
-  return (
-    texto.includes("racao") ||
-    texto.includes("pet") ||
-    texto.includes("animal")
-  );
-}
-
-function ehPedidoDeIngresso(pedido: PedidoMeta) {
-  const tipo = textoSeguro(pedido.tipo);
-  const metadata = pedido.metadata || {};
-  const tipoMetadata = textoSeguro(metadata.tipo);
+function ehStatusPago(status: unknown) {
+  const texto = normalizarTexto(status);
 
   return (
-    TIPOS_INGRESSO.includes(tipo) ||
-    TIPOS_INGRESSO.includes(tipoMetadata) ||
-    contemIngressoOficial(pedido.tipo) ||
-    contemIngressoOficial(pedido.categoria) ||
-    contemIngressoOficial(metadata.tipo) ||
-    contemIngressoOficial(metadata.categoria) ||
-    contemIngressoOficial(metadata.produto) ||
-    contemIngressoOficial(metadata.titulo) ||
-    contemIngressoOficial(metadata.evento_id) ||
-    contemIngressoOficial(metadata.eventoId) ||
-    contemIngressoOficial(metadata.ingresso_modelo_id) ||
-    contemIngressoOficial(metadata.ingressoModeloId)
-  );
-}
-
-function ehIngressoEternizado(pedido: PedidoMeta) {
-  const metadata = pedido.metadata || {};
-  return (
-    ehPedidoDeIngresso(pedido) &&
-    (contemEternizado(pedido.tipo) ||
-      contemEternizado(pedido.categoria) ||
-      contemEternizado(metadata.tipo) ||
-      contemEternizado(metadata.categoria) ||
-      contemEternizado(metadata.produto) ||
-      contemEternizado(metadata.titulo) ||
-      contemEternizado(metadata.ingresso_modelo_id) ||
-      contemEternizado(metadata.ingressoModeloId) ||
-      Boolean(metadata.nome_ingresso_eternizado) ||
-      Boolean(metadata.nomeIngressoEternizado))
-  );
-}
-
-function ehPedidoDeKit(pedido: PedidoMeta) {
-  const metadata = pedido.metadata || {};
-  return (
-    Boolean(metadata.kit_id) ||
-    Boolean(metadata.kitId) ||
-    contemKit(pedido.tipo) ||
-    contemKit(pedido.categoria) ||
-    contemKit(metadata.tipo) ||
-    contemKit(metadata.categoria) ||
-    contemKit(metadata.produto) ||
-    contemKit(metadata.titulo)
+    texto === "pago" ||
+    texto === "approved" ||
+    texto === "aprovado" ||
+    texto === "accredited"
   );
 }
 
 function ehPedidoDeRacao(pedido: PedidoMeta) {
   const metadata = pedido.metadata || {};
+
   return (
-    contemRacao(pedido.tipo) ||
-    contemRacao(pedido.categoria) ||
-    contemRacao(metadata.tipo) ||
-    contemRacao(metadata.categoria) ||
-    contemRacao(metadata.produto) ||
-    contemRacao(metadata.titulo) ||
-    contemRacao(metadata.kit_id) ||
-    contemRacao(metadata.kitId)
+    contem(pedido.tipo, ["racao", "ração", "pet", "animal"]) ||
+    contem(pedido.categoria, ["racao", "ração", "pet", "animal"]) ||
+    contem(pedido.produto, ["racao", "ração", "pet", "animal"]) ||
+    contem(metadata.tipo, ["racao", "ração", "pet", "animal"]) ||
+    contem(metadata.categoria, ["racao", "ração", "pet", "animal"]) ||
+    contem(metadata.produto, ["racao", "ração", "pet", "animal"]) ||
+    contem(metadata.titulo, ["racao", "ração", "pet", "animal"]) ||
+    numeroSeguro(metadata.kg_racao) > 0 ||
+    numeroSeguro(metadata.kgRacao) > 0 ||
+    numeroSeguro(metadata.racao_kg) > 0 ||
+    numeroSeguro(metadata.racaoKg) > 0
   );
+}
+
+function ehPedidoDeIngresso(pedido: PedidoMeta) {
+  const metadata = pedido.metadata || {};
+
+  return (
+    contem(pedido.tipo, [
+      "ingresso",
+      "ingresso_evento",
+      "ingresso-evento",
+      "ingresso_fixo",
+      "ingresso-fixo",
+      "ingresso_historico",
+      "ingresso-historico",
+      "city quest",
+      "hemose",
+      "gastronomia que salva vidas",
+    ]) ||
+    contem(pedido.categoria, [
+      "ingresso",
+      "ingresso_evento",
+      "ingresso-evento",
+      "ingresso_fixo",
+      "ingresso-fixo",
+      "ingresso_historico",
+      "ingresso-historico",
+      "city quest",
+      "hemose",
+      "gastronomia que salva vidas",
+    ]) ||
+    contem(pedido.produto, [
+      "ingresso",
+      "city quest",
+      "hemose",
+      "gastronomia que salva vidas",
+      "eternizado",
+      "eternizados",
+    ]) ||
+    contem(metadata.tipo, [
+      "ingresso",
+      "ingresso_evento",
+      "ingresso-evento",
+      "ingresso_fixo",
+      "ingresso-fixo",
+      "ingresso_historico",
+      "ingresso-historico",
+    ]) ||
+    contem(metadata.categoria, [
+      "ingresso",
+      "ingresso_evento",
+      "ingresso-evento",
+      "ingresso_fixo",
+      "ingresso-fixo",
+      "ingresso_historico",
+      "ingresso-historico",
+    ]) ||
+    contem(metadata.produto, [
+      "ingresso",
+      "city quest",
+      "hemose",
+      "gastronomia que salva vidas",
+      "eternizado",
+      "eternizados",
+    ]) ||
+    contem(metadata.titulo, [
+      "ingresso",
+      "city quest",
+      "hemose",
+      "gastronomia que salva vidas",
+      "eternizado",
+      "eternizados",
+    ]) ||
+    contem(metadata.evento_id, [
+      "city quest",
+      "hemose",
+      "gastronomia",
+      "ingresso",
+    ]) ||
+    contem(metadata.eventoId, [
+      "city quest",
+      "hemose",
+      "gastronomia",
+      "ingresso",
+    ]) ||
+    contem(metadata.ingresso_modelo_id, [
+      "ingresso",
+      "eternizado",
+      "eternizados",
+    ]) ||
+    contem(metadata.ingressoModeloId, [
+      "ingresso",
+      "eternizado",
+      "eternizados",
+    ])
+  );
+}
+
+function ehIngressoEternizado(pedido: PedidoMeta) {
+  const metadata = pedido.metadata || {};
+
+  return (
+    ehPedidoDeIngresso(pedido) &&
+    (contem(pedido.tipo, ["eternizado", "eternizados"]) ||
+      contem(pedido.categoria, ["eternizado", "eternizados"]) ||
+      contem(pedido.produto, ["eternizado", "eternizados"]) ||
+      contem(metadata.tipo, ["eternizado", "eternizados"]) ||
+      contem(metadata.categoria, ["eternizado", "eternizados"]) ||
+      contem(metadata.produto, ["eternizado", "eternizados"]) ||
+      contem(metadata.titulo, ["eternizado", "eternizados"]) ||
+      contem(metadata.ingresso_modelo_id, ["eternizado", "eternizados"]) ||
+      contem(metadata.ingressoModeloId, ["eternizado", "eternizados"]) ||
+      Boolean(metadata.nome_ingresso_eternizado) ||
+      Boolean(metadata.nomeIngressoEternizado))
+  );
+}
+
+function ehPedidoDeKitAlimentacao(pedido: PedidoMeta) {
+  if (ehPedidoDeRacao(pedido)) {
+    return false;
+  }
+
+  const metadata = pedido.metadata || {};
+
+  const temKit =
+    contem(pedido.tipo, ["kit", "combo"]) ||
+    contem(pedido.categoria, ["kit", "combo"]) ||
+    contem(pedido.produto, ["kit", "combo"]) ||
+    contem(metadata.tipo, ["kit", "combo"]) ||
+    contem(metadata.categoria, ["kit", "combo"]) ||
+    contem(metadata.produto, ["kit", "combo"]) ||
+    contem(metadata.titulo, ["kit", "combo"]);
+
+  const temAlimento =
+    contem(pedido.tipo, ["alimento", "alimentacao", "alimentação", "cesta"]) ||
+    contem(pedido.categoria, [
+      "alimento",
+      "alimentacao",
+      "alimentação",
+      "cesta",
+    ]) ||
+    contem(pedido.produto, [
+      "alimento",
+      "alimentacao",
+      "alimentação",
+      "cesta",
+    ]) ||
+    contem(metadata.tipo, [
+      "alimento",
+      "alimentacao",
+      "alimentação",
+      "cesta",
+    ]) ||
+    contem(metadata.categoria, [
+      "alimento",
+      "alimentacao",
+      "alimentação",
+      "cesta",
+    ]) ||
+    contem(metadata.produto, [
+      "alimento",
+      "alimentacao",
+      "alimentação",
+      "cesta",
+    ]) ||
+    contem(metadata.titulo, [
+      "alimento",
+      "alimentacao",
+      "alimentação",
+      "cesta",
+    ]);
+
+  return temKit && temAlimento;
 }
 
 function obterQuantidade(pedido: PedidoMeta) {
   const metadata = pedido.metadata || {};
+
   const quantidade =
     numeroSeguro(pedido.quantidade) ||
+    numeroSeguro(metadata.quantidade_total_compra) ||
+    numeroSeguro(metadata.quantidadeTotalCompra) ||
     numeroSeguro(metadata.quantidade_total) ||
+    numeroSeguro(metadata.quantidadeTotal) ||
     numeroSeguro(metadata.quantidade) ||
     numeroSeguro(metadata.ingressos) ||
     0;
+
   return Math.max(0, Math.floor(quantidade));
 }
 
-function obterIngressosSimbolicosInformados(pedido: PedidoMeta) {
+function obterQuantidadeIngressosComuns(pedido: PedidoMeta) {
   const metadata = pedido.metadata || {};
+
+  const quantidade =
+    numeroSeguro(metadata.ingressos) ||
+    numeroSeguro(metadata.quantidade_ingressos) ||
+    numeroSeguro(metadata.quantidadeIngressos) ||
+    numeroSeguro(metadata.quantidade_total) ||
+    numeroSeguro(metadata.quantidadeTotal) ||
+    numeroSeguro(pedido.quantidade) ||
+    0;
+
+  return Math.max(0, Math.floor(quantidade));
+}
+
+function obterIngressosSimbolicos(pedido: PedidoMeta) {
+  const metadata = pedido.metadata || {};
+
   const ingressos =
     numeroSeguro(metadata.ingressos_simbolicos) ||
     numeroSeguro(metadata.ingressosSimbolicos) ||
     numeroSeguro(metadata.ingressos_equivalentes) ||
     numeroSeguro(metadata.ingressosEquivalentes) ||
     0;
+
   return Math.max(0, Math.floor(ingressos));
 }
 
 function obterKgAlimentosInformado(pedido: PedidoMeta) {
+  if (ehPedidoDeRacao(pedido)) {
+    return 0;
+  }
+
   const metadata = pedido.metadata || {};
+
   return Math.max(
     0,
     numeroSeguro(metadata.kg_alimentos) ||
       numeroSeguro(metadata.kgAlimentos) ||
       numeroSeguro(metadata.alimentos_kg) ||
       numeroSeguro(metadata.alimentosKg) ||
-      0,
-  );
-}
-
-function obterKgRacaoOuTotalInformado(pedido: PedidoMeta) {
-  const metadata = pedido.metadata || {};
-  return Math.max(
-    0,
-    numeroSeguro(metadata.kg_racao) ||
-      numeroSeguro(metadata.kgRacao) ||
-      numeroSeguro(metadata.racao_kg) ||
-      numeroSeguro(metadata.racaoKg) ||
-      numeroSeguro(metadata.kg_total) ||
-      numeroSeguro(metadata.kgTotal) ||
-      numeroSeguro(metadata.peso_kg) ||
-      numeroSeguro(metadata.pesoKg) ||
+      numeroSeguro(metadata.kg) ||
       0,
   );
 }
 
 function calcularKgMembro(pedido: PedidoMeta) {
+  if (ehPedidoDeRacao(pedido)) {
+    return 0;
+  }
+
   const metadata = pedido.metadata || {};
   const tipo = normalizarTexto(pedido.tipo || metadata.tipo);
 
-  if (tipo !== "clube_membro") return 0;
+  if (tipo !== "clube_membro" && tipo !== "clube-membro") {
+    return 0;
+  }
 
   const plano = normalizarTexto(
     pedido.plano ||
       metadata.plano ||
-      metadata.nome ||
       metadata.produto ||
-      metadata.titulo,
+      metadata.titulo ||
+      metadata.nome,
   );
 
-  if (
-    plano === "apoiador" ||
-    plano === "lendario" ||
-    plano === "lenda" ||
-    plano === "fundador" ||
-    plano === "colecionador"
-  ) {
-    return 1;
+  if (plano.includes("guardiao")) {
+    return 3;
   }
 
-  if (plano === "guardiao") return 3;
-  if (plano === "eternizados" || plano === "eternizado") return 14;
+  if (plano.includes("eternizado")) {
+    return 14;
+  }
 
   return 1;
 }
@@ -220,23 +358,24 @@ export async function GET() {
   try {
     const { data, error } = await supabaseAdmin
       .from("pedidos")
-      .select("tipo, categoria, plano, quantidade, metadata")
-      .eq("status", "pago");
+      .select("status, tipo, categoria, produto, plano, quantidade, metadata")
+      .in("status", ["pago", "approved", "aprovado", "accredited"]);
 
     if (error) {
       console.error("ERRO AO BUSCAR PEDIDOS PARA META DE IMPACTO:", error);
+
       return NextResponse.json(
         {
           error: "Erro ao buscar dados da meta de impacto.",
           detalhe: error.message,
-          hint: error.hint,
-          code: error.code,
         },
         { status: 500 },
       );
     }
 
-    const pedidos = (data || []) as PedidoMeta[];
+    const pedidos = ((data || []) as PedidoMeta[]).filter((pedido) =>
+      ehStatusPago(pedido.status),
+    );
 
     let ingressosVendidosBruto = 0;
     let ingressosComunsVendidosBruto = 0;
@@ -245,34 +384,40 @@ export async function GET() {
     let kgPorKits = 0;
     let kgPorMembros = 0;
     let kgOutros = 0;
-    let pedidosRacaoIgnorados = 0;
-    let kgRacaoIgnoradoNesteTermometro = 0;
 
     for (const pedido of pedidos) {
+      if (ehPedidoDeRacao(pedido)) {
+        continue;
+      }
+
       const quantidade = obterQuantidade(pedido);
       const kgInformado = obterKgAlimentosInformado(pedido);
 
-      if (ehPedidoDeRacao(pedido)) {
-        pedidosRacaoIgnorados += 1;
-        kgRacaoIgnoradoNesteTermometro +=
-          obterKgRacaoOuTotalInformado(pedido) || quantidade;
-        continue;
-      }
-
       if (ehPedidoDeIngresso(pedido)) {
         const eternizado = ehIngressoEternizado(pedido);
-        ingressosVendidosBruto += quantidade;
 
         if (eternizado) {
-          ingressosEternizadosVendidosBruto += quantidade;
-        } else {
-          ingressosComunsVendidosBruto += quantidade;
+          const qtdEternizados = quantidade || 1;
+          const kgFinal = kgInformado || qtdEternizados * 3;
+
+          ingressosVendidosBruto += qtdEternizados;
+          ingressosEternizadosVendidosBruto += qtdEternizados;
+          kgOutros += Math.max(kgFinal, qtdEternizados * 3);
+
+          continue;
         }
+
+        const qtdComuns = obterQuantidadeIngressosComuns(pedido) || quantidade;
+        const kgFinal = kgInformado || qtdComuns;
+
+        ingressosVendidosBruto += qtdComuns;
+        ingressosComunsVendidosBruto += qtdComuns;
+        kgOutros += Math.max(kgFinal, qtdComuns);
 
         continue;
       }
 
-      const ingressosSimbolicos = obterIngressosSimbolicosInformados(pedido);
+      const ingressosSimbolicos = obterIngressosSimbolicos(pedido);
 
       if (ingressosSimbolicos > 0) {
         ingressosVendidosBruto += ingressosSimbolicos;
@@ -288,7 +433,7 @@ export async function GET() {
         continue;
       }
 
-      if (ehPedidoDeKit(pedido)) {
+      if (ehPedidoDeKitAlimentacao(pedido)) {
         kgPorKits += kgInformado || quantidade;
         continue;
       }
@@ -326,12 +471,10 @@ export async function GET() {
       0,
     );
 
-    const kgPorIngressosContabilizados =
+    const kgPorIngressos =
       ingressosComunsContabilizados + ingressosEternizadosContabilizados * 3;
 
-    const kgAlimentos =
-      kgPorIngressosContabilizados + kgPorKits + kgPorMembros + kgOutros;
-
+    const kgAlimentos = kgPorIngressos + kgPorKits + kgPorMembros + kgOutros;
     const toneladasAlimentos = kgAlimentos / 1000;
 
     const percentualIngressos = Math.min(
@@ -351,7 +494,6 @@ export async function GET() {
         ingressos_eternizados: LIMITE_INGRESSOS_ETERNIZADOS,
         alimentos_kg: META_ALIMENTOS_KG,
         alimentos_toneladas: META_ALIMENTOS_KG / 1000,
-        evento_atual: META_EVENTO_ATUAL,
       },
 
       ingressos: {
@@ -416,51 +558,33 @@ export async function GET() {
       },
 
       fontes: {
-        ingressos_kg: kgPorIngressosContabilizados,
+        ingressos_kg: kgPorIngressos,
         kits_kg: kgPorKits,
         membros_kg: kgPorMembros,
         outros_kg: kgOutros,
-        pedidos_racao_ignorados: pedidosRacaoIgnorados,
-        kg_racao_ignorado_neste_termometro: kgRacaoIgnoradoNesteTermometro,
       },
 
       regra: {
         ingressos_comuns:
-          "100.000 ingressos comuns x 1 kg = 100 toneladas de alimentos",
+          "Cada ingresso comum pago conta 1 ingresso e 1 kg de alimento.",
         ingressos_eternizados:
-          "2.000 ingressos eternizados x 3 kg = 6 toneladas de alimentos",
-        limite_eternizados:
-          "Máximo de 2.000 ingressos eternizados na meta geral",
-        ciclo_evento:
-          "O evento atual pode ter controle próprio de 25.000 ingressos, mas o termômetro geral continua acumulando até 102.000 ingressos.",
-        ingressos_simbolicos:
-          "Ingressos simbólicos só somam no termômetro de alimentos quando o pedido não for de ração.",
+          "Cada ingresso Eternizados pago conta 1 ingresso e 3 kg de alimento.",
+        ingressos_historicos:
+          "Ingressos históricos da Loja Solidária contam quando o pedido estiver com status pago.",
+        nao_membro:
+          "O valor de R$ 85,00 para não membro não altera a regra do termômetro; o que conta é quantidade e kg_alimentos.",
         kits_alimentacao:
-          "Somente kits de alimentação somam no termômetro de alimentos.",
+          "Kits de alimentação contam somente em alimentos, não em ingressos.",
         kits_racao:
-          "Kits de ração nunca somam no termômetro de alimentos. Eles devem aparecer somente no termômetro exclusivo de ração.",
-        clube_apoiador:
-          "Apoiador: R$ 19,90 por mês = 1 kg de alimento por pagamento aprovado",
-        clube_lendario:
-          "Lendário: R$ 29,90 por mês = 1 kg de alimento por pagamento aprovado",
-        clube_fundador:
-          "Fundador: R$ 39,90 por mês = 1 kg de alimento por pagamento aprovado",
-        clube_colecionador:
-          "Colecionador: R$ 59,90 por mês = 1 kg de alimento por pagamento aprovado",
-        clube_guardiao:
-          "Guardião: R$ 89,90 por mês = 3 kg de alimento por pagamento aprovado",
-        clube_eternizados:
-          "Eternizados: R$ 499,90 por ano = 14 kg de alimentos ou uma cesta básica por pagamento aprovado",
-        meta_total:
-          "102.000 ingressos no total: 100.000 comuns + 2.000 eternizados = 106 toneladas de alimentos, separadas da meta de 50 toneladas de ração.",
+          "Kits de ração não entram neste termômetro; entram apenas no termômetro de ração.",
       },
     });
   } catch (error) {
     console.error("ERRO GERAL NA META DE IMPACTO:", error);
+
     return NextResponse.json(
       {
         error: "Erro interno ao calcular meta de impacto.",
-        detalhe: error instanceof Error ? error.message : String(error),
       },
       { status: 500 },
     );
