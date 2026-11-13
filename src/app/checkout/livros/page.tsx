@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useMemo, useState, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 
+type FormaEntrega = "retirada-local" | "retirada-evento" | "receber-casa";
+
 type DadosComprador = {
   nome: string;
   cpf: string;
@@ -18,6 +20,8 @@ type DadosComprador = {
   estado: string;
   observacoes: string;
 };
+
+const FRETE_ENTREGA_CASA = 20;
 
 function formatarMoeda(valor: number) {
   return valor.toLocaleString("pt-BR", {
@@ -59,6 +63,12 @@ function formatarCep(valor: string) {
     .replace(/^(\d{5})(\d)/, "$1-$2");
 }
 
+function obterTextoFormaEntrega(formaEntrega: FormaEntrega) {
+  if (formaEntrega === "retirada-local") return "Retirada na sede";
+  if (formaEntrega === "retirada-evento") return "Retirada no evento";
+  return "Receber em casa";
+}
+
 export default function CheckoutLivrosPage() {
   const searchParams = useSearchParams();
 
@@ -84,6 +94,9 @@ export default function CheckoutLivrosPage() {
     observacoes: "",
   });
 
+  const [formaEntrega, setFormaEntrega] =
+    useState<FormaEntrega>("receber-casa");
+
   const [aceitouPreVenda, setAceitouPreVenda] = useState(false);
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState("");
@@ -94,6 +107,22 @@ export default function CheckoutLivrosPage() {
     if (tipoPreco === "nao-membro") return "Valor para não membro";
     return "Valor do livro";
   }, [tipoPreco]);
+
+  const valorFrete = useMemo(() => {
+    if (formaEntrega === "receber-casa") {
+      return FRETE_ENTREGA_CASA;
+    }
+
+    return 0;
+  }, [formaEntrega]);
+
+  const valorTotal = useMemo(() => {
+    return valor + valorFrete;
+  }, [valor, valorFrete]);
+
+  const formaEntregaTexto = useMemo(() => {
+    return obterTextoFormaEntrega(formaEntrega);
+  }, [formaEntrega]);
 
   function atualizarCampo(campo: keyof DadosComprador, valorCampo: string) {
     let valorFinal = valorCampo;
@@ -141,28 +170,30 @@ export default function CheckoutLivrosPage() {
       return "Informe um telefone válido.";
     }
 
-    if (limparNumeros(dados.cep).length !== 8) {
-      return "Informe um CEP válido com 8 números.";
-    }
+    if (formaEntrega === "receber-casa") {
+      if (limparNumeros(dados.cep).length !== 8) {
+        return "Informe um CEP válido com 8 números.";
+      }
 
-    if (!dados.endereco.trim()) {
-      return "Informe o endereço de entrega.";
-    }
+      if (!dados.endereco.trim()) {
+        return "Informe o endereço de entrega.";
+      }
 
-    if (!dados.numero.trim()) {
-      return "Informe o número do endereço.";
-    }
+      if (!dados.numero.trim()) {
+        return "Informe o número do endereço.";
+      }
 
-    if (!dados.bairro.trim()) {
-      return "Informe o bairro.";
-    }
+      if (!dados.bairro.trim()) {
+        return "Informe o bairro.";
+      }
 
-    if (!dados.cidade.trim()) {
-      return "Informe a cidade.";
-    }
+      if (!dados.cidade.trim()) {
+        return "Informe a cidade.";
+      }
 
-    if (dados.estado.trim().length !== 2) {
-      return "Informe a UF do estado com 2 letras.";
+      if (dados.estado.trim().length !== 2) {
+        return "Informe a UF do estado com 2 letras.";
+      }
     }
 
     if (!aceitouPreVenda) {
@@ -196,28 +227,34 @@ export default function CheckoutLivrosPage() {
           produto,
           titulo,
           quantidade: 1,
-          valor,
+          valor: valorTotal,
+          valorLivro: valor,
+          frete: valorFrete,
           tipoPreco,
           livro,
           entrega,
+          formaEntrega,
+          formaEntregaTexto,
           comprador: {
             nome: dados.nome.trim(),
             cpf: limparNumeros(dados.cpf),
             email: dados.email.trim(),
             telefone: limparNumeros(dados.telefone),
           },
-          entregaEndereco: {
-            cep: limparNumeros(dados.cep),
-            endereco: dados.endereco.trim(),
-            numero: dados.numero.trim(),
-            complemento: dados.complemento.trim(),
-            bairro: dados.bairro.trim(),
-            cidade: dados.cidade.trim(),
-            estado: dados.estado.trim().toUpperCase(),
-            observacoes: dados.observacoes.trim(),
-          },
-          observacaoPedido:
-            "Produto em pré-venda. Entrega conforme prazo informado na página do produto.",
+          entregaEndereco:
+            formaEntrega === "receber-casa"
+              ? {
+                  cep: limparNumeros(dados.cep),
+                  endereco: dados.endereco.trim(),
+                  numero: dados.numero.trim(),
+                  complemento: dados.complemento.trim(),
+                  bairro: dados.bairro.trim(),
+                  cidade: dados.cidade.trim(),
+                  estado: dados.estado.trim().toUpperCase(),
+                  observacoes: dados.observacoes.trim(),
+                }
+              : null,
+          observacaoPedido: `Produto em pré-venda. Entrega conforme prazo informado na página do produto. Forma de entrega: ${formaEntregaTexto}. Frete: ${formatarMoeda(valorFrete)}.`,
         }),
       });
 
@@ -238,7 +275,9 @@ export default function CheckoutLivrosPage() {
         resultado?.checkoutUrl;
 
       if (!urlPagamento) {
-        throw new Error("A resposta do Mercado Pago não retornou o link de pagamento.");
+        throw new Error(
+          "A resposta do Mercado Pago não retornou o link de pagamento.",
+        );
       }
 
       window.location.href = urlPagamento;
@@ -294,10 +333,37 @@ export default function CheckoutLivrosPage() {
 
               <div>
                 <p className="text-xs font-black uppercase text-gray-500">
-                  Valor
+                  Valor do livro
+                </p>
+                <p className="text-3xl font-black text-green-700">
+                  {formatarMoeda(valor)}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-black uppercase text-gray-500">
+                  Forma de entrega
+                </p>
+                <p className="text-lg font-black text-red-700">
+                  {formaEntregaTexto}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-black uppercase text-gray-500">
+                  Frete
+                </p>
+                <p className="text-lg font-black text-gray-950">
+                  {valorFrete > 0 ? formatarMoeda(valorFrete) : "Sem frete"}
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-white p-4 ring-1 ring-green-100">
+                <p className="text-xs font-black uppercase text-gray-500">
+                  Total do pedido
                 </p>
                 <p className="text-4xl font-black text-green-700">
-                  {formatarMoeda(valor)}
+                  {formatarMoeda(valorTotal)}
                 </p>
               </div>
 
@@ -314,6 +380,11 @@ export default function CheckoutLivrosPage() {
             <div className="mt-5 rounded-3xl bg-red-50 p-5 text-sm font-bold leading-relaxed text-red-800">
               Este produto está em pré-venda. A produção, separação e entrega
               seguem o prazo informado na Loja Solidária.
+            </div>
+
+            <div className="mt-4 rounded-3xl bg-green-50 p-5 text-sm font-bold leading-relaxed text-green-800">
+              Para receber em casa, o frete fixo é de R$ 20,00. Para retirada na
+              sede ou no evento, não há cobrança de frete.
             </div>
           </aside>
 
@@ -335,7 +406,9 @@ export default function CheckoutLivrosPage() {
                   </span>
                   <input
                     value={dados.nome}
-                    onChange={(event) => atualizarCampo("nome", event.target.value)}
+                    onChange={(event) =>
+                      atualizarCampo("nome", event.target.value)
+                    }
                     required
                     className="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm font-bold outline-none focus:border-red-500"
                     placeholder="Seu nome completo"
@@ -346,7 +419,9 @@ export default function CheckoutLivrosPage() {
                   <span className="text-sm font-black text-gray-800">CPF</span>
                   <input
                     value={dados.cpf}
-                    onChange={(event) => atualizarCampo("cpf", event.target.value)}
+                    onChange={(event) =>
+                      atualizarCampo("cpf", event.target.value)
+                    }
                     required
                     className="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm font-bold outline-none focus:border-red-500"
                     placeholder="000.000.000-00"
@@ -360,7 +435,9 @@ export default function CheckoutLivrosPage() {
                   <input
                     type="email"
                     value={dados.email}
-                    onChange={(event) => atualizarCampo("email", event.target.value)}
+                    onChange={(event) =>
+                      atualizarCampo("email", event.target.value)
+                    }
                     required
                     className="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm font-bold outline-none focus:border-red-500"
                     placeholder="seuemail@email.com"
@@ -385,115 +462,192 @@ export default function CheckoutLivrosPage() {
 
               <div className="rounded-3xl bg-[#fff7e8] p-5">
                 <h3 className="text-lg font-black text-red-700">
-                  Endereço de entrega
+                  Forma de entrega
                 </h3>
 
-                <div className="mt-4 grid gap-4 md:grid-cols-2">
-                  <label className="block">
-                    <span className="text-sm font-black text-gray-800">CEP</span>
-                    <input
-                      value={dados.cep}
-                      onChange={(event) => atualizarCampo("cep", event.target.value)}
-                      required
-                      className="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm font-bold outline-none focus:border-red-500"
-                      placeholder="00000-000"
-                    />
-                  </label>
+                <p className="mt-1 text-sm font-semibold leading-relaxed text-gray-700">
+                  Escolha como deseja receber ou retirar seu livro.
+                </p>
 
-                  <label className="block">
-                    <span className="text-sm font-black text-gray-800">
-                      Endereço
-                    </span>
-                    <input
-                      value={dados.endereco}
-                      onChange={(event) =>
-                        atualizarCampo("endereco", event.target.value)
-                      }
-                      required
-                      className="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm font-bold outline-none focus:border-red-500"
-                      placeholder="Rua, avenida, travessa..."
-                    />
-                  </label>
+                <div className="mt-4 grid gap-3 md:grid-cols-3">
+                  <button
+                    type="button"
+                    onClick={() => setFormaEntrega("retirada-local")}
+                    className={`rounded-2xl p-4 text-left shadow-sm ring-2 transition ${
+                      formaEntrega === "retirada-local"
+                        ? "bg-red-600 text-white ring-red-600"
+                        : "bg-white text-gray-800 ring-red-100 hover:bg-red-50"
+                    }`}
+                  >
+                    <p className="text-sm font-black">Retirada na sede</p>
+                    <p className="mt-1 text-xs font-bold opacity-90">
+                      Sem cobrança de frete.
+                    </p>
+                  </button>
 
-                  <label className="block">
-                    <span className="text-sm font-black text-gray-800">
-                      Número
-                    </span>
-                    <input
-                      value={dados.numero}
-                      onChange={(event) =>
-                        atualizarCampo("numero", event.target.value)
-                      }
-                      required
-                      className="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm font-bold outline-none focus:border-red-500"
-                      placeholder="123"
-                    />
-                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setFormaEntrega("retirada-evento")}
+                    className={`rounded-2xl p-4 text-left shadow-sm ring-2 transition ${
+                      formaEntrega === "retirada-evento"
+                        ? "bg-yellow-400 text-gray-950 ring-yellow-400"
+                        : "bg-white text-gray-800 ring-yellow-100 hover:bg-yellow-50"
+                    }`}
+                  >
+                    <p className="text-sm font-black">Retirada no evento</p>
+                    <p className="mt-1 text-xs font-bold opacity-90">
+                      Entrega combinada no evento.
+                    </p>
+                  </button>
 
-                  <label className="block">
-                    <span className="text-sm font-black text-gray-800">
-                      Complemento
-                    </span>
-                    <input
-                      value={dados.complemento}
-                      onChange={(event) =>
-                        atualizarCampo("complemento", event.target.value)
-                      }
-                      className="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm font-bold outline-none focus:border-red-500"
-                      placeholder="Apto, bloco, referência..."
-                    />
-                  </label>
-
-                  <label className="block">
-                    <span className="text-sm font-black text-gray-800">
-                      Bairro
-                    </span>
-                    <input
-                      value={dados.bairro}
-                      onChange={(event) =>
-                        atualizarCampo("bairro", event.target.value)
-                      }
-                      required
-                      className="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm font-bold outline-none focus:border-red-500"
-                      placeholder="Bairro"
-                    />
-                  </label>
-
-                  <div className="grid gap-4 sm:grid-cols-[1fr_90px]">
-                    <label className="block">
-                      <span className="text-sm font-black text-gray-800">
-                        Cidade
-                      </span>
-                      <input
-                        value={dados.cidade}
-                        onChange={(event) =>
-                          atualizarCampo("cidade", event.target.value)
-                        }
-                        required
-                        className="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm font-bold outline-none focus:border-red-500"
-                        placeholder="Cidade"
-                      />
-                    </label>
-
-                    <label className="block">
-                      <span className="text-sm font-black text-gray-800">UF</span>
-                      <input
-                        value={dados.estado}
-                        onChange={(event) =>
-                          atualizarCampo("estado", event.target.value)
-                        }
-                        required
-                        className="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm font-bold uppercase outline-none focus:border-red-500"
-                        placeholder="SE"
-                      />
-                    </label>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFormaEntrega("receber-casa")}
+                    className={`rounded-2xl p-4 text-left shadow-sm ring-2 transition ${
+                      formaEntrega === "receber-casa"
+                        ? "bg-green-600 text-white ring-green-600"
+                        : "bg-white text-gray-800 ring-green-100 hover:bg-green-50"
+                    }`}
+                  >
+                    <p className="text-sm font-black">Receber em casa</p>
+                    <p className="mt-1 text-xs font-bold opacity-90">
+                      Frete fixo de R$ 20,00.
+                    </p>
+                  </button>
                 </div>
               </div>
 
+              {formaEntrega === "receber-casa" && (
+                <div className="rounded-3xl bg-[#fff7e8] p-5">
+                  <h3 className="text-lg font-black text-red-700">
+                    Endereço de entrega
+                  </h3>
+
+                  <p className="mt-1 text-sm font-semibold leading-relaxed text-gray-700">
+                    O frete para entrega em casa é fixo: R$ 20,00.
+                  </p>
+
+                  <div className="mt-4 grid gap-4 md:grid-cols-2">
+                    <label className="block">
+                      <span className="text-sm font-black text-gray-800">
+                        CEP
+                      </span>
+                      <input
+                        value={dados.cep}
+                        onChange={(event) =>
+                          atualizarCampo("cep", event.target.value)
+                        }
+                        required={formaEntrega === "receber-casa"}
+                        className="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm font-bold outline-none focus:border-red-500"
+                        placeholder="00000-000"
+                      />
+                    </label>
+
+                    <label className="block">
+                      <span className="text-sm font-black text-gray-800">
+                        Endereço
+                      </span>
+                      <input
+                        value={dados.endereco}
+                        onChange={(event) =>
+                          atualizarCampo("endereco", event.target.value)
+                        }
+                        required={formaEntrega === "receber-casa"}
+                        className="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm font-bold outline-none focus:border-red-500"
+                        placeholder="Rua, avenida, travessa..."
+                      />
+                    </label>
+
+                    <label className="block">
+                      <span className="text-sm font-black text-gray-800">
+                        Número
+                      </span>
+                      <input
+                        value={dados.numero}
+                        onChange={(event) =>
+                          atualizarCampo("numero", event.target.value)
+                        }
+                        required={formaEntrega === "receber-casa"}
+                        className="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm font-bold outline-none focus:border-red-500"
+                        placeholder="123"
+                      />
+                    </label>
+
+                    <label className="block">
+                      <span className="text-sm font-black text-gray-800">
+                        Complemento
+                      </span>
+                      <input
+                        value={dados.complemento}
+                        onChange={(event) =>
+                          atualizarCampo("complemento", event.target.value)
+                        }
+                        className="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm font-bold outline-none focus:border-red-500"
+                        placeholder="Apto, bloco, referência..."
+                      />
+                    </label>
+
+                    <label className="block">
+                      <span className="text-sm font-black text-gray-800">
+                        Bairro
+                      </span>
+                      <input
+                        value={dados.bairro}
+                        onChange={(event) =>
+                          atualizarCampo("bairro", event.target.value)
+                        }
+                        required={formaEntrega === "receber-casa"}
+                        className="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm font-bold outline-none focus:border-red-500"
+                        placeholder="Bairro"
+                      />
+                    </label>
+
+                    <div className="grid gap-4 sm:grid-cols-[1fr_90px]">
+                      <label className="block">
+                        <span className="text-sm font-black text-gray-800">
+                          Cidade
+                        </span>
+                        <input
+                          value={dados.cidade}
+                          onChange={(event) =>
+                            atualizarCampo("cidade", event.target.value)
+                          }
+                          required={formaEntrega === "receber-casa"}
+                          className="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm font-bold outline-none focus:border-red-500"
+                          placeholder="Cidade"
+                        />
+                      </label>
+
+                      <label className="block">
+                        <span className="text-sm font-black text-gray-800">
+                          UF
+                        </span>
+                        <input
+                          value={dados.estado}
+                          onChange={(event) =>
+                            atualizarCampo("estado", event.target.value)
+                          }
+                          required={formaEntrega === "receber-casa"}
+                          className="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm font-bold uppercase outline-none focus:border-red-500"
+                          placeholder="SE"
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {formaEntrega !== "receber-casa" && (
+                <div className="rounded-3xl bg-green-50 p-5 text-sm font-bold leading-relaxed text-green-800">
+                  Você escolheu {formaEntregaTexto.toLowerCase()}. Não será
+                  cobrado frete. Entraremos em contato pelo WhatsApp informado
+                  para combinar os detalhes da retirada.
+                </div>
+              )}
+
               <label className="block">
                 <span className="text-sm font-black text-gray-800">
-                  Observações para entrega
+                  Observações
                 </span>
                 <textarea
                   value={dados.observacoes}
@@ -502,7 +656,11 @@ export default function CheckoutLivrosPage() {
                   }
                   rows={3}
                   className="mt-2 w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm font-bold outline-none focus:border-red-500"
-                  placeholder="Ex.: entregar pela manhã, ponto de referência, nome de quem recebe..."
+                  placeholder={
+                    formaEntrega === "receber-casa"
+                      ? "Ex.: entregar pela manhã, ponto de referência, nome de quem recebe..."
+                      : "Ex.: melhor horário para contato, evento que pretende retirar, observações sobre a retirada..."
+                  }
                 />
               </label>
 
@@ -516,7 +674,8 @@ export default function CheckoutLivrosPage() {
 
                 <span>
                   Confirmo que estou comprando um produto em pré-venda e que a
-                  entrega seguirá o prazo informado na página do produto.
+                  entrega ou retirada seguirá o prazo informado na página do
+                  produto.
                 </span>
               </label>
 
@@ -531,7 +690,9 @@ export default function CheckoutLivrosPage() {
                 disabled={carregando}
                 className="w-full rounded-full bg-red-600 px-6 py-4 text-center text-sm font-black uppercase tracking-wide text-white shadow-lg transition hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-gray-400"
               >
-                {carregando ? "Preparando pagamento..." : "Continuar para pagamento"}
+                {carregando
+                  ? "Preparando pagamento..."
+                  : `Continuar para pagamento — ${formatarMoeda(valorTotal)}`}
               </button>
             </form>
           </section>
