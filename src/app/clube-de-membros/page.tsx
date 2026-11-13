@@ -27,7 +27,7 @@ export default function ClubeDeMembrosPage() {
       "Participação em sorteios e campanhas.",
       "Acesso a novidades e bastidores da marca.",
       "Nome na lista de apoiadores, mediante autorização.",
-      "Contribui para a meta anual de 104 toneladas de alimentos.",
+      "Contribui para a meta anual de 106 toneladas de alimentos.",
       "Também ajuda ações voltadas a famílias em vulnerabilidade e animais de rua.",
     ],
     botao: "Quero ser Apoiador",
@@ -50,7 +50,7 @@ export default function ClubeDeMembrosPage() {
       "Prioridade em experiências presenciais gratuitas, quando houver limite de vagas.",
       "Reconhecimento como membro ativo da comunidade Hot Dogueres.",
       "Benefícios voltados para quem acompanha os eventos de perto.",
-      "Contribui para a meta anual de 104 toneladas de alimentos.",
+      "Contribui para a meta anual de 106 toneladas de alimentos.",
     ],
     botao: "Quero ser Lenda Solidária",
     href: "/clube/cadastro?plano=lendario",
@@ -75,7 +75,7 @@ export default function ClubeDeMembrosPage() {
       "Acesso a conteúdos especiais da marca.",
       "Participação em enquetes e decisões simbólicas do ecossistema, quando houver.",
       "Futuramente, acesso online a transmissões e bastidores dos eventos, quando houver estrutura disponível.",
-      "Contribui para a meta anual de 104 toneladas de alimentos.",
+      "Contribui para a meta anual de 106 toneladas de alimentos.",
     ],
     botao: "Quero ser Fundador",
     href: "/clube/cadastro?plano=fundador",
@@ -97,7 +97,7 @@ export default function ClubeDeMembrosPage() {
       "Participação em campanhas especiais ligadas à Área do Colecionador.",
       "Nome na lista de membros colecionadores, mediante autorização.",
       "Benefícios pensados para quem acompanha a história e quer guardar cada fase da marca.",
-      "Contribui para a meta anual de 104 toneladas de alimentos.",
+      "Contribui para a meta anual de 106 toneladas de alimentos.",
     ],
     botao: "Quero ser Colecionador",
     href: "/clube/cadastro?plano=colecionador",
@@ -120,7 +120,7 @@ export default function ClubeDeMembrosPage() {
       "Ingresso colecionável em eventos selecionados.",
       "Acesso a conteúdos especiais sobre o impacto social da Hot Dogueres.",
       "Plano ideal para quem quer ajudar mais famílias ao longo do ano.",
-      "Contribui de forma reforçada para a meta anual de 104 toneladas de alimentos.",
+      "Contribui de forma reforçada para a meta anual de 106 toneladas de alimentos.",
     ],
     botao: "Quero ser Guardião",
     href: "/clube/cadastro?plano=guardiao",
@@ -157,7 +157,7 @@ export default function ClubeDeMembrosPage() {
 
 
   const impactos = [
-  "Meta anual: 104 toneladas de alimentos",
+  "Meta anual: 106 toneladas de alimentos",
   "Apoiador: 1 kg de alimento por mês",
   "Lenda Solidária: 1 kg de alimento por mês",
   "Fundador: 1 kg de alimento por mês",
@@ -190,7 +190,7 @@ const beneficiosGerais = [
   "Apoio a animais de rua",
   "Futuro acesso online aos eventos",
   "Participação em campanhas e ações especiais",
-  "Contribuição para a meta de 104 toneladas",
+  "Contribuição para a meta de 106 toneladas",
 ];
 
   const destaquesClube = [
