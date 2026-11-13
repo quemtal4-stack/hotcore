@@ -13,7 +13,6 @@ type RegraPontuacao = {
   descricao: string;
 };
 
-
 type ParticipanteRanking = {
   id: string;
   nome: string;
@@ -79,22 +78,30 @@ const REGRAS_PESSOA_FISICA: RegraPontuacao[] = [
   {
     titulo: "Compra de ingresso",
     pontos: 10,
-    descricao: "Cada ingresso comprado e aprovado gera pontos.",
+    descricao: "Cada ingresso comprado e aprovado gera pontos no Ranking do Bem.",
   },
   {
-    titulo: "Clube de membros",
+    titulo: "Presença confirmada no evento",
     pontos: 50,
-    descricao: "Pontuação mensal para membros ativos do clube.",
+    descricao:
+      "Participante presente em evento oficial da Hot Dogueres, com confirmação da equipe.",
   },
   {
-    titulo: "Ingresso eternizado",
+    titulo: "Clube de membros ativo",
+    pontos: 50,
+    descricao:
+      "Pontuação para membros ativos do Clube Hot Dogueres com participação regular.",
+  },
+  {
+    titulo: "Ingresso colecionável ou eternizado",
     pontos: 30,
-    descricao: "Compra de ingresso colecionável ou eternizado.",
+    descricao:
+      "Compra de ingresso colecionável, histórico ou eternizado aprovado no sistema.",
   },
   {
-    titulo: "Compra de camisa",
+    titulo: "Compra de camisa oficial",
     pontos: 25,
-    descricao: "Cada camisa oficial comprada gera pontos.",
+    descricao: "Cada camisa oficial comprada e aprovada gera pontos.",
   },
   {
     titulo: "Kit solidário 01",
@@ -119,17 +126,30 @@ const REGRAS_PESSOA_FISICA: RegraPontuacao[] = [
   {
     titulo: "Livro 1 / Box especial",
     pontos: 100,
-    descricao: "Compra do primeiro livro ou kit box especial.",
+    descricao: "Compra do primeiro livro ou kit box especial da coleção.",
   },
   {
     titulo: "Demais livros",
     pontos: 80,
-    descricao: "Compra dos demais livros da coleção.",
+    descricao: "Compra dos demais livros da coleção Hot Dogueres.",
   },
   {
     titulo: "Voluntário em evento",
     pontos: 100,
-    descricao: "Participação confirmada como voluntário em ação social.",
+    descricao:
+      "Participação confirmada como voluntário em evento, ação social ou ação de apoio.",
+  },
+  {
+    titulo: "Doação validada pela equipe",
+    pontos: "20 a 300",
+    descricao:
+      "Doações extras de alimentos, ração, materiais ou apoio logístico podem pontuar após validação manual.",
+  },
+  {
+    titulo: "Participação em campanha especial",
+    pontos: "50 a 200",
+    descricao:
+      "Participação em campanhas oficiais da Hot Dogueres pode gerar pontos conforme regulamento divulgado.",
   },
 ];
 
@@ -182,8 +202,13 @@ const REGRAS_EMPRESAS: RegraPontuacao[] = [
     descricao:
       "Pontuação para permutas validadas manualmente conforme tamanho, recorrência e importância da entrega.",
   },
+  {
+    titulo: "Apoio estrutural ao evento",
+    pontos: "200 a 1.000+",
+    descricao:
+      "Empresas que ajudarem com estrutura, transporte, som, palco, segurança, mídia ou operação podem receber pontuação extra validada.",
+  },
 ];
-
 
 const ITENS_CALCULO = [
   "Compra aprovada no Mercado Pago",
@@ -193,8 +218,41 @@ const ITENS_CALCULO = [
   "Compra de kit solidário",
   "Compra dos livros da coleção",
   "Clube de membros ativo",
-  "Validação manual da equipe",
+  "Presença confirmada em evento",
   "Participação como voluntário",
+  "Validação manual da equipe",
+];
+
+const RECONHECIMENTOS_2027 = [
+  {
+    titulo: "Pessoa física",
+    destaque: "Certificado de Reconhecimento Solidário",
+    texto:
+      "No evento de 04 de dezembro de 2027, os participantes individuais com maior pontuação poderão receber certificado e homenagem pública pela contribuição realizada.",
+  },
+  {
+    titulo: "Empresa",
+    destaque: "Troféu Empresa do Bem",
+    texto:
+      "As empresas mais bem colocadas poderão receber troféu, selo de reconhecimento e destaque público como parceiras que ajudaram a transformar solidariedade em ação.",
+  },
+  {
+    titulo: "Critério principal",
+    destaque: "Reconhecimento por mérito",
+    texto:
+      "Não é sorteio. O reconhecimento considera pontos acumulados, ações aprovadas, presença confirmada quando exigida e validação da equipe Hot Dogueres.",
+  },
+];
+
+const REGULAMENTO_RECONHECIMENTO = [
+  "O Ranking do Bem não é sorteio, rifa, concurso aleatório ou promessa de ganho financeiro.",
+  "A participação deve ter como objetivo principal apoiar ações sociais, culturais, educativas, ambientais e de proteção animal.",
+  "Os pontos servem para reconhecer publicamente boas ações já realizadas e aprovadas.",
+  "Compras e assinaturas só pontuam após confirmação de pagamento aprovado.",
+  "Ações presenciais, voluntariado, doações, permutas e apoios extras podem depender de validação manual da equipe.",
+  "Para receber reconhecimento presencial no evento, poderá ser exigida presença do participante ou representante oficial.",
+  "A data prevista para a entrega dos reconhecimentos é 04 de dezembro de 2027, podendo ser ajustada conforme organização do evento.",
+  "Os critérios finais, posições reconhecidas e eventuais bonificações serão divulgados previamente em regulamento próprio.",
 ];
 
 function paraNumero(valor: unknown) {
@@ -462,7 +520,7 @@ async function carregarParticipantesBanco(): Promise<ParticipanteRanking[]> {
           tipo,
           pontos: pontuacao.total,
           destaque: pontuacao.destaque,
-          ultimaPontuacao: "Pontuação calculada automaticamente",
+          ultimaPontuacao: "Pontuação calculada por ações aprovadas",
         };
       })
       .filter((participante) => participante.pontos > 0);
@@ -501,7 +559,6 @@ function CardEstatistica({
   );
 }
 
-
 function ListaRanking({
   titulo,
   descricao,
@@ -519,7 +576,7 @@ function ListaRanking({
     <div className="rounded-[2rem] bg-white p-6 shadow-xl ring-1 ring-red-100 md:p-8">
       <div className="text-center">
         <p className="inline-flex rounded-full bg-yellow-400 px-5 py-2 text-xs font-black uppercase tracking-[0.2em] text-gray-950 shadow-sm">
-          Classificação
+          Classificação por boas ações
         </p>
 
         <h2 className="mt-4 text-3xl font-black text-gray-950 md:text-4xl">
@@ -580,7 +637,7 @@ function ListaRanking({
 
                 <div className="rounded-2xl bg-white px-6 py-4 text-center shadow-sm ring-1 ring-gray-100">
                   <p className="text-xs font-black uppercase tracking-wide text-gray-500">
-                    Pontos
+                    Pontos de reconhecimento
                   </p>
 
                   <p className="text-3xl font-black text-green-600">
@@ -603,7 +660,6 @@ function ListaRanking({
     </div>
   );
 }
-
 
 function CardRegraPontuacao({
   regra,
@@ -643,6 +699,7 @@ function CardRegraPontuacao({
     </div>
   );
 }
+
 function CardImagemRanking() {
   return (
     <section className="px-4 py-10 md:py-14">
@@ -653,7 +710,7 @@ function CardImagemRanking() {
           </p>
 
           <h2 className="mt-5 text-3xl font-black leading-tight md:text-5xl">
-            Cada ponto conta uma atitude de bem.
+            Cada ponto representa uma atitude de bem.
           </h2>
 
           <p className="mt-5 text-base font-bold leading-relaxed text-white/80 md:text-lg">
@@ -662,6 +719,17 @@ function CardImagemRanking() {
             educacionais, solidárias e de proteção animal dentro do Ecossistema
             Hot Dogueres.
           </p>
+
+          <div className="mt-7 rounded-[1.5rem] bg-white/10 p-5 ring-1 ring-white/10">
+            <p className="text-sm font-black uppercase tracking-wide text-yellow-300">
+              Não é sobre ajudar para ganhar algo.
+            </p>
+
+            <p className="mt-2 text-sm font-bold leading-relaxed text-white/80">
+              É sobre reconhecer quem decidiu ajudar. O ranking valoriza boas
+              ações já realizadas, aprovadas e validadas pela Hot Dogueres.
+            </p>
+          </div>
 
           <div className="mt-7 grid gap-3 sm:grid-cols-2">
             {[
@@ -697,7 +765,6 @@ function CardImagemRanking() {
   );
 }
 
-
 export default async function RankingDoBemPage({
   searchParams,
 }: {
@@ -717,7 +784,6 @@ export default async function RankingDoBemPage({
     "pessoa-fisica"
   );
 
-
   const rankingEmpresas = filtrarRankingPorCategoria(participantes, "empresa");
 
   const totalParticipantes = rankingGeral.length;
@@ -725,73 +791,73 @@ export default async function RankingDoBemPage({
   const totalPessoasFisicas = rankingPessoaFisica.length;
   const totalEmpresas = rankingEmpresas.length;
 
-return (
-  <main className="min-h-screen bg-[#fff7e8] text-gray-950">
-    <CardImagemRanking />
+  return (
+    <main className="min-h-screen bg-[#fff7e8] text-gray-950">
+      <CardImagemRanking />
 
-  
-    <section className="relative overflow-hidden px-4 pb-10 md:pb-14">
-      <div className="absolute left-[-180px] top-[-180px] h-[360px] w-[360px] rounded-full bg-red-200/50 blur-3xl" />
-      <div className="absolute right-[-180px] top-[120px] h-[420px] w-[420px] rounded-full bg-yellow-200/70 blur-3xl" />
-      <div className="absolute bottom-[-200px] left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-green-200/30 blur-3xl" />
+      <section className="relative overflow-hidden px-4 pb-10 md:pb-14">
+        <div className="absolute left-[-180px] top-[-180px] h-[360px] w-[360px] rounded-full bg-red-200/50 blur-3xl" />
+        <div className="absolute right-[-180px] top-[120px] h-[420px] w-[420px] rounded-full bg-yellow-200/70 blur-3xl" />
+        <div className="absolute bottom-[-200px] left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-green-200/30 blur-3xl" />
 
-      <div className="relative mx-auto max-w-6xl rounded-[2.5rem] bg-white p-6 text-center shadow-2xl ring-1 ring-red-100 md:p-12">
-        <p className="inline-flex rounded-full bg-red-600 px-5 py-2 text-xs font-black uppercase tracking-[0.2em] text-white shadow-md">
-          Programa de pontuação solidária
-        </p>
+        <div className="relative mx-auto max-w-6xl rounded-[2.5rem] bg-white p-6 text-center shadow-2xl ring-1 ring-red-100 md:p-12">
+          <p className="inline-flex rounded-full bg-red-600 px-5 py-2 text-xs font-black uppercase tracking-[0.2em] text-white shadow-md">
+            Programa de reconhecimento por boas ações
+          </p>
 
-        <h1 className="mt-6 text-4xl font-black leading-tight text-gray-950 md:text-7xl">
-          Ranking do Bem
-        </h1>
+          <h1 className="mt-6 text-4xl font-black leading-tight text-gray-950 md:text-7xl">
+            Ranking do Bem
+          </h1>
 
-        <p className="mx-auto mt-5 max-w-3xl text-base font-bold leading-relaxed text-gray-700 md:text-lg">
-          Cada compra aprovada, participação, voluntariado ou parceria ajuda a
-          fortalecer o Ecossistema Hot Dogueres e gera pontos para reconhecer
-          quem transforma solidariedade em ação.
-        </p>
+          <p className="mx-auto mt-5 max-w-3xl text-base font-bold leading-relaxed text-gray-700 md:text-lg">
+            Cada compra aprovada, participação, voluntariado, doação ou parceria
+            ajuda a fortalecer o Ecossistema Hot Dogueres e gera pontos para
+            reconhecer quem transforma solidariedade em ação.
+          </p>
 
-        {cadastroSucesso && (
-          <div className="mx-auto mt-6 max-w-3xl rounded-[1.5rem] bg-green-50 p-5 text-left ring-1 ring-green-200">
-            <p className="text-sm font-black uppercase tracking-wide text-green-700">
-              Cadastro recebido com sucesso
+          {cadastroSucesso && (
+            <div className="mx-auto mt-6 max-w-3xl rounded-[1.5rem] bg-green-50 p-5 text-left ring-1 ring-green-200">
+              <p className="text-sm font-black uppercase tracking-wide text-green-700">
+                Cadastro recebido com sucesso
+              </p>
+
+              <p className="mt-2 text-sm font-bold leading-relaxed text-gray-700">
+                Seu cadastro foi registrado. A pontuação será exibida quando
+                existir uma ação aprovada no banco de dados ou validada pela
+                equipe.
+              </p>
+            </div>
+          )}
+
+          <div className="mx-auto mt-6 max-w-3xl rounded-[1.5rem] bg-yellow-50 p-5 ring-1 ring-yellow-200">
+            <p className="text-sm font-black uppercase tracking-wide text-yellow-700">
+              Reconhecimento, não sorteio
             </p>
 
             <p className="mt-2 text-sm font-bold leading-relaxed text-gray-700">
-              Seu cadastro foi registrado. A pontuação será exibida quando
-              existir uma ação aprovada no banco de dados.
+              O Ranking do Bem não funciona por sorte. Ele reconhece ações
+              concretas, compras aprovadas, presença, voluntariado, doações,
+              parcerias e contribuições validadas.
             </p>
           </div>
-        )}
 
-        <div className="mx-auto mt-6 max-w-3xl rounded-[1.5rem] bg-yellow-50 p-5 ring-1 ring-yellow-200">
-          <p className="text-sm font-black uppercase tracking-wide text-yellow-700">
-            Ranking automático
-          </p>
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link
+              href="/cadastro?tipo=ranking-do-bem&perfil=pessoa-fisica"
+              className="rounded-full bg-red-600 px-7 py-4 text-sm font-black uppercase tracking-wide text-white shadow-lg transition hover:-translate-y-1 hover:bg-red-700 hover:shadow-xl"
+            >
+              Participar como pessoa física
+            </Link>
 
-          <p className="mt-2 text-sm font-bold leading-relaxed text-gray-700">
-            O sistema calcula os pontos diretamente pelo banco de dados,
-            considerando apenas compras, assinaturas e ações aprovadas.
-          </p>
+            <Link
+              href="/cadastro?tipo=ranking-do-bem&perfil=empresa"
+              className="rounded-full bg-gray-950 px-7 py-4 text-sm font-black uppercase tracking-wide text-white shadow-lg transition hover:-translate-y-1 hover:bg-gray-800 hover:shadow-xl"
+            >
+              Participar como empresa
+            </Link>
+          </div>
         </div>
-
-        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link
-            href="/cadastro?tipo=ranking-do-bem&perfil=pessoa-fisica"
-            className="rounded-full bg-red-600 px-7 py-4 text-sm font-black uppercase tracking-wide text-white shadow-lg transition hover:-translate-y-1 hover:bg-red-700 hover:shadow-xl"
-          >
-            Participar como pessoa física
-          </Link>
-
-          <Link
-            href="/cadastro?tipo=ranking-do-bem&perfil=empresa"
-            className="rounded-full bg-gray-950 px-7 py-4 text-sm font-black uppercase tracking-wide text-white shadow-lg transition hover:-translate-y-1 hover:bg-gray-800 hover:shadow-xl"
-          >
-            Participar como empresa
-          </Link>
-        </div>
-      </div>
-    </section>
-
+      </section>
 
       <section className="px-4 pb-10">
         <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-4">
@@ -803,9 +869,9 @@ return (
           />
 
           <CardEstatistica
-            titulo="Pontos distribuídos"
+            titulo="Pontos de reconhecimento"
             valor={totalPontos.toLocaleString("pt-BR")}
-            detalhe="Calculado pelo banco"
+            detalhe="Calculado por ações aprovadas"
             cor="text-yellow-500"
           />
 
@@ -829,7 +895,7 @@ return (
         <div className="mx-auto max-w-6xl">
           <ListaRanking
             titulo="Ranking geral"
-            descricao="A classificação geral reúne pessoas físicas, empresas, patrocinadores, voluntários, membros e apoiadores."
+            descricao="A classificação geral reúne pessoas físicas, empresas, patrocinadores, voluntários, membros e apoiadores. A posição representa reconhecimento por contribuição real."
             participantes={rankingGeral}
             vazioTitulo="O Ranking do Bem ainda vai começar"
             vazioDescricao="Assim que as primeiras compras, doações, participações ou parcerias forem aprovadas no banco de dados, os nomes aparecerão aqui automaticamente."
@@ -858,6 +924,47 @@ return (
       </section>
 
       <section className="px-4 pb-10">
+        <div className="mx-auto max-w-6xl rounded-[2.5rem] bg-gray-950 p-6 text-white shadow-2xl md:p-10">
+          <div className="text-center">
+            <p className="inline-flex rounded-full bg-yellow-400 px-5 py-2 text-xs font-black uppercase tracking-[0.2em] text-gray-950">
+              04 de dezembro de 2027
+            </p>
+
+            <h2 className="mt-5 text-3xl font-black md:text-5xl">
+              Dia do Reconhecimento Solidário
+            </h2>
+
+            <p className="mx-auto mt-4 max-w-3xl text-sm font-bold leading-relaxed text-gray-300 md:text-base">
+              A proposta é reconhecer publicamente quem mais ajudou ao longo da
+              jornada. O participante não ajuda para ganhar prêmio: ele é
+              reconhecido porque já praticou uma boa ação.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {RECONHECIMENTOS_2027.map((item) => (
+              <div
+                key={item.titulo}
+                className="rounded-[1.8rem] bg-white/10 p-5 ring-1 ring-white/10"
+              >
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-yellow-300">
+                  {item.titulo}
+                </p>
+
+                <h3 className="mt-3 text-xl font-black text-white">
+                  {item.destaque}
+                </h3>
+
+                <p className="mt-3 text-sm font-bold leading-relaxed text-gray-300">
+                  {item.texto}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 pb-10">
         <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-2">
           <div className="rounded-[2rem] bg-white p-6 shadow-xl ring-1 ring-red-100 md:p-8">
             <p className="inline-flex rounded-full bg-red-600 px-5 py-2 text-xs font-black uppercase tracking-[0.2em] text-white">
@@ -865,12 +972,13 @@ return (
             </p>
 
             <h2 className="mt-4 text-2xl font-black text-gray-950 md:text-3xl">
-              Como ganhar pontos
+              Como ganhar pontos de reconhecimento
             </h2>
 
             <p className="mt-3 text-sm font-bold leading-relaxed text-gray-600">
               Pontuação destinada aos participantes individuais: compradores,
-              membros, doadores, voluntários e apoiadores.
+              membros, doadores, voluntários e apoiadores. O objetivo é
+              reconhecer a boa ação, não incentivar ajuda apenas por prêmio.
             </p>
 
             <div className="mt-6 space-y-3">
@@ -895,7 +1003,8 @@ return (
 
             <p className="mt-3 text-sm font-bold leading-relaxed text-gray-600">
               Pontuação destinada a empresas, patrocinadores, apoiadores e
-              parceiros institucionais.
+              parceiros institucionais que fortalecem o impacto social da Hot
+              Dogueres.
             </p>
 
             <div className="mt-6 space-y-3">
@@ -915,7 +1024,7 @@ return (
         <div className="mx-auto max-w-6xl rounded-[2rem] bg-white p-6 shadow-xl ring-1 ring-green-100 md:p-8">
           <div className="text-center">
             <p className="inline-flex rounded-full bg-green-600 px-5 py-2 text-xs font-black uppercase tracking-[0.2em] text-white">
-              Automação pelo banco
+              Cálculo e validação
             </p>
 
             <h2 className="mt-4 text-3xl font-black text-gray-950 md:text-4xl">
@@ -924,7 +1033,9 @@ return (
 
             <p className="mx-auto mt-3 max-w-3xl text-sm font-bold leading-relaxed text-gray-600">
               O sistema soma automaticamente as pontuações de compras,
-              assinaturas e ações aprovadas no banco de dados usando Prisma.
+              assinaturas e ações aprovadas no banco de dados. Algumas ações
+              especiais podem depender de validação manual da equipe Hot
+              Dogueres.
             </p>
           </div>
 
@@ -941,6 +1052,48 @@ return (
         </div>
       </section>
 
+      <section className="px-4 pb-10">
+        <div className="mx-auto max-w-6xl rounded-[2rem] bg-white p-6 shadow-xl ring-1 ring-yellow-200 md:p-8">
+          <div className="text-center">
+            <p className="inline-flex rounded-full bg-yellow-400 px-5 py-2 text-xs font-black uppercase tracking-[0.2em] text-gray-950">
+              Regulamento base
+            </p>
+
+            <h2 className="mt-4 text-3xl font-black text-gray-950 md:text-4xl">
+              Regras para o reconhecimento
+            </h2>
+
+            <p className="mx-auto mt-3 max-w-3xl text-sm font-bold leading-relaxed text-gray-600">
+              Essas regras deixam claro que o Ranking do Bem existe para
+              reconhecer boas ações, evitando qualquer aparência de sorteio.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            {REGULAMENTO_RECONHECIMENTO.map((regra, index) => (
+              <div
+                key={regra}
+                className="rounded-2xl bg-yellow-50 p-5 ring-1 ring-yellow-100"
+              >
+                <p className="text-xs font-black uppercase tracking-wide text-yellow-700">
+                  Regra {String(index + 1).padStart(2, "0")}
+                </p>
+
+                <p className="mt-2 text-sm font-bold leading-relaxed text-gray-700">
+                  {regra}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <p className="mx-auto mt-6 max-w-3xl text-center text-xs font-bold leading-relaxed text-gray-500">
+            O regulamento final poderá ser ajustado e publicado antes do evento,
+            com critérios detalhados de pontuação, validação, presença e
+            reconhecimento.
+          </p>
+        </div>
+      </section>
+
       <section className="px-4 pb-12">
         <div className="mx-auto max-w-6xl rounded-[2.5rem] bg-gray-950 p-6 text-center text-white shadow-2xl md:p-10">
           <p className="inline-flex rounded-full bg-yellow-400 px-5 py-2 text-xs font-black uppercase tracking-[0.2em] text-gray-950">
@@ -953,8 +1106,14 @@ return (
 
           <p className="mx-auto mt-4 max-w-3xl text-sm font-bold leading-relaxed text-gray-300 md:text-base">
             Compras feitas pelo Mercado Pago devem pontuar somente após o
-            pagamento aprovado. Voluntariado, patrocínio e ações presenciais
-            podem ser confirmados manualmente pela equipe Hot Dogueres.
+            pagamento aprovado. Voluntariado, patrocínio, doações, presença e
+            ações presenciais podem ser confirmados manualmente pela equipe Hot
+            Dogueres.
+          </p>
+
+          <p className="mx-auto mt-4 max-w-3xl text-sm font-black leading-relaxed text-yellow-300 md:text-base">
+            O Ranking do Bem não premia a sorte. Ele reconhece compromisso,
+            presença, participação e boas ações.
           </p>
 
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
@@ -974,13 +1133,13 @@ return (
           </div>
         </div>
       </section>
-            <SetasNavegacao
+
+      <SetasNavegacao
         anterior="/nossa-historia"
         proxima="/clube-de-membros"
         labelAnterior="Voltar para Nossa História"
         labelProxima="Ir para Clube de Membros"
       />
     </main>
-
   );
 }
