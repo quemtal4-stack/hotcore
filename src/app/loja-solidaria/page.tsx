@@ -562,23 +562,23 @@ function CardCamisa({
           </p>
         )}
 
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-2xl bg-white p-4 text-center shadow-sm ring-1 ring-red-100">
-            <p className="text-[10px] font-black uppercase tracking-wide text-red-600">
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+          <div className="flex min-h-[96px] flex-col items-center justify-center overflow-hidden rounded-2xl bg-white px-2 py-4 text-center shadow-sm ring-1 ring-red-100">
+            <p className="w-full text-center text-[10px] font-black uppercase tracking-wide text-red-600">
               Não membro
             </p>
 
-            <p className="mt-1 text-2xl font-black text-gray-950">
+            <p className="mt-2 w-full whitespace-nowrap text-center text-xl font-black leading-none tracking-tight text-gray-950">
               {formatarMoeda(produto.valorNaoMembro)}
             </p>
           </div>
 
-          <div className="rounded-2xl bg-green-50 p-4 text-center shadow-sm ring-1 ring-green-100">
-            <p className="text-[10px] font-black uppercase tracking-wide text-green-700">
+          <div className="flex min-h-[96px] flex-col items-center justify-center overflow-hidden rounded-2xl bg-green-50 px-2 py-4 text-center shadow-sm ring-1 ring-green-100">
+            <p className="w-full text-center text-[10px] font-black uppercase tracking-wide text-green-700">
               Membro
             </p>
 
-            <p className="mt-1 text-2xl font-black text-green-700">
+            <p className="mt-2 w-full whitespace-nowrap text-center text-xl font-black leading-none tracking-tight text-green-700">
               {formatarMoeda(produto.valorMembro)}
             </p>
           </div>
@@ -770,35 +770,35 @@ function CardLivro({ livro, hoje }: { livro: LivroPreVenda; hoje: Date }) {
       </p>
 
       <div className="mt-4 grid gap-3">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-2xl bg-white p-4 text-center shadow-sm ring-1 ring-red-100">
-            <p className="text-[10px] font-black uppercase tracking-wide text-red-600">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+          <div className="flex min-h-[96px] flex-col items-center justify-center overflow-hidden rounded-2xl bg-white px-2 py-4 text-center shadow-sm ring-1 ring-red-100">
+            <p className="w-full text-center text-[10px] font-black uppercase tracking-wide text-red-600">
               Não membro
             </p>
 
-            <p className="mt-1 text-2xl font-black text-gray-950">
+            <p className="mt-2 w-full whitespace-nowrap text-center text-xl font-black leading-none tracking-tight text-gray-950">
               {formatarMoeda(livro.valorNaoMembro)}
             </p>
           </div>
 
-          <div className="rounded-2xl bg-green-50 p-4 text-center shadow-sm ring-1 ring-green-100">
-            <p className="text-[10px] font-black uppercase tracking-wide text-green-700">
+          <div className="flex min-h-[96px] flex-col items-center justify-center overflow-hidden rounded-2xl bg-green-50 px-2 py-4 text-center shadow-sm ring-1 ring-green-100">
+            <p className="w-full text-center text-[10px] font-black uppercase tracking-wide text-green-700">
               Membro
             </p>
 
-            <p className="mt-1 text-2xl font-black text-green-700">
+            <p className="mt-2 w-full whitespace-nowrap text-center text-xl font-black leading-none tracking-tight text-green-700">
               {formatarMoeda(livro.valorMembro)}
             </p>
           </div>
         </div>
 
         {livro.valorPromocional !== undefined && (
-          <div className="rounded-2xl bg-yellow-400 p-4 text-center shadow-sm">
-            <p className="text-[10px] font-black uppercase tracking-wide text-gray-800">
+          <div className="flex min-h-[102px] flex-col items-center justify-center overflow-hidden rounded-2xl bg-yellow-400 px-2 py-4 text-center shadow-sm">
+            <p className="w-full text-center text-[10px] font-black uppercase tracking-wide text-gray-800">
               Valor promocional
             </p>
 
-            <p className="mt-1 text-3xl font-black text-gray-950">
+            <p className="mt-2 w-full whitespace-nowrap text-center text-2xl font-black leading-none tracking-tight text-gray-950">
               {formatarMoeda(livro.valorPromocional)}
             </p>
           </div>
