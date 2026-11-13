@@ -8,6 +8,27 @@ import SecaoIngressosHistoricosLojaSolidaria from "@/components/SecaoIngressosHi
 
 const CHECKOUT_ALIMENTO_URL = "/checkout/alimentos";
 const CHECKOUT_RACAO_URL = "/checkout/racao";
+const CHECKOUT_CAMISAS_URL = "/checkout/camisas";
+const CHECKOUT_LIVROS_URL = "/checkout/livros";
+
+const PRECO_LIVRO_BOX_NAO_MEMBRO = 149.9;
+const PRECO_LIVRO_BOX_PROMOCIONAL = 139.9;
+const PRECO_LIVRO_BOX_MEMBRO = 130.9;
+
+const PRECO_LIVRO_COMUM_NAO_MEMBRO = 99.9;
+const PRECO_LIVRO_COMUM_MEMBRO = 80.9;
+
+const PRECO_CAMISA_EVENTO_NAO_MEMBRO = 69.9;
+const PRECO_CAMISA_EVENTO_MEMBRO = 60.9;
+
+const PRECO_KIT_ESPORTIVO_NAO_MEMBRO = 119.9;
+const PRECO_KIT_ESPORTIVO_MEMBRO = 99.9;
+
+const PRECO_CAMISA_JORNADA_NAO_MEMBRO = 99.9;
+const PRECO_CAMISA_JORNADA_MEMBRO = 89.9;
+
+const PRECO_CAMISA_GAMER_NAO_MEMBRO = 99.9;
+const PRECO_CAMISA_GAMER_MEMBRO = 89.9;
 
 type KitSolidario = {
   id: string;
@@ -21,11 +42,32 @@ type KitSolidario = {
   href: string;
 };
 
+type ProdutoImagem = {
+  titulo: string;
+  imagem: string;
+  valorNaoMembro: number;
+  valorMembro: number;
+};
+
+type LivroPreVenda = {
+  id: string;
+  numero: number;
+  titulo: string;
+  imagem: string;
+  inicio: Date;
+  fechamento: Date;
+  entrega: Date;
+  valorNaoMembro: number;
+  valorMembro: number;
+  valorPromocional?: number;
+};
+
 const KITS_ALIMENTOS: KitSolidario[] = [
   {
     id: "alimento-essencial-2kg",
     titulo: "Kit Alimento Essencial 2kg",
-    descricao: "Ajuda na compra de alimentos básicos para famílias em situação de vulnerabilidade.",
+    descricao:
+      "Ajuda na compra de alimentos básicos para famílias em situação de vulnerabilidade.",
     imagem: "/kits/alimento-essencial-2kg.png",
     valor: "R$ 22,00",
     valorNumero: 22,
@@ -72,7 +114,8 @@ const KITS_RACAO: KitSolidario[] = [
   {
     id: "racao-solidaria-1kg",
     titulo: "Kit Ração Solidária 1kg",
-    descricao: "Ajuda na compra de ração para cães e gatos em situação de abandono.",
+    descricao:
+      "Ajuda na compra de ração para cães e gatos em situação de abandono.",
     imagem: "/kits/racao-solidaria-1kg.png",
     valor: "R$ 25,00",
     valorNumero: 25,
@@ -115,6 +158,72 @@ const KITS_RACAO: KitSolidario[] = [
   },
 ];
 
+const CORES_KIT = {
+  red: {
+    valor: "text-red-600",
+    botaoMenos: "text-red-600 hover:bg-red-100",
+    botaoMais: "bg-red-600 hover:bg-red-700",
+    comprar: "bg-red-600 hover:bg-red-700",
+  },
+  blue: {
+    valor: "text-blue-600",
+    botaoMenos: "text-blue-600 hover:bg-blue-100",
+    botaoMais: "bg-blue-600 hover:bg-blue-700",
+    comprar: "bg-blue-600 hover:bg-blue-700",
+  },
+} as const;
+
+const CAMISAS_EVENTOS_OFICIAIS: ProdutoImagem[] = Array.from(
+  { length: 3 },
+  (_, index) => ({
+    titulo: `Camisa Evento Oficial ${String(index + 1).padStart(2, "0")}`,
+    imagem: `/loja-solidaria/camisas/eventos-oficiais-${String(
+      index + 1,
+    ).padStart(2, "0")}.png`,
+    valorNaoMembro: PRECO_CAMISA_EVENTO_NAO_MEMBRO,
+    valorMembro: PRECO_CAMISA_EVENTO_MEMBRO,
+  }),
+);
+
+const CAMISAS_ESPORTIVAS: ProdutoImagem[] = Array.from(
+  { length: 2 },
+  (_, index) => ({
+    titulo: `Camisa Evento Esportivo ${String(index + 1).padStart(2, "0")}`,
+    imagem: `/loja-solidaria/camisas/esportiva-${String(index + 1).padStart(
+      2,
+      "0",
+    )}.png`,
+    valorNaoMembro: PRECO_KIT_ESPORTIVO_NAO_MEMBRO,
+    valorMembro: PRECO_KIT_ESPORTIVO_MEMBRO,
+  }),
+);
+
+const CAMISAS_GAMER: ProdutoImagem[] = Array.from({ length: 8 }, (_, index) => ({
+  titulo: `Camisa Gamer ${String(index + 1).padStart(2, "0")}`,
+  imagem: `/loja-solidaria/camisas/gamer-${String(index + 1).padStart(
+    2,
+    "0",
+  )}.png`,
+  valorNaoMembro: PRECO_CAMISA_GAMER_NAO_MEMBRO,
+  valorMembro: PRECO_CAMISA_GAMER_MEMBRO,
+}));
+
+const CAMISAS_INFANTIS_JORNADA: ProdutoImagem[] = Array.from(
+  { length: 8 },
+  (_, index) => ({
+    titulo: `Camisa Infantil A Jornada Hot Dogueres ${String(
+      index + 1,
+    ).padStart(2, "0")}`,
+    imagem: `/loja-solidaria/camisas/jornada-infantil-${String(
+      index + 1,
+    ).padStart(2, "0")}.png`,
+    valorNaoMembro: PRECO_CAMISA_JORNADA_NAO_MEMBRO,
+    valorMembro: PRECO_CAMISA_JORNADA_MEMBRO,
+  }),
+);
+
+const TAMANHOS_CAMISA = ["PP", "P", "M", "G", "GG", "XG", "G1", "G2"];
+
 function montarLinkCheckout({
   href,
   kit,
@@ -142,23 +251,135 @@ function montarLinkCheckout({
 }
 
 function formatarMoeda(valor: number) {
-  return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  return valor.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
 }
 
-const CORES_KIT = {
-  red: {
-    valor: "text-red-600",
-    botaoMenos: "text-red-600 hover:bg-red-100",
-    botaoMais: "bg-red-600 hover:bg-red-700",
-    comprar: "bg-red-600 hover:bg-red-700",
-  },
-  blue: {
-    valor: "text-blue-600",
-    botaoMenos: "text-blue-600 hover:bg-blue-100",
-    botaoMais: "bg-blue-600 hover:bg-blue-700",
-    comprar: "bg-blue-600 hover:bg-blue-700",
-  },
-} as const;
+function formatarData(data: Date) {
+  return data.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function criarData(ano: number, mes: number, dia: number, fimDoDia = false) {
+  return new Date(
+    ano,
+    mes - 1,
+    dia,
+    fimDoDia ? 23 : 0,
+    fimDoDia ? 59 : 0,
+    fimDoDia ? 59 : 0,
+  );
+}
+
+function gerarLivrosPreVenda({
+  quantidade,
+  prefixoTitulo,
+  pasta,
+  baseAno = 2026,
+  baseMes = 7,
+}: {
+  quantidade: number;
+  prefixoTitulo: string;
+  pasta: string;
+  baseAno?: number;
+  baseMes?: number;
+}) {
+  return Array.from({ length: quantidade }, (_, index) => {
+    const numero = index + 1;
+    const mesInicio = baseMes + index;
+    const primeiroLivro = numero === 1;
+
+    return {
+      id: `${pasta}-${String(numero).padStart(2, "0")}`,
+      numero,
+      titulo: `${prefixoTitulo} ${String(numero).padStart(2, "0")}`,
+      imagem: `/loja-solidaria/livros/${pasta}-${String(numero).padStart(
+        2,
+        "0",
+      )}.png`,
+      inicio: criarData(baseAno, mesInicio, 10),
+      fechamento: criarData(baseAno, mesInicio + 1, 20, true),
+      entrega: criarData(baseAno, mesInicio + 2, 12),
+      valorNaoMembro: primeiroLivro
+        ? PRECO_LIVRO_BOX_NAO_MEMBRO
+        : PRECO_LIVRO_COMUM_NAO_MEMBRO,
+      valorMembro: primeiroLivro
+        ? PRECO_LIVRO_BOX_MEMBRO
+        : PRECO_LIVRO_COMUM_MEMBRO,
+      valorPromocional: primeiroLivro
+        ? PRECO_LIVRO_BOX_PROMOCIONAL
+        : undefined,
+    };
+  });
+}
+
+function statusPreVenda(livro: LivroPreVenda, hoje: Date) {
+  if (hoje < livro.inicio) {
+    return "futura";
+  }
+
+  if (hoje > livro.fechamento) {
+    return "encerrada";
+  }
+
+  return "ativa";
+}
+
+function livroLiberadoParaCompra(livro: LivroPreVenda, hoje: Date) {
+  return hoje >= livro.inicio;
+}
+
+function montarLinkCompraLivroLoja({
+  livro,
+  valor,
+  tipoPreco,
+}: {
+  livro: LivroPreVenda;
+  valor: number;
+  tipoPreco: "promocional" | "membro" | "nao-membro";
+}) {
+  const parametros = new URLSearchParams({
+    produto: livro.id,
+    titulo: livro.titulo,
+    valor: String(valor),
+    tipo: "livro-pre-venda",
+    tipoPreco,
+    livro: String(livro.numero),
+    entrega: formatarData(livro.entrega),
+  });
+
+  return `${CHECKOUT_LIVROS_URL}?${parametros.toString()}`;
+}
+
+function montarLinkCompraCamisaLoja({
+  produto,
+  tamanho,
+  cep,
+  valor,
+  tipoPreco,
+}: {
+  produto: ProdutoImagem;
+  tamanho: string;
+  cep: string;
+  valor: number;
+  tipoPreco: "membro" | "nao-membro";
+}) {
+  const parametros = new URLSearchParams({
+    produto: produto.titulo,
+    tamanho,
+    cep,
+    valor: String(valor),
+    tipo: "camisa",
+    tipoPreco,
+  });
+
+  return `${CHECKOUT_CAMISAS_URL}?${parametros.toString()}`;
+}
 
 function CardKitComQuantidade({
   kit,
@@ -262,101 +483,6 @@ function CardKitComQuantidade({
   );
 }
 
-const CAMISAS_EVENTOS_OFICIAIS = Array.from({ length: 3 }, (_, index) => ({
-  titulo: `Camisa Evento Oficial ${String(index + 1).padStart(2, "0")}`,
-  imagem: `/loja-solidaria/camisas/eventos-oficiais-${String(index + 1).padStart(2, "0")}.png`,
-}));
-
-const CAMISAS_ESPORTIVAS = Array.from({ length: 2 }, (_, index) => ({
-  titulo: `Camisa Evento Esportivo ${String(index + 1).padStart(2, "0")}`,
-  imagem: `/loja-solidaria/camisas/esportiva-${String(index + 1).padStart(2, "0")}.png`,
-}));
-
-const CAMISAS_GAMER = Array.from({ length: 8 }, (_, index) => ({
-  titulo: `Camisa Gamer ${String(index + 1).padStart(2, "0")}`,
-  imagem: `/loja-solidaria/camisas/gamer-${String(index + 1).padStart(2, "0")}.png`,
-}));
-
-const CAMISAS_INFANTIS_JORNADA = Array.from({ length: 8 }, (_, index) => ({
-  titulo: `Camisa Infantil A Jornada Hot Dogueres ${String(index + 1).padStart(2, "0")}`,
-  imagem: `/loja-solidaria/camisas/jornada-infantil-${String(index + 1).padStart(2, "0")}.png`,
-}));
-
-type ProdutoImagem = {
-  titulo: string;
-  imagem: string;
-};
-
-type LivroPreVenda = {
-  numero: number;
-  titulo: string;
-  imagem: string;
-  inicio: Date;
-  fechamento: Date;
-  entrega: Date;
-};
-
-const TAMANHOS_CAMISA = ["PP", "P", "M", "G", "GG", "XG", "G1", "G2"];
-
-function formatarData(data: Date) {
-  return data.toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-}
-
-function criarData(ano: number, mes: number, dia: number, fimDoDia = false) {
-  return new Date(
-    ano,
-    mes - 1,
-    dia,
-    fimDoDia ? 23 : 0,
-    fimDoDia ? 59 : 0,
-    fimDoDia ? 59 : 0,
-  );
-}
-
-function gerarLivrosPreVenda({
-  quantidade,
-  prefixoTitulo,
-  pasta,
-  baseAno = 2026,
-  baseMes = 7,
-}: {
-  quantidade: number;
-  prefixoTitulo: string;
-  pasta: string;
-  baseAno?: number;
-  baseMes?: number;
-}) {
-  return Array.from({ length: quantidade }, (_, index) => {
-    const numero = index + 1;
-    const mesInicio = baseMes + index;
-
-    return {
-      numero,
-      titulo: `${prefixoTitulo} ${String(numero).padStart(2, "0")}`,
-      imagem: `/loja-solidaria/livros/${pasta}-${String(numero).padStart(2, "0")}.png`,
-      inicio: criarData(baseAno, mesInicio, 10),
-      fechamento: criarData(baseAno, mesInicio + 1, 20, true),
-      entrega: criarData(baseAno, mesInicio + 2, 12),
-    };
-  });
-}
-
-function statusPreVenda(livro: LivroPreVenda, hoje: Date) {
-  if (hoje < livro.inicio) {
-    return "futura";
-  }
-
-  if (hoje > livro.fechamento) {
-    return "encerrada";
-  }
-
-  return "ativa";
-}
-
 function CardCamisa({
   produto,
   observacao,
@@ -408,11 +534,6 @@ function CardCamisa({
     });
   }
 
-  const PRECO_CAMISA = 99.9;
-  const checkoutUrl = `/checkout?produto=${encodeURIComponent(
-    produto.titulo,
-  )}&tamanho=${encodeURIComponent(tamanhoSelecionado)}&cep=${encodeURIComponent(cep)}&valor=${PRECO_CAMISA}`;
-
   return (
     <div className="flex h-full flex-col rounded-3xl border-2 border-red-100 bg-white p-4 shadow-lg transition hover:-translate-y-1 hover:shadow-xl">
       <div className="relative h-72 overflow-hidden rounded-2xl bg-[#fff7e8]">
@@ -440,6 +561,28 @@ function CardCamisa({
             {observacao}
           </p>
         )}
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-2xl bg-white p-4 text-center shadow-sm ring-1 ring-red-100">
+            <p className="text-[10px] font-black uppercase tracking-wide text-red-600">
+              Não membro
+            </p>
+
+            <p className="mt-1 text-2xl font-black text-gray-950">
+              {formatarMoeda(produto.valorNaoMembro)}
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-green-50 p-4 text-center shadow-sm ring-1 ring-green-100">
+            <p className="text-[10px] font-black uppercase tracking-wide text-green-700">
+              Membro
+            </p>
+
+            <p className="mt-1 text-2xl font-black text-green-700">
+              {formatarMoeda(produto.valorMembro)}
+            </p>
+          </div>
+        </div>
 
         <div className="mt-5">
           <p className="mb-3 text-sm font-black text-gray-800">
@@ -499,12 +642,33 @@ function CardCamisa({
         </div>
 
         {tamanhoSelecionado ? (
-          <Link
-            href={checkoutUrl}
-            className={`mt-5 rounded-full px-5 py-3 text-center text-sm font-black shadow-md transition ${corBotao}`}
-          >
-            Ir para pagamento
-          </Link>
+          <div className="mt-5 grid gap-3">
+            <Link
+              href={montarLinkCompraCamisaLoja({
+                produto,
+                tamanho: tamanhoSelecionado,
+                cep,
+                valor: produto.valorNaoMembro,
+                tipoPreco: "nao-membro",
+              })}
+              className={`rounded-full px-5 py-3 text-center text-sm font-black shadow-md transition ${corBotao}`}
+            >
+              Comprar como não membro
+            </Link>
+
+            <Link
+              href={montarLinkCompraCamisaLoja({
+                produto,
+                tamanho: tamanhoSelecionado,
+                cep,
+                valor: produto.valorMembro,
+                tipoPreco: "membro",
+              })}
+              className="rounded-full bg-green-600 px-5 py-3 text-center text-sm font-black text-white shadow-md transition hover:bg-green-700"
+            >
+              Comprar como membro
+            </Link>
+          </div>
         ) : (
           <button
             type="button"
@@ -544,13 +708,14 @@ function GradeCamisas({
 
 function CardLivro({ livro, hoje }: { livro: LivroPreVenda; hoje: Date }) {
   const status = statusPreVenda(livro, hoje);
+  const compraLiberada = livroLiberadoParaCompra(livro, hoje);
 
   const statusTexto =
     status === "ativa"
       ? "Pré-venda aberta"
       : status === "futura"
         ? "Pré-venda programada"
-        : "Pré-venda encerrada";
+        : "Pedido sob encomenda";
 
   const statusClasse =
     status === "ativa"
@@ -560,7 +725,7 @@ function CardLivro({ livro, hoje }: { livro: LivroPreVenda; hoje: Date }) {
         : "bg-gray-200 text-gray-700";
 
   return (
-    <div className="rounded-3xl border-2 border-red-100 bg-white p-4 shadow-lg">
+    <div className="flex h-full flex-col rounded-3xl border-2 border-red-100 bg-white p-4 shadow-lg">
       <div className="relative h-72 overflow-hidden rounded-2xl bg-[#fff7e8]">
         <Image
           src={livro.imagem}
@@ -572,7 +737,9 @@ function CardLivro({ livro, hoje }: { livro: LivroPreVenda; hoje: Date }) {
         />
       </div>
 
-      <div className={`mx-auto mt-4 w-fit rounded-full px-4 py-2 text-xs font-black ${statusClasse}`}>
+      <div
+        className={`mx-auto mt-4 w-fit rounded-full px-4 py-2 text-xs font-black ${statusClasse}`}
+      >
         {statusTexto}
       </div>
 
@@ -602,13 +769,88 @@ function CardLivro({ livro, hoje }: { livro: LivroPreVenda; hoje: Date }) {
         custo de produção é alto e o lucro é mínimo.
       </p>
 
-      <button
-        type="button"
-        disabled
-        className="mt-4 block w-full cursor-not-allowed rounded-full bg-yellow-300 px-5 py-3 text-center text-sm font-black text-gray-800"
-      >
-        Compra online dos livros em breve
-      </button>
+      <div className="mt-4 grid gap-3">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="rounded-2xl bg-white p-4 text-center shadow-sm ring-1 ring-red-100">
+            <p className="text-[10px] font-black uppercase tracking-wide text-red-600">
+              Não membro
+            </p>
+
+            <p className="mt-1 text-2xl font-black text-gray-950">
+              {formatarMoeda(livro.valorNaoMembro)}
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-green-50 p-4 text-center shadow-sm ring-1 ring-green-100">
+            <p className="text-[10px] font-black uppercase tracking-wide text-green-700">
+              Membro
+            </p>
+
+            <p className="mt-1 text-2xl font-black text-green-700">
+              {formatarMoeda(livro.valorMembro)}
+            </p>
+          </div>
+        </div>
+
+        {livro.valorPromocional !== undefined && (
+          <div className="rounded-2xl bg-yellow-400 p-4 text-center shadow-sm">
+            <p className="text-[10px] font-black uppercase tracking-wide text-gray-800">
+              Valor promocional
+            </p>
+
+            <p className="mt-1 text-3xl font-black text-gray-950">
+              {formatarMoeda(livro.valorPromocional)}
+            </p>
+          </div>
+        )}
+
+        {compraLiberada ? (
+          <div className="grid gap-3">
+            {livro.valorPromocional !== undefined && (
+              <Link
+                href={montarLinkCompraLivroLoja({
+                  livro,
+                  valor: livro.valorPromocional,
+                  tipoPreco: "promocional",
+                })}
+                className="block w-full rounded-full bg-yellow-400 px-5 py-3 text-center text-sm font-black text-gray-950 shadow-md transition hover:bg-yellow-500"
+              >
+                Comprar promocional
+              </Link>
+            )}
+
+            <Link
+              href={montarLinkCompraLivroLoja({
+                livro,
+                valor: livro.valorNaoMembro,
+                tipoPreco: "nao-membro",
+              })}
+              className="block w-full rounded-full bg-red-600 px-5 py-3 text-center text-sm font-black text-white shadow-md transition hover:bg-red-700"
+            >
+              Comprar como não membro
+            </Link>
+
+            <Link
+              href={montarLinkCompraLivroLoja({
+                livro,
+                valor: livro.valorMembro,
+                tipoPreco: "membro",
+              })}
+              className="block w-full rounded-full bg-green-600 px-5 py-3 text-center text-sm font-black text-white shadow-md transition hover:bg-green-700"
+            >
+              Comprar como membro
+            </Link>
+          </div>
+        ) : (
+          <button
+            type="button"
+            disabled
+            className="block w-full cursor-not-allowed rounded-full bg-gray-300 px-5 py-3 text-center text-sm font-black text-gray-600"
+          >
+            Compra bloqueada até {formatarData(livro.inicio)}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -653,8 +895,13 @@ function FormularioProjetoEspecial() {
   function enviar(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const assunto = encodeURIComponent("Interesse em Projeto Especial Hot Dogueres");
-    const corpo = encodeURIComponent(`Nome: ${nome}\nContato: ${contato}\n\nMensagem:\n${mensagem}`);
+    const assunto = encodeURIComponent(
+      "Interesse em Projeto Especial Hot Dogueres",
+    );
+
+    const corpo = encodeURIComponent(
+      `Nome: ${nome}\nContato: ${contato}\n\nMensagem:\n${mensagem}`,
+    );
 
     window.location.href = `mailto:contato@hotdogueres.com.br?subject=${assunto}&body=${corpo}`;
   }
@@ -749,7 +996,9 @@ function CardCartoonLojaSolidaria() {
                     Cada compra ajuda uma causa
                   </p>
 
-                  <p className="mt-1 text-2xl font-black">Comprar também é doar</p>
+                  <p className="mt-1 text-2xl font-black">
+                    Comprar também é doar
+                  </p>
                 </div>
               </div>
 
@@ -821,8 +1070,14 @@ function CardCartoonLojaSolidaria() {
 
 export default function LojaSolidariaPage() {
   const [hoje, setHoje] = useState(new Date());
-  const [quantidadesAlimentos, setQuantidadesAlimentos] = useState<Record<string, number>>({});
-  const [quantidadesRacao, setQuantidadesRacao] = useState<Record<string, number>>({});
+
+  const [quantidadesAlimentos, setQuantidadesAlimentos] = useState<
+    Record<string, number>
+  >({});
+
+  const [quantidadesRacao, setQuantidadesRacao] = useState<
+    Record<string, number>
+  >({});
 
   useEffect(() => {
     setHoje(new Date());
@@ -943,14 +1198,18 @@ export default function LojaSolidariaPage() {
         <section className="bg-white px-4 py-12">
           <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">
             <div className="rounded-3xl border-4 border-red-600 bg-[#fff7e8] p-6 text-center shadow-lg">
-              <h2 className="text-3xl font-black text-red-700">106 toneladas</h2>
+              <h2 className="text-3xl font-black text-red-700">
+                106 toneladas
+              </h2>
               <p className="mt-2 font-bold text-gray-800">
                 Meta de alimentos arrecadados
               </p>
             </div>
 
             <div className="rounded-3xl border-4 border-yellow-400 bg-[#fff7e8] p-6 text-center shadow-lg">
-              <h2 className="text-3xl font-black text-yellow-600">Pré-venda</h2>
+              <h2 className="text-3xl font-black text-yellow-600">
+                Pré-venda
+              </h2>
               <p className="mt-2 font-bold text-gray-800">
                 Livros e camisas vendidos por encomenda
               </p>
