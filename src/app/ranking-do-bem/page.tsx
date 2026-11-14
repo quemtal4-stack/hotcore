@@ -226,21 +226,21 @@ const ITENS_CALCULO = [
 const RECONHECIMENTOS_2027 = [
   {
     titulo: "Pessoa física",
-    destaque: "Certificado de Reconhecimento Solidário",
+    destaque: "Certificado, medalha e homenagem no palco",
     texto:
-      "No evento de 04 de dezembro de 2027, os participantes individuais com maior pontuação poderão receber certificado e homenagem pública pela contribuição realizada.",
+      "No evento de 04 de dezembro de 2027, a pessoa física em destaque no Ranking do Bem poderá receber uma homenagem pública no palco, certificado de reconhecimento solidário e medalha pela contribuição realizada.",
   },
   {
-    titulo: "Empresa",
-    destaque: "Troféu Empresa do Bem",
+    titulo: "Pessoa jurídica",
+    destaque: "Troféu Eraldo de Boas Ações",
     texto:
-      "As empresas mais bem colocadas poderão receber troféu, selo de reconhecimento e destaque público como parceiras que ajudaram a transformar solidariedade em ação.",
+      "A empresa em destaque poderá receber uma homenagem no palco e o Troféu Eraldo de Boas Ações, em reconhecimento à sua participação e apoio às ações do Ecossistema Hot Dogueres. O restante da homenagem será surpresa.",
   },
   {
     titulo: "Critério principal",
-    destaque: "Reconhecimento por mérito",
+    destaque: "Reconhecimento pela causa",
     texto:
-      "Não é sorteio. O reconhecimento considera pontos acumulados, ações aprovadas, presença confirmada quando exigida e validação da equipe Hot Dogueres.",
+      "Não é sorteio e não é promessa de prêmio. O reconhecimento considera pontos acumulados, ações aprovadas, presença confirmada quando exigida e validação da equipe Hot Dogueres.",
   },
 ];
 
@@ -251,8 +251,10 @@ const REGULAMENTO_RECONHECIMENTO = [
   "Compras e assinaturas só pontuam após confirmação de pagamento aprovado.",
   "Ações presenciais, voluntariado, doações, permutas e apoios extras podem depender de validação manual da equipe.",
   "Para receber reconhecimento presencial no evento, poderá ser exigida presença do participante ou representante oficial.",
-  "A data prevista para a entrega dos reconhecimentos é 04 de dezembro de 2027, podendo ser ajustada conforme organização do evento.",
-  "Os critérios finais, posições reconhecidas e eventuais bonificações serão divulgados previamente em regulamento próprio.",
+  "A data prevista para a homenagem no palco é 04 de dezembro de 2027, podendo ser ajustada conforme organização do evento.",
+  "Pessoa física e pessoa jurídica terão reconhecimentos separados, respeitando suas categorias dentro do Ranking do Bem.",
+  "A empresa em destaque poderá receber o Troféu Eraldo de Boas Ações em homenagem pública no palco.",
+  "Os critérios finais, posições reconhecidas e detalhes das homenagens poderão ser divulgados previamente em regulamento próprio.",
 ];
 
 function paraNumero(valor: unknown) {
@@ -726,8 +728,10 @@ function CardImagemRanking() {
             </p>
 
             <p className="mt-2 text-sm font-bold leading-relaxed text-white/80">
-              É sobre reconhecer quem decidiu ajudar. O ranking valoriza boas
-              ações já realizadas, aprovadas e validadas pela Hot Dogueres.
+              É sobre reconhecer quem decidiu ajudar pela causa. O ranking
+              valoriza boas ações já realizadas, aprovadas e validadas pela Hot
+              Dogueres, sem transformar a solidariedade em sorteio ou promessa
+              de prêmio.
             </p>
           </div>
 
@@ -812,7 +816,8 @@ export default async function RankingDoBemPage({
           <p className="mx-auto mt-5 max-w-3xl text-base font-bold leading-relaxed text-gray-700 md:text-lg">
             Cada compra aprovada, participação, voluntariado, doação ou parceria
             ajuda a fortalecer o Ecossistema Hot Dogueres e gera pontos para
-            reconhecer quem transforma solidariedade em ação.
+            reconhecer quem transforma solidariedade em ação. A ideia é valorizar
+            quem ajuda pela causa e merece ter suas boas ações reconhecidas.
           </p>
 
           {cadastroSucesso && (
@@ -837,7 +842,9 @@ export default async function RankingDoBemPage({
             <p className="mt-2 text-sm font-bold leading-relaxed text-gray-700">
               O Ranking do Bem não funciona por sorte. Ele reconhece ações
               concretas, compras aprovadas, presença, voluntariado, doações,
-              parcerias e contribuições validadas.
+              parcerias e contribuições validadas. A motivação principal é
+              ajudar; o reconhecimento vem como homenagem pública a quem fez o
+              bem.
             </p>
           </div>
 
@@ -936,8 +943,9 @@ export default async function RankingDoBemPage({
 
             <p className="mx-auto mt-4 max-w-3xl text-sm font-bold leading-relaxed text-gray-300 md:text-base">
               A proposta é reconhecer publicamente quem mais ajudou ao longo da
-              jornada. O participante não ajuda para ganhar prêmio: ele é
-              reconhecido porque já praticou uma boa ação.
+              jornada. A pessoa não ajuda para ganhar algo: ela ajuda pela causa
+              e pode ser homenageada no palco porque suas boas ações foram
+              importantes para o Ecossistema Hot Dogueres.
             </p>
           </div>
 
@@ -978,7 +986,8 @@ export default async function RankingDoBemPage({
             <p className="mt-3 text-sm font-bold leading-relaxed text-gray-600">
               Pontuação destinada aos participantes individuais: compradores,
               membros, doadores, voluntários e apoiadores. O objetivo é
-              reconhecer a boa ação, não incentivar ajuda apenas por prêmio.
+              reconhecer a boa ação, valorizar quem ajuda pela causa e destacar
+              publicamente atitudes que merecem ser lembradas.
             </p>
 
             <div className="mt-6 space-y-3">
@@ -1065,7 +1074,8 @@ export default async function RankingDoBemPage({
 
             <p className="mx-auto mt-3 max-w-3xl text-sm font-bold leading-relaxed text-gray-600">
               Essas regras deixam claro que o Ranking do Bem existe para
-              reconhecer boas ações, evitando qualquer aparência de sorteio.
+              reconhecer boas ações, homenagear pessoas e empresas no palco e
+              evitar qualquer aparência de sorteio.
             </p>
           </div>
 
@@ -1113,7 +1123,8 @@ export default async function RankingDoBemPage({
 
           <p className="mx-auto mt-4 max-w-3xl text-sm font-black leading-relaxed text-yellow-300 md:text-base">
             O Ranking do Bem não premia a sorte. Ele reconhece compromisso,
-            presença, participação e boas ações.
+            presença, participação, boas ações e quem ajuda porque acredita na
+            causa.
           </p>
 
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
