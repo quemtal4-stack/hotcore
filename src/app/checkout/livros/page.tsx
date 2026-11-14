@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, type FormEvent } from "react";
+import { Suspense, useMemo, useState, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 
 type FormaEntrega = "retirada-local" | "retirada-evento" | "receber-casa";
@@ -69,7 +69,7 @@ function obterTextoFormaEntrega(formaEntrega: FormaEntrega) {
   return "Receber em casa";
 }
 
-export default function CheckoutLivrosPage() {
+function CheckoutLivrosConteudo() {
   const searchParams = useSearchParams();
 
   const produto = searchParams.get("produto") || "";
@@ -699,5 +699,27 @@ export default function CheckoutLivrosPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+function CheckoutLivrosCarregando() {
+  return (
+    <main className="min-h-screen bg-[#fff7e8] px-4 py-10 text-gray-950">
+      <div className="mx-auto max-w-5xl">
+        <div className="rounded-[2rem] bg-white p-8 text-center shadow-xl">
+          <p className="text-lg font-black text-red-700">
+            Carregando checkout...
+          </p>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+export default function CheckoutLivrosPage() {
+  return (
+    <Suspense fallback={<CheckoutLivrosCarregando />}>
+      <CheckoutLivrosConteudo />
+    </Suspense>
   );
 }
