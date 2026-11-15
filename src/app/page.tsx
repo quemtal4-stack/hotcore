@@ -781,17 +781,21 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
           <SecaoCalendario2027 />
 
       <div className="mt-6 flex w-full min-w-0 flex-col items-center gap-6">
-  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 sm:max-w-6xl [&>*]:!mx-auto [&>*]:!w-full [&>*]:!max-w-full [&>*]:!translate-x-0">
+  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 overflow-hidden sm:max-w-6xl">
     <TermometroImpacto />
   </div>
 
-  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 sm:max-w-6xl [&>*]:!mx-auto [&>*]:!w-full [&>*]:!max-w-full [&>*]:!translate-x-0">
+  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 overflow-hidden sm:max-w-6xl">
     <TermometroRacao />
   </div>
 
-  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 sm:max-w-6xl [&>*]:!mx-auto [&>*]:!w-full [&>*]:!max-w-full [&>*]:!translate-x-0">
+  <div
+    id="projeto-revela"
+    className="mx-auto flex w-full max-w-[calc(100vw-24px)] min-w-0 justify-center overflow-hidden sm:max-w-6xl"
+  >
     <BlocoProjetoRevelaHome />
   </div>
+
 
   <section className="flex w-full min-w-0 justify-center pb-8">
               <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 overflow-hidden rounded-[1.75rem] border-4 border-red-600 bg-white text-center shadow-2xl sm:max-w-6xl sm:rounded-[2rem]">
@@ -966,10 +970,9 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
 </article>
 
 
-<div className="col-span-full w-full min-w-0 overflow-hidden [&>*]:!mx-auto [&>*]:!w-full [&>*]:!max-w-full [&>*]:!translate-x-0">
+<div className="col-span-full mx-auto w-full max-w-6xl min-w-0 overflow-hidden">
   <SecaoCamisasEventos />
 </div>
-
           </div>
 
           <div className="mt-6 rounded-[2rem] bg-gray-950 p-5 text-white shadow-xl md:p-8">
@@ -1029,11 +1032,11 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
         </div>
       </section>
 
-   <div
+ <div
   id="ingressos"
   className="mx-auto w-full max-w-6xl min-w-0 scroll-mt-28 space-y-8 overflow-hidden px-3 pb-8 sm:px-4"
 >
-  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 sm:max-w-6xl [&>*]:!mx-auto [&>*]:!w-full [&>*]:!max-w-full [&>*]:!translate-x-0">
+  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 overflow-hidden sm:max-w-6xl">
     <SecaoIngressosEventos
       kgDoados={kgAlimentosTermometro}
       metaKg={META_DOACAO_KG}
@@ -1041,7 +1044,7 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
     />
   </div>
 
-  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 sm:max-w-6xl [&>*]:!mx-auto [&>*]:!w-full [&>*]:!max-w-full [&>*]:!translate-x-0">
+  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 overflow-hidden sm:max-w-6xl">
     <SecaoIngressosColecionaveis />
   </div>
 </div>
@@ -1095,7 +1098,8 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
             </div>
           </div>
 
-          <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+         <div className="mx-auto mt-6 grid w-full max-w-[calc(100vw-24px)] grid-cols-2 justify-items-stretch gap-3 sm:max-w-6xl sm:gap-4 lg:grid-cols-3">
+
             <input type="checkbox" id="toggle-livros-mobile" className="peer hidden" />
 
             {LIVROS_PREVENDA.map((livro, index) => {
