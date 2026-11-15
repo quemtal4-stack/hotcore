@@ -780,10 +780,18 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
 
           <SecaoCalendario2027 />
 
-          <div className="mt-6 space-y-6">
-            <TermometroImpacto />
-            <TermometroRacao />
-          <BlocoProjetoRevelaHome />
+        <div className="mx-auto mt-6 flex w-full max-w-full flex-col items-center gap-5 overflow-visible sm:gap-6">
+  <div className="w-full min-w-0 max-w-full">
+    <TermometroImpacto />
+  </div>
+
+  <div className="w-full min-w-0 max-w-full">
+    <TermometroRacao />
+  </div>
+
+  <div className="w-full min-w-0 max-w-full">
+    <BlocoProjetoRevelaHome />
+  </div>
 
             <section className="flex w-full justify-center pb-8">
               <div className="mx-auto w-full max-w-6xl overflow-hidden rounded-[2rem] border-4 border-red-600 bg-white text-center shadow-2xl">
