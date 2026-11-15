@@ -842,7 +842,7 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
                         </p>
                       </div>
 
-                      <div className="mt-6 grid gap-4 md:grid-cols-2">
+                      <div className="mt-6 grid w-full min-w-0 gap-5 md:grid-cols-2">
                         <div className="mx-auto w-full max-w-md rounded-3xl bg-white p-5 text-center shadow-md md:max-w-none">
                           <p className="text-lg font-black text-gray-950">
                             A Hot Dogueres não aborda pessoas para vender
@@ -966,7 +966,7 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
 </article>
 
 
-           <div className="w-full max-w-xl min-w-0 lg:max-w-none [&>*]:!mx-auto [&>*]:!w-full [&>*]:!max-w-full [&>*]:!translate-x-0">
+<div className="col-span-full w-full min-w-0 overflow-hidden [&>*]:!mx-auto [&>*]:!w-full [&>*]:!max-w-full [&>*]:!translate-x-0">
   <SecaoCamisasEventos />
 </div>
 
