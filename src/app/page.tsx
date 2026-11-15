@@ -744,11 +744,11 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
         </div>
       </header>
 
-      <section className="relative overflow-hidden px-4 py-8 md:py-10">
+      <section className="relative overflow-hidden px-3 py-8 sm:px-4 md:py-10">
         <div className="absolute left-[-180px] top-[-180px] h-[360px] w-[360px] rounded-full bg-red-200/40 blur-3xl" />
         <div className="absolute bottom-[-200px] right-[-150px] h-[420px] w-[420px] rounded-full bg-yellow-200/60 blur-3xl" />
 
-        <div className="relative mx-auto max-w-6xl">
+        <div className="relative mx-auto w-full max-w-6xl min-w-0">
           <div className="rounded-[2rem] bg-white p-5 text-center shadow-xl md:p-8">
             <p className="inline-flex rounded-full bg-red-600 px-5 py-2 text-xs font-black uppercase tracking-wide text-white">
               Seja bem-vindo
@@ -780,23 +780,24 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
 
           <SecaoCalendario2027 />
 
-        <div className="mx-auto mt-6 flex w-full max-w-full flex-col items-center gap-5 overflow-visible sm:gap-6">
-  <div className="w-full min-w-0 max-w-full">
+      <div className="mt-6 flex w-full min-w-0 flex-col items-center gap-6">
+  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 sm:max-w-6xl [&>*]:!mx-auto [&>*]:!w-full [&>*]:!max-w-full [&>*]:!translate-x-0">
     <TermometroImpacto />
   </div>
 
-  <div className="w-full min-w-0 max-w-full">
+  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 sm:max-w-6xl [&>*]:!mx-auto [&>*]:!w-full [&>*]:!max-w-full [&>*]:!translate-x-0">
     <TermometroRacao />
   </div>
 
-  <div className="w-full min-w-0 max-w-full">
+  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 sm:max-w-6xl [&>*]:!mx-auto [&>*]:!w-full [&>*]:!max-w-full [&>*]:!translate-x-0">
     <BlocoProjetoRevelaHome />
   </div>
 
-            <section className="flex w-full justify-center pb-8">
-              <div className="mx-auto w-full max-w-6xl overflow-hidden rounded-[2rem] border-4 border-red-600 bg-white text-center shadow-2xl">
-                <div className="grid w-full gap-0 lg:grid-cols-[0.85fr_1.15fr]">
-                  <div className="relative flex min-h-[260px] items-center justify-center overflow-hidden bg-gradient-to-br from-red-700 via-red-600 to-yellow-400 p-6 text-center text-white md:p-8">
+  <section className="flex w-full min-w-0 justify-center pb-8">
+              <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 overflow-hidden rounded-[1.75rem] border-4 border-red-600 bg-white text-center shadow-2xl sm:max-w-6xl sm:rounded-[2rem]">
+
+                <div className="grid w-full min-w-0 gap-0 lg:grid-cols-[0.85fr_1.15fr]">
+                 <div className="relative flex min-h-[240px] min-w-0 items-center justify-center overflow-hidden bg-gradient-to-br from-red-700 via-red-600 to-yellow-400 p-4 text-center text-white sm:p-6 md:min-h-[260px] md:p-8">
                     <div className="absolute left-[-80px] top-[-80px] h-56 w-56 rounded-full bg-white/20 blur-3xl" />
                     <div className="absolute bottom-[-100px] right-[-80px] h-64 w-64 rounded-full bg-black/25 blur-3xl" />
 
@@ -809,7 +810,7 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
                         Alerta oficial
                       </p>
 
-                      <h2 className="mt-4 text-center text-4xl font-black leading-tight md:text-5xl">
+                     <h2 className="mt-4 text-center text-3xl font-black leading-tight sm:text-4xl md:text-5xl">
                         Cuidado com golpes
                       </h2>
 
@@ -820,19 +821,23 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
                     </div>
                   </div>
 
-                  <div className="flex w-full items-center justify-center bg-[#FFF8E7] p-5 text-center md:p-8 lg:justify-start lg:text-left">
-                    <div className="mx-auto w-full max-w-2xl">
+                  <div className="flex w-full min-w-0 items-center justify-center bg-[#FFF8E7] p-4 text-center sm:p-5 md:p-8">
+
+                    <div className="mx-auto w-full max-w-2xl min-w-0 text-center">
                       <p className="inline-flex rounded-full bg-red-100 px-4 py-2 text-center text-xs font-black uppercase tracking-[0.2em] text-red-700">
                         Compra segura
                       </p>
 
-                      <h3 className="mx-auto mt-5 max-w-2xl text-center text-2xl font-black leading-tight text-gray-950 sm:text-3xl md:text-4xl lg:mx-0 lg:text-left">
+                      <h3 className="mx-auto mt-5 max-w-2xl text-center text-2xl font-black leading-tight text-gray-950 sm:text-3xl md:text-4xl">
+
                         Todos os produtos do ecossistema Hot Dogueres são
                         vendidos apenas pelo site oficial.
                       </h3>
 
-                      <div className="mx-auto mt-5 max-w-xl rounded-3xl border-2 border-dashed border-red-300 bg-white p-5 shadow-inner lg:mx-0">
-                        <p className="break-all text-center text-xl font-black text-red-700 sm:break-words sm:text-2xl md:text-3xl">
+                      <div className="mx-auto mt-5 w-full max-w-xl min-w-0 rounded-3xl border-2 border-dashed border-red-300 bg-white p-4 shadow-inner sm:p-5">
+
+                       <p className="break-all text-center text-lg font-black text-red-700 min-[380px]:text-xl sm:break-words sm:text-2xl md:text-3xl">
+
                           www.hotdogueres.com.br
                         </p>
                       </div>
@@ -864,7 +869,8 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
                         </div>
                       </div>
 
-                      <div className="mx-auto mt-6 max-w-2xl rounded-3xl bg-gray-950 p-5 text-center text-white shadow-xl lg:mx-0">
+                      <div className="mx-auto mt-6 w-full max-w-2xl min-w-0 rounded-3xl bg-gray-950 p-4 text-center text-white shadow-xl sm:p-5">
+
                         <p className="text-sm font-black uppercase tracking-[0.2em] text-yellow-300">
                           Regra de segurança
                         </p>
@@ -887,8 +893,10 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
             </section>
           </div>
 
-          <div className="mt-6 grid gap-5 lg:grid-cols-2">
-            <article className="rounded-[2rem] bg-white p-5 shadow-xl ring-1 ring-red-100">
+          <div className="mx-auto mt-6 grid w-full max-w-6xl min-w-0 justify-items-center gap-5 lg:grid-cols-2">
+
+            <article className="w-full max-w-xl rounded-[2rem] bg-white p-5 text-center shadow-xl ring-1 ring-red-100 lg:max-w-none">
+
               <p className="inline-flex rounded-full bg-red-600 px-4 py-2 text-xs font-black uppercase tracking-wide text-white">
                 Primeiro evento
               </p>
@@ -922,7 +930,8 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
               </Link>
             </article>
 
-          <article className="rounded-[2rem] bg-white p-5 shadow-xl ring-1 ring-yellow-200">
+          <article className="w-full max-w-xl rounded-[2rem] bg-white p-5 text-center shadow-xl ring-1 ring-yellow-200 lg:max-w-none">
+
   <p className="inline-flex rounded-full bg-yellow-400 px-4 py-2 text-xs font-black uppercase tracking-wide text-gray-950">
     Segundo evento
   </p>
@@ -957,7 +966,10 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
 </article>
 
 
-            <SecaoCamisasEventos />
+           <div className="w-full max-w-xl min-w-0 lg:max-w-none [&>*]:!mx-auto [&>*]:!w-full [&>*]:!max-w-full [&>*]:!translate-x-0">
+  <SecaoCamisasEventos />
+</div>
+
           </div>
 
           <div className="mt-6 rounded-[2rem] bg-gray-950 p-5 text-white shadow-xl md:p-8">
@@ -1017,18 +1029,25 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
         </div>
       </section>
 
-      <div id="ingressos" className="scroll-mt-28 space-y-8 px-4 pb-8">
-        <SecaoIngressosEventos
-          kgDoados={kgAlimentosTermometro}
-          metaKg={META_DOACAO_KG}
-          ingressosVendidos={ingressosVendidosParaExibicao}
-        />
+   <div
+  id="ingressos"
+  className="mx-auto w-full max-w-6xl min-w-0 scroll-mt-28 space-y-8 overflow-hidden px-3 pb-8 sm:px-4"
+>
+  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 sm:max-w-6xl [&>*]:!mx-auto [&>*]:!w-full [&>*]:!max-w-full [&>*]:!translate-x-0">
+    <SecaoIngressosEventos
+      kgDoados={kgAlimentosTermometro}
+      metaKg={META_DOACAO_KG}
+      ingressosVendidos={ingressosVendidosParaExibicao}
+    />
+  </div>
 
-        <SecaoIngressosColecionaveis />
-      </div>
+  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 sm:max-w-6xl [&>*]:!mx-auto [&>*]:!w-full [&>*]:!max-w-full [&>*]:!translate-x-0">
+    <SecaoIngressosColecionaveis />
+  </div>
+</div>
 
       <section id="livros" className="scroll-mt-28 px-4 pb-8">
-        <div className="mx-auto max-w-6xl translate-x-2 overflow-hidden rounded-[2rem] border-4 border-red-600 bg-white p-5 shadow-2xl sm:translate-x-3 md:p-6 lg:translate-x-0">
+        <div className="mx-auto w-full max-w-6xl min-w-0 overflow-hidden rounded-[2rem] border-4 border-red-600 bg-white p-5 shadow-2xl md:p-6">
           <div className="text-center">
             <p className="inline-flex rounded-full bg-purple-700 px-5 py-2 text-xs font-black uppercase tracking-wide text-white">
               Livros colecionáveis
