@@ -471,19 +471,18 @@ body {
 
 .setas-navegacao {
   position: fixed;
-  top: 50%;
-  left: 0;
-  right: 0;
-  z-index: 9999;
+  inset: 0;
+  z-index: 2147483000;
   pointer-events: none;
 }
 
 .seta-nav {
   position: fixed;
   top: 50%;
+  z-index: 2147483001;
   transform: translateY(-50%);
-  width: 52px;
-  height: 52px;
+  width: 56px;
+  height: 56px;
   border-radius: 999px;
   background: #e63946;
   color: #ffffff;
@@ -491,17 +490,28 @@ body {
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  font-size: 32px;
+  font-size: 34px;
   font-weight: 900;
   line-height: 1;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
   pointer-events: auto;
-  transition: transform 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .seta-nav:hover {
   background: #c92f3b;
   transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.42);
+}
+
+.seta-nav:active {
+  transform: translateY(-50%) scale(0.96);
 }
 
 .seta-nav::before,
@@ -511,11 +521,27 @@ body {
 }
 
 .seta-esquerda {
-  left: 24px;
+  left: max(16px, env(safe-area-inset-left));
 }
 
 .seta-direita {
-  right: 24px;
+  right: max(16px, env(safe-area-inset-right));
+}
+
+@media (max-width: 520px) {
+  .seta-nav {
+    width: 46px;
+    height: 46px;
+    font-size: 28px;
+  }
+
+  .seta-esquerda {
+    left: max(10px, env(safe-area-inset-left));
+  }
+
+  .seta-direita {
+    right: max(10px, env(safe-area-inset-right));
+  }
 }
 
 /* Modal de ampliação do ingresso */

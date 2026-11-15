@@ -342,11 +342,12 @@ export default function NossaHistoriaPage() {
   return (
     <>
       <SetasNavegacao
-        anterior="/"
-        proxima="/ranking-do-bem"
-        labelAnterior="Voltar para a página inicial"
-        labelProxima="Ir para Ranking do Bem"
-      />
+  anterior="/"
+  proxima="/projeto-revela"
+  labelAnterior="Voltar para o início"
+  labelProxima="Ir para Projeto Hot Dogueres Revela"
+/>
+
 
       <main className="min-h-screen bg-[#FFF8E7] text-[#000000]">
         <section className="relative overflow-hidden px-6 py-20 md:px-10 lg:px-16">

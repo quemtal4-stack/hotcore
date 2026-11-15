@@ -1178,12 +1178,13 @@ export default async function RankingDoBemPage({
         </div>
       </section>
 
-      <SetasNavegacao
-        anterior="/nossa-historia"
-        proxima="/clube-de-membros"
-        labelAnterior="Voltar para Nossa História"
-        labelProxima="Ir para Clube de Membros"
-      />
+   <SetasNavegacao
+  anterior="/projeto-revela"
+  proxima="/clube-de-membros"
+  labelAnterior="Voltar para Projeto Hot Dogueres Revela"
+  labelProxima="Ir para Clube de Membros"
+/>
+
     </main>
   );
 }

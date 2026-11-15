@@ -72,6 +72,7 @@ const ingressos = [
     descricao:
       "Ingresso comemorativo para apoiar a turma de judô do Projeto Hot Dogueres Revela.",
     emoji: "🥋",
+    imagem: "/projeto-revela/ingressos/ingresso-judo-2027.png",
   },
   {
     nome: "Projeto Hot Dogueres Revela — Dança 2027",
@@ -80,6 +81,7 @@ const ingressos = [
     descricao:
       "Ingresso comemorativo para apoiar a turma de dança do Projeto Hot Dogueres Revela.",
     emoji: "💃",
+    imagem: "/projeto-revela/ingressos/ingresso-danca-2027.png",
   },
   {
     nome: "Projeto Hot Dogueres Revela — Pintura 2027",
@@ -88,8 +90,10 @@ const ingressos = [
     descricao:
       "Ingresso comemorativo para apoiar a turma de pintura e artes visuais do Projeto Hot Dogueres Revela.",
     emoji: "🎨",
+    imagem: "/projeto-revela/ingressos/ingresso-pintura-2027.png",
   },
 ];
+
 
 const despesas = [
   ["Transporte das crianças", "R$ 4.800 a R$ 7.200/mês"],
@@ -120,7 +124,7 @@ function linkCota(valor: number, nome: string) {
   return `/cadastro?${params.toString()}`;
 }
 
-function linkIngresso(nome: string, slug: string) {
+function linkIngresso(nome: string, slug: string, colecionar = false) {
   const params = new URLSearchParams({
     tipo: "ingresso-projeto-revela",
     produto: slug,
@@ -128,13 +132,15 @@ function linkIngresso(nome: string, slug: string) {
     valor: "100",
     quantidadeTotal: "1",
     projeto: "hot-dogueres-revela",
+    colecionar: colecionar ? "sim" : "nao",
+    rankingPontos: "100",
   });
 
   return `/cadastro?${params.toString()}`;
 }
 
 export default function ProjetoRevelaPage() {
-  const metaMensal = 20000;
+  const metaMensal = 60000;
   const custoPorAluno = 650;
   const alunosGratuitos = 30;
   const alunosPagantes = 60;
@@ -512,21 +518,23 @@ export default function ProjetoRevelaPage() {
 
                 <div className="mt-5 grid gap-3">
                   <Link
-                    href={linkIngresso(ingresso.nome, ingresso.slug)}
-                    className="flex justify-center rounded-full bg-gray-950 px-5 py-3 text-center text-xs font-black uppercase tracking-wide text-white transition hover:bg-gray-800"
-                  >
-                    Comprar para apoiar
-                  </Link>
+  
+                href={linkIngresso(ingresso.nome, ingresso.slug, false)}
+                className="flex justify-center rounded-full bg-gray-950 px-5 py-3 text-center text-xs font-black uppercase tracking-wide text-white transition hover:bg-gray-800"
+>
+  Comprar para apoiar
+</Link>
 
-                  <Link
-                    href={linkIngresso(
-                      `${ingresso.nome} — Colecionador`,
-                      `${ingresso.slug}-colecionador`,
-                    )}
-                    className="flex justify-center rounded-full bg-yellow-300 px-5 py-3 text-center text-xs font-black uppercase tracking-wide text-gray-950 transition hover:bg-yellow-400"
-                  >
-                    Quero colecionar
-                  </Link>
+<Link
+  href={linkIngresso(
+    `${ingresso.nome} — Colecionador`,
+    `${ingresso.slug}-colecionador`,
+    true,
+  )}
+  className="flex justify-center rounded-full bg-yellow-300 px-5 py-3 text-center text-xs font-black uppercase tracking-wide text-gray-950 transition hover:bg-yellow-400"
+>
+  Quero colecionar
+</Link>
                 </div>
               </article>
             ))}
