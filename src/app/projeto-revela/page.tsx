@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SetasNavegacao from "@/components/SetasNavegacao";
 
 export const metadata = {
   title: "Projeto Hot Dogueres Revela | Instituto Hot Dogueres",
@@ -142,14 +143,12 @@ export default function ProjetoRevelaPage() {
 
   return (
     <>
-        <Link
-          href="/"
-          className="fixed left-4 top-1/2 z-50 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white text-2xl font-black text-red-700 shadow-lg ring-1 ring-red-100 transition hover:scale-105 hover:bg-red-50"
-          aria-label="Voltar para a nossa historia"
-          title="Ir para a página ranking do bem"
-        >
-          ←
-        </Link>
+      <SetasNavegacao
+        anterior="/nossa-historia"
+        proxima="/ranking-do-bem"
+        labelAnterior="Voltar para Nossa História"
+        labelProxima="Ir para Ranking do Bem"
+      />
 
       <main className="min-h-screen bg-[#fff7e8] text-gray-950">
       <section className="relative overflow-hidden bg-gradient-to-br from-yellow-300 via-orange-200 to-amber-100 px-4 py-14 md:py-20">
