@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const META_PROJETO_REVELA_REAIS = 65000;
+const META_PROJETO_REVELA_REAIS = 60000;
 const TOTAL_ARRECADADO_PROJETO_REVELA_REAIS = 0;
 
 const COTAS_PROJETO_REVELA = [
@@ -91,7 +91,32 @@ export default function BlocoProjetoRevelaHome() {
             </div>
           </div>
         </div>
+<p className="text-xs font-black uppercase tracking-[0.2em] text-orange-700">
+  Primeira meta de implantação
+</p>
 
+<h3 className="mt-2 text-3xl font-black text-gray-950">
+  R$ 60.000
+</h3>
+
+<p className="mt-3 text-sm font-semibold leading-relaxed text-gray-700">
+  A primeira meta será destinada à compra dos equipamentos e materiais para
+  iniciar o Projeto Hot Dogueres Revela: tatames, kimonos, camisas das
+  crianças, materiais de pintura, estrutura de dança, caixa de som, apoio aos
+  primeiros custos, professores, lanche e organização.
+</p>
+
+<p className="mt-3 rounded-2xl bg-yellow-100 p-4 text-sm font-black leading-relaxed text-gray-900 ring-1 ring-yellow-300">
+  Após a implantação inicial, a meta passa para R$ 20.000 por mês para manter
+  as aulas, transporte, alimentação, professores e reposição de materiais.
+</p>
+
+<Link
+  href="/projeto-revela"
+  className="mt-5 inline-flex rounded-full bg-gray-950 px-6 py-3 text-sm font-black uppercase tracking-wide text-white transition hover:bg-gray-800"
+>
+  Conhecer o projeto
+</Link>
         <div className="flex items-center justify-center bg-[#fff7e8] p-6 md:p-8 lg:p-10">
           <div className="w-full max-w-xl">
             <div className="text-center">

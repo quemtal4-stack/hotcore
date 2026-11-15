@@ -140,12 +140,13 @@ function linkIngresso(nome: string, slug: string, colecionar = false) {
 }
 
 export default function ProjetoRevelaPage() {
-  const metaMensal = 60000;
-  const custoPorAluno = 650;
-  const alunosGratuitos = 30;
-  const alunosPagantes = 60;
-  const valorAlunoPagante = 90;
-  const receitaPagantes = alunosPagantes * valorAlunoPagante;
+const metaInicial = 60000;
+const metaMensalRecorrente = 20000;
+const custoPorAluno = 650;
+const alunosGratuitos = 30;
+const alunosPagantes = 60;
+const valorAlunoPagante = 90;
+const receitaPagantes = alunosPagantes * valorAlunoPagante;
 
   return (
     <>
@@ -202,37 +203,47 @@ export default function ProjetoRevelaPage() {
 
           <div className="rounded-[2rem] bg-white/85 p-5 shadow-2xl ring-1 ring-white/70 backdrop-blur">
             <div className="rounded-[1.5rem] bg-gray-950 p-6 text-white">
-              <p className="text-sm font-bold uppercase tracking-[0.2em] text-yellow-300">
-                Meta mensal
-              </p>
+         <p className="text-sm font-bold uppercase tracking-[0.2em] text-yellow-300">
+  Primeira meta de implantação
+</p>
 
-              <p className="mt-3 text-5xl font-black">
-                {formatarReal(metaMensal)}
-              </p>
+<p className="mt-3 text-5xl font-black">
+  {formatarReal(metaInicial)}
+</p>
 
-              <p className="mt-4 text-sm leading-relaxed text-gray-200">
-                Valor aproximado para manter a primeira etapa com 30 crianças
-                gratuitas, considerando transporte, professores, monitores,
-                alimentação, materiais, coordenação e cuidados.
-              </p>
+<p className="mt-4 text-sm leading-relaxed text-gray-200">
+  A primeira meta precisa ser maior porque será usada para colocar o
+  projeto de pé: compra de tatames, kimonos, camisas personalizadas para
+  as crianças, materiais de pintura, estrutura para dança, caixa de som,
+  armazenamento, além de ajudar nos primeiros custos com espaço,
+  professores, lanche e organização.
+</p>
 
+<p className="mt-4 rounded-2xl bg-yellow-300/15 p-4 text-sm font-bold leading-relaxed text-yellow-100 ring-1 ring-yellow-300/30">
+  Depois da implantação inicial, a meta pública passa a ser de{" "}
+  <span className="text-yellow-300">
+    {formatarReal(metaMensalRecorrente)} por mês
+  </span>{" "}
+  para manter transporte, professores, alimentação, reposição de materiais,
+  coordenação e acompanhamento das crianças.
+</p>
               <div className="mt-6 grid grid-cols-2 gap-3">
-                <div className="rounded-2xl bg-white/10 p-4">
-                  <p className="text-3xl font-black">{alunosGratuitos}</p>
-                  <p className="mt-1 text-xs font-bold uppercase text-gray-300">
-                    crianças gratuitas
-                  </p>
-                </div>
+  <div className="rounded-2xl bg-white/10 p-4">
+    <p className="text-3xl font-black">{alunosGratuitos}</p>
+    <p className="mt-1 text-xs font-bold uppercase text-gray-300">
+      crianças gratuitas
+    </p>
+  </div>
 
-                <div className="rounded-2xl bg-white/10 p-4">
-                  <p className="text-3xl font-black">
-                    {formatarReal(custoPorAluno)}
-                  </p>
-                  <p className="mt-1 text-xs font-bold uppercase text-gray-300">
-                    custo estimado por aluno
-                  </p>
-                </div>
-              </div>
+  <div className="rounded-2xl bg-white/10 p-4">
+    <p className="text-3xl font-black">
+      {formatarReal(metaMensalRecorrente)}
+    </p>
+    <p className="mt-1 text-xs font-bold uppercase text-gray-300">
+      meta mensal após implantação
+    </p>
+  </div>
+</div>
             </div>
           </div>
         </div>
@@ -393,6 +404,74 @@ export default function ProjetoRevelaPage() {
           </div>
         </div>
       </section>
+<section className="bg-white px-4 py-12">
+  <div className="mx-auto max-w-6xl">
+    <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+      <div>
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-orange-700">
+          Primeira meta do projeto
+        </p>
+
+        <h2 className="mt-3 text-3xl font-black md:text-4xl">
+          Por que a primeira meta será de R$ 60 mil?
+        </h2>
+
+        <p className="mt-4 text-base leading-relaxed text-gray-700">
+          Antes de manter as aulas mensalmente, o Projeto Hot Dogueres Revela
+          precisa montar a estrutura inicial. Essa primeira arrecadação será
+          destinada à compra dos equipamentos, materiais e itens essenciais
+          para que as crianças possam começar as atividades com segurança,
+          identificação e qualidade.
+        </p>
+
+        <p className="mt-4 text-base leading-relaxed text-gray-700">
+          Depois dessa implantação, a meta volta para{" "}
+          <strong>{formatarReal(metaMensalRecorrente)} por mês</strong>,
+          valor pensado para manter transporte, professores, lanche,
+          reposição de materiais, coordenação e acompanhamento das crianças.
+        </p>
+      </div>
+
+      <div className="rounded-[2rem] bg-[#fff7e8] p-6 shadow-xl ring-1 ring-orange-100">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-orange-700">
+          O que entra nessa primeira etapa
+        </p>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          {[
+            "Tatames para as aulas de judô",
+            "Kimonos para as crianças",
+            "Duas camisas personalizadas por criança",
+            "Tripés, tintas, pincéis e quadros",
+            "Cadeiras e caixas para armazenamento",
+            "Tablado para a equipe de dança",
+            "Caixa de som para as aulas e ensaios",
+            "Aluguel, professores, lanches e primeiros custos",
+          ].map((item) => (
+            <div
+              key={item}
+              className="rounded-2xl bg-white p-4 text-sm font-bold leading-relaxed text-gray-800 shadow-sm ring-1 ring-orange-100"
+            >
+              ✓ {item}
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 rounded-2xl bg-gray-950 p-5 text-white">
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-yellow-300">
+            Comunicação transparente
+          </p>
+
+          <p className="mt-3 text-sm leading-relaxed text-gray-200">
+            A meta inicial de {formatarReal(metaInicial)} é uma etapa de
+            implantação. Ela não substitui a meta mensal do projeto: ela permite
+            que o projeto comece com estrutura mínima para funcionar.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
       <section id="apoie" className="bg-white px-4 py-12">
         <div className="mx-auto max-w-6xl">
@@ -668,10 +747,12 @@ export default function ProjetoRevelaPage() {
             </p>
 
             <p className="mt-3 text-sm leading-relaxed text-gray-800">
-              O planejamento financeiro prevê custo mensal aproximado entre
-              R$ 15.000 e R$ 23.300, com referência média de R$ 19.000 mensais
-              para a primeira etapa. Por isso, a meta mensal pública será
-              arredondada para R$ 20.000.
+             O planejamento financeiro prevê uma primeira meta de implantação de
+R$ 60.000 para compra de equipamentos, materiais, uniformes, estrutura
+inicial e primeiros custos de funcionamento. Após essa etapa inicial, a
+meta mensal pública será de R$ 20.000 para manter transporte, professores,
+alimentação, reposição de materiais, coordenação e acompanhamento das
+crianças.
             </p>
           </div>
         </div>
