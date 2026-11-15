@@ -10,6 +10,7 @@ import { TermometroImpacto } from "@/components/TermometroImpacto";
 import { TermometroRacao } from "@/components/TermometroRacao";
 import SecaoCamisasEventos from "@/components/SecaoCamisasEventos";
 import SecaoIngressosEventos from "@/components/SecaoIngressosEventos";
+import BlocoProjetoRevelaHome from "@/components/BlocoProjetoRevelaHome";
 
 const META_DOACAO_KG = 106000;
 const ALIMENTOS_ARRECADADOS_ATUAL_KG = 0;
@@ -782,6 +783,7 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
           <div className="mt-6 space-y-6">
             <TermometroImpacto />
             <TermometroRacao />
+          <BlocoProjetoRevelaHome />
 
             <section className="flex w-full justify-center pb-8">
               <div className="mx-auto w-full max-w-6xl overflow-hidden rounded-[2rem] border-4 border-red-600 bg-white text-center shadow-2xl">

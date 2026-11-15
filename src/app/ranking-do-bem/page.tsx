@@ -74,12 +74,43 @@ const STATUS_APROVADOS = [
 
 const STATUS_MEMBRO_ATIVO = ["ativo", "active"];
 
+const PONTOS_INGRESSO_APROVADO = 100;
+
+const COTAS_PROJETO_REVELA: RegraPontuacao[] = [
+  {
+    titulo: "Cota 01 - Semente de Talento",
+    pontos: 100,
+    descricao:
+      "Apoio de R$ 100,00 ao Projeto Revela. Pontuação válida para pessoa física e pessoa jurídica após confirmação do pagamento.",
+  },
+  {
+    titulo: "Cota 02 - Incentivador",
+    pontos: 220,
+    descricao:
+      "Apoio de R$ 200,00 ao Projeto Revela. Pontuação válida para pessoa física e pessoa jurídica após confirmação do pagamento.",
+  },
+  {
+    titulo: "Cota 03 - Desenvolvedor",
+    pontos: 380,
+    descricao:
+      "Apoio de R$ 325,00 ao Projeto Revela. Pontuação válida para pessoa física e pessoa jurídica após confirmação do pagamento.",
+  },
+  {
+    titulo: "Cota 04 - Adotante Integral",
+    pontos: 800,
+    descricao:
+      "Apoio de R$ 650,00 ao Projeto Revela. Pontuação válida para pessoa física e pessoa jurídica após confirmação do pagamento.",
+  },
+];
+
 const REGRAS_PESSOA_FISICA: RegraPontuacao[] = [
   {
     titulo: "Compra de ingresso",
-    pontos: 10,
-    descricao: "Cada ingresso comprado e aprovado gera pontos no Ranking do Bem.",
+    pontos: PONTOS_INGRESSO_APROVADO,
+    descricao:
+      "Cada ingresso de R$ 100,00 comprado e aprovado gera 100 pontos no Ranking do Bem.",
   },
+  ...COTAS_PROJETO_REVELA,
   {
     titulo: "Presença confirmada no evento",
     pontos: 50,
@@ -154,11 +185,12 @@ const REGRAS_PESSOA_FISICA: RegraPontuacao[] = [
 ];
 
 const REGRAS_EMPRESAS: RegraPontuacao[] = [
+  ...COTAS_PROJETO_REVELA,
   {
     titulo: "Patrocínio confirmado",
     pontos: 150,
     descricao:
-      "Pontuação inicial para empresas que confirmam patrocínio ou cota de evento no prazo.",
+      "Pontuação inicial para empresas que confirmam patrocínio, cota de evento ou apoio institucional no prazo.",
   },
   {
     titulo: "Presença no evento",
@@ -212,7 +244,8 @@ const REGRAS_EMPRESAS: RegraPontuacao[] = [
 
 const ITENS_CALCULO = [
   "Compra aprovada no Mercado Pago",
-  "Compra de ingresso comum",
+ "Compra de ingresso de R$ 100,00",
+"Cotas do Projeto Revela",
   "Compra de ingresso colecionável",
   "Compra de camisa oficial",
   "Compra de kit solidário",
@@ -312,9 +345,9 @@ function obterPontosKit(valorUnitario: number) {
 }
 
 function calcularPontuacaoUsuario(usuario: UsuarioRankingDb) {
-  const pontosIngressos = usuario.compras_ingressos.reduce((total, compra) => {
-    return total + (compra.quantidade || 0) * 10;
-  }, 0);
+const pontosIngressos = usuario.compras_ingressos.reduce((total, compra) => {
+  return total + (compra.quantidade || 0) * PONTOS_INGRESSO_APROVADO;
+}, 0);
 
   const pontosIngressosEternizados = usuario.compras_ingressos.reduce(
     (total, compra) => {
