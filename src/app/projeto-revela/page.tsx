@@ -141,7 +141,17 @@ export default function ProjetoRevelaPage() {
   const receitaPagantes = alunosPagantes * valorAlunoPagante;
 
   return (
-    <main className="min-h-screen bg-[#fff7e8] text-gray-950">
+    <>
+        <Link
+          href="/"
+          className="fixed left-4 top-1/2 z-50 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white text-2xl font-black text-red-700 shadow-lg ring-1 ring-red-100 transition hover:scale-105 hover:bg-red-50"
+          aria-label="Voltar para a nossa historia"
+          title="Ir para a página ranking do bem"
+        >
+          ←
+        </Link>
+
+      <main className="min-h-screen bg-[#fff7e8] text-gray-950">
       <section className="relative overflow-hidden bg-gradient-to-br from-yellow-300 via-orange-200 to-amber-100 px-4 py-14 md:py-20">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute -left-24 top-10 h-72 w-72 rounded-full bg-white blur-3xl" />
@@ -694,6 +704,7 @@ export default function ProjetoRevelaPage() {
           </div>
         </div>
       </section>
-    </main>
+      </main>
+    </>
   );
 }
