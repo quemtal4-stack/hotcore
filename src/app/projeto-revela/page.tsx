@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SetasNavegacao from "@/components/SetasNavegacao";
+import Image from "next/image";
 
 export const metadata = {
   title: "Projeto Hot Dogueres Revela | Instituto Hot Dogueres",
@@ -158,19 +159,21 @@ const receitaPagantes = alunosPagantes * valorAlunoPagante;
       />
 
       <main className="min-h-screen bg-[#fff7e8] text-gray-950">
-      <section className="relative overflow-hidden bg-gradient-to-br from-yellow-300 via-orange-200 to-amber-100 px-4 py-14 md:py-20">
+      <section className="relative overflow-hidden bg-gradient-to-br from-yellow-300 via-orange-200 to-amber-100 px-3 py-10 sm:px-4 md:py-20">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute -left-24 top-10 h-72 w-72 rounded-full bg-white blur-3xl" />
           <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-orange-500 blur-3xl" />
         </div>
 
-        <div className="relative mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+        <div className="relative mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+
           <div>
             <p className="inline-flex rounded-full bg-white/80 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-orange-700 shadow-sm">
               Instituto Hot Dogueres de Ação Social e Cultural
             </p>
 
-            <h1 className="mt-5 text-4xl font-black leading-tight tracking-tight text-gray-950 md:text-6xl">
+            <h1 className="mt-5 text-3xl font-black leading-tight tracking-tight text-gray-950 sm:text-4xl md:text-6xl">
+
               Projeto Hot Dogueres Revela
             </h1>
 
@@ -201,13 +204,16 @@ const receitaPagantes = alunosPagantes * valorAlunoPagante;
             </div>
           </div>
 
-          <div className="rounded-[2rem] bg-white/85 p-5 shadow-2xl ring-1 ring-white/70 backdrop-blur">
-            <div className="rounded-[1.5rem] bg-gray-950 p-6 text-white">
+          <div className="w-full min-w-0 rounded-[1.5rem] bg-white/85 p-3 shadow-2xl ring-1 ring-white/70 backdrop-blur sm:rounded-[2rem] sm:p-5">
+
+            <div className="min-w-0 rounded-[1.25rem] bg-gray-950 p-4 text-white sm:rounded-[1.5rem] sm:p-6">
+
          <p className="text-sm font-bold uppercase tracking-[0.2em] text-yellow-300">
   Primeira meta de implantação
 </p>
 
-<p className="mt-3 text-5xl font-black">
+<p className="mt-3 break-words text-4xl font-black sm:text-5xl">
+
   {formatarReal(metaInicial)}
 </p>
 
@@ -227,7 +233,8 @@ const receitaPagantes = alunosPagantes * valorAlunoPagante;
   para manter transporte, professores, alimentação, reposição de materiais,
   coordenação e acompanhamento das crianças.
 </p>
-              <div className="mt-6 grid grid-cols-2 gap-3">
+              <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+
   <div className="rounded-2xl bg-white/10 p-4">
     <p className="text-3xl font-black">{alunosGratuitos}</p>
     <p className="mt-1 text-xs font-bold uppercase text-gray-300">
