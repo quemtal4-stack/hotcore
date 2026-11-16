@@ -780,7 +780,7 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
 
           <SecaoCalendario2027 />
 
-          {/* Termômetros flutuantes no canto inferior direito */}
+          
 <div className="fixed bottom-4 right-4 z-50 flex w-[calc(100vw-32px)] max-w-xs flex-col gap-3 sm:max-w-sm">
   <TermometroImpacto />
   <TermometroRacao />
