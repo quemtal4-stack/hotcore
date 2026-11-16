@@ -780,28 +780,26 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
 
           <SecaoCalendario2027 />
 
-      <div className="mt-6 flex w-full min-w-0 flex-col items-center gap-6">
-  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 overflow-hidden sm:max-w-6xl">
-    <TermometroImpacto />
-  </div>
+          <div className="mt-6 flex w-full min-w-0 flex-col items-center gap-6">
+            <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 overflow-hidden sm:max-w-6xl">
+              <TermometroImpacto />
+            </div>
 
-  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 overflow-hidden sm:max-w-6xl">
-    <TermometroRacao />
-  </div>
+            <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 overflow-hidden sm:max-w-6xl">
+              <TermometroRacao />
+            </div>
 
-  <div
-    id="projeto-revela"
-    className="mx-auto flex w-full max-w-[calc(100vw-24px)] min-w-0 justify-center overflow-hidden sm:max-w-6xl"
-  >
-    <BlocoProjetoRevelaHome />
-  </div>
+            <div
+              id="projeto-revela"
+              className="mx-auto flex w-full max-w-[calc(100vw-24px)] min-w-0 justify-center overflow-hidden sm:max-w-6xl"
+            >
+              <BlocoProjetoRevelaHome />
+            </div>
 
-
-  <section className="flex w-full min-w-0 justify-center pb-8">
+            <section className="flex w-full min-w-0 justify-center pb-8">
               <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 overflow-hidden rounded-[1.75rem] border-4 border-red-600 bg-white text-center shadow-2xl sm:max-w-6xl sm:rounded-[2rem]">
-
                 <div className="grid w-full min-w-0 gap-0 lg:grid-cols-[0.85fr_1.15fr]">
-                 <div className="relative flex min-h-[240px] min-w-0 items-center justify-center overflow-hidden bg-gradient-to-br from-red-700 via-red-600 to-yellow-400 p-4 text-center text-white sm:p-6 md:min-h-[260px] md:p-8">
+                  <div className="relative flex min-h-[240px] min-w-0 items-center justify-center overflow-hidden bg-gradient-to-br from-red-700 via-red-600 to-yellow-400 p-4 text-center text-white sm:p-6 md:min-h-[260px] md:p-8">
                     <div className="absolute left-[-80px] top-[-80px] h-56 w-56 rounded-full bg-white/20 blur-3xl" />
                     <div className="absolute bottom-[-100px] right-[-80px] h-64 w-64 rounded-full bg-black/25 blur-3xl" />
 
@@ -814,7 +812,7 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
                         Alerta oficial
                       </p>
 
-                     <h2 className="mt-4 text-center text-3xl font-black leading-tight sm:text-4xl md:text-5xl">
+                      <h2 className="mt-4 text-center text-3xl font-black leading-tight sm:text-4xl md:text-5xl">
                         Cuidado com golpes
                       </h2>
 
@@ -826,22 +824,18 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
                   </div>
 
                   <div className="flex w-full min-w-0 items-center justify-center bg-[#FFF8E7] p-4 text-center sm:p-5 md:p-8">
-
                     <div className="mx-auto w-full max-w-2xl min-w-0 text-center">
                       <p className="inline-flex rounded-full bg-red-100 px-4 py-2 text-center text-xs font-black uppercase tracking-[0.2em] text-red-700">
                         Compra segura
                       </p>
 
                       <h3 className="mx-auto mt-5 max-w-2xl text-center text-2xl font-black leading-tight text-gray-950 sm:text-3xl md:text-4xl">
-
                         Todos os produtos do ecossistema Hot Dogueres são
                         vendidos apenas pelo site oficial.
                       </h3>
 
                       <div className="mx-auto mt-5 w-full max-w-xl min-w-0 rounded-3xl border-2 border-dashed border-red-300 bg-white p-4 shadow-inner sm:p-5">
-
-                       <p className="break-all text-center text-lg font-black text-red-700 min-[380px]:text-xl sm:break-words sm:text-2xl md:text-3xl">
-
+                        <p className="break-all text-center text-lg font-black text-red-700 min-[380px]:text-xl sm:break-words sm:text-2xl md:text-3xl">
                           www.hotdogueres.com.br
                         </p>
                       </div>
@@ -874,7 +868,6 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
                       </div>
 
                       <div className="mx-auto mt-6 w-full max-w-2xl min-w-0 rounded-3xl bg-gray-950 p-4 text-center text-white shadow-xl sm:p-5">
-
                         <p className="text-sm font-black uppercase tracking-[0.2em] text-yellow-300">
                           Regra de segurança
                         </p>
@@ -898,9 +891,7 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
           </div>
 
           <div className="mx-auto mt-6 grid w-full max-w-6xl min-w-0 justify-items-center gap-5 lg:grid-cols-2">
-
             <article className="w-full max-w-xl rounded-[2rem] bg-white p-5 text-center shadow-xl ring-1 ring-red-100 lg:max-w-none">
-
               <p className="inline-flex rounded-full bg-red-600 px-4 py-2 text-xs font-black uppercase tracking-wide text-white">
                 Primeiro evento
               </p>
@@ -934,45 +925,43 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
               </Link>
             </article>
 
-          <article className="w-full max-w-xl rounded-[2rem] bg-white p-5 text-center shadow-xl ring-1 ring-yellow-200 lg:max-w-none">
+            <article className="w-full max-w-xl rounded-[2rem] bg-white p-5 text-center shadow-xl ring-1 ring-yellow-200 lg:max-w-none">
+              <p className="inline-flex rounded-full bg-yellow-400 px-4 py-2 text-xs font-black uppercase tracking-wide text-gray-950">
+                Segundo evento
+              </p>
 
-  <p className="inline-flex rounded-full bg-yellow-400 px-4 py-2 text-xs font-black uppercase tracking-wide text-gray-950">
-    Segundo evento
-  </p>
+              <h2 className="mt-4 text-2xl font-black leading-tight text-gray-950">
+                Hot Dogueres City Quest 2027
+              </h2>
 
-  <h2 className="mt-4 text-2xl font-black leading-tight text-gray-950">
-    Hot Dogueres City Quest 2027
-  </h2>
+              <p className="mt-3 text-sm leading-relaxed text-gray-700">
+                Uma gincana urbana em municípios de Sergipe, com desafios, participação
+                popular e metas solidárias por cidade. Garanta seu ingresso e participe
+                dessa jornada do bem.
+              </p>
 
-  <p className="mt-3 text-sm leading-relaxed text-gray-700">
-    Uma gincana urbana em municípios de Sergipe, com desafios, participação
-    popular e metas solidárias por cidade. Garanta seu ingresso e participe
-    dessa jornada do bem.
-  </p>
+              <div className="relative mt-5 h-72 overflow-hidden rounded-[1.5rem] bg-gray-50 shadow-inner">
+                <Image
+                  src="/ingressos/hot-dogueres-city-quest-2027-01.png"
+                  alt="Ingresso Hot Dogueres City Quest 2027"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 520px"
+                  className="object-contain p-3"
+                  unoptimized
+                />
+              </div>
 
-  <div className="relative mt-5 h-72 overflow-hidden rounded-[1.5rem] bg-gray-50 shadow-inner">
-    <Image
-      src="/ingressos/hot-dogueres-city-quest-2027-01.png"
-      alt="Ingresso Hot Dogueres City Quest 2027"
-      fill
-      sizes="(max-width: 1024px) 100vw, 520px"
-      className="object-contain p-3"
-      unoptimized
-    />
-  </div>
+              <Link
+                href="/cadastro?tipo=ingresso-solidario-colecionavel&produto=hot-dogueres-city-quest-2027-01&titulo=Hot%20Dogueres%20City%20Quest%202027%20-%201%C2%BA%20munic%C3%ADpio%20de%20Sergipe&ingressos=1&quantidadeTotal=1&kgAlimentos=1&valor=20"
+                className="mt-5 flex w-full justify-center rounded-full bg-yellow-400 px-5 py-3 text-xs font-black uppercase tracking-wide text-gray-950 shadow-lg transition hover:bg-yellow-500"
+              >
+                Comprar ingresso City Quest
+              </Link>
+            </article>
 
-  <Link
-    href="/cadastro?tipo=ingresso-solidario-colecionavel&produto=hot-dogueres-city-quest-2027-01&titulo=Hot%20Dogueres%20City%20Quest%202027%20-%201%C2%BA%20munic%C3%ADpio%20de%20Sergipe&ingressos=1&quantidadeTotal=1&kgAlimentos=1&valor=20"
-    className="mt-5 flex w-full justify-center rounded-full bg-yellow-400 px-5 py-3 text-xs font-black uppercase tracking-wide text-gray-950 shadow-lg transition hover:bg-yellow-500"
-  >
-    Comprar ingresso City Quest
-  </Link>
-</article>
-
-
-<div className="col-span-full mx-auto w-full max-w-6xl min-w-0 overflow-hidden">
-  <SecaoCamisasEventos />
-</div>
+            <div className="col-span-full mx-auto grid w-full max-w-6xl min-w-0 gap-5 overflow-visible md:grid-cols-2">
+              <SecaoCamisasEventos />
+            </div>
           </div>
 
           <div className="mt-6 rounded-[2rem] bg-gray-950 p-5 text-white shadow-xl md:p-8">
@@ -1032,10 +1021,10 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
         </div>
       </section>
 
-  <div
-  id="ingressos"
-  className="mx-auto w-full max-w-6xl scroll-mt-28 space-y-8 px-4 pb-8"
->
+      <div
+        id="ingressos"
+        className="mx-auto w-full max-w-6xl scroll-mt-28 space-y-8 px-4 pb-8"
+      >
   <div className="mx-auto w-full max-w-6xl">
     <SecaoIngressosEventos
       kgDoados={kgAlimentosTermometro}

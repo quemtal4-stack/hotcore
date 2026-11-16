@@ -34,10 +34,10 @@ const CAMISAS_EVENTOS: CamisaEvento[] = [
   {
     id: "camisa-hot-dogueres-salva-vidas-2027",
     titulo: "Camisa Hot Dogueres Salva Vidas",
-    projeto: "Projeto Hot Dogueres Salva Vidas",
+    projeto:"HEMOSE",
     descricao:
       "Camisa oficial do projeto. A compra será feita pelo site e a retirada acontecerá no local do evento.",
-    imagem: "/camisas/camisa-ecossistema-hot-dogueres-apresentacao.png",
+    imagem: "/camisas/camisa-gastronomia-que-salva-vidas.png",
     valor: VALOR_PADRAO_CAMISA_EVENTO,
     dataEvento: "2027-01-25T17:00:00-03:00",
     localRetirada: "Local do evento — endereço será confirmado na página oficial.",
