@@ -33,7 +33,7 @@ export default function TermometroHotDogueres({
           </p>
 
           <h2 className="mt-4 text-3xl font-black leading-tight text-gray-950 md:text-5xl">
-            104 toneladas de alimento
+            106 toneladas de alimento
           </h2>
 
           <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-gray-700 md:text-base">
