@@ -20,6 +20,7 @@
     "prisma:studio": "prisma studio"
   },
   "dependencies": {
+    "@mercadopago/sdk-js": "^0.0.3",
     "@prisma/adapter-pg": "6.19.3",
     "@prisma/client": "6.19.3",
     "@supabase/ssr": "^0.12.7",

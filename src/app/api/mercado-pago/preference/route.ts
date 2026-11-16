@@ -587,6 +587,8 @@ export async function POST(request: Request) {
       external_reference: pedidoReferencia,
       mercado_pago_preference_id: result.id,
       mercado_pago_init_point: urlCheckout,
+cpf: cpfLimpo || null,
+cpf_comprador: cpfLimpo || null,
 
       tipo,
       categoria,

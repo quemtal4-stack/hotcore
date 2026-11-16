@@ -885,12 +885,14 @@ async function processarNotificacao(request: Request) {
     if (externalReference) {
       const { data, error } = await supabaseAdmin
         .from("pedidos")
-        .update({
-          payment_id: String(notificationId),
-          status: statusPedido,
-          mercado_pago_metadata: pagamentoJson,
-          updated_at: new Date().toISOString(),
-        })
+.update({
+  payment_id: String(notificationId),
+  mercado_pago_payment_id: String(notificationId),
+  status: statusPedido,
+  mercado_pago_metadata: pagamentoJson,
+  updated_at: new Date().toISOString(),
+})
+
         .eq("external_reference", externalReference)
         .select()
         .maybeSingle();
