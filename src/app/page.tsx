@@ -597,7 +597,8 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
   }, []);
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#fff7e8] text-gray-950">
+    <main className="min-h-screen overflow-x-hidden bg-[#fff7e8] pb-40 text-gray-950 sm:pb-48">
+
       <SetasNavegacao
         proxima="/nossa-historia"
         labelProxima="Ir para Nossa História"
@@ -780,19 +781,22 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
 
           <SecaoCalendario2027 />
 
-          
-<div className="fixed bottom-4 right-4 z-50 flex w-[calc(100vw-32px)] max-w-xs flex-col gap-3 sm:max-w-sm">
-  <TermometroImpacto />
-  <TermometroRacao />
-</div>
+   <div className="mt-6 flex w-full min-w-0 flex-col items-center gap-6">
+  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 overflow-hidden sm:max-w-6xl">
+    <TermometroImpacto />
+  </div>
 
-<div className="mt-6 flex w-full min-w-0 flex-col items-center gap-6">
+  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 overflow-hidden sm:max-w-6xl">
+    <TermometroRacao />
+  </div>
+
   <div
     id="projeto-revela"
     className="mx-auto flex w-full max-w-[calc(100vw-24px)] min-w-0 justify-center overflow-hidden sm:max-w-6xl"
   >
     <BlocoProjetoRevelaHome />
   </div>
+
 
 
             <section className="flex w-full min-w-0 justify-center pb-8">
