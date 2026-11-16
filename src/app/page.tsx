@@ -597,7 +597,8 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
   }, []);
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#fff7e8] text-gray-950">
+    <main className="min-h-screen overflow-x-hidden bg-[#fff7e8] pb-40 text-gray-950 sm:pb-48">
+
       <SetasNavegacao
         proxima="/nossa-historia"
         labelProxima="Ir para Nossa História"
@@ -780,13 +781,23 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
 
           <SecaoCalendario2027 />
 
-          <div className="mt-6 flex w-full min-w-0 flex-col items-center gap-6">
-            <div
-              id="projeto-revela"
-              className="mx-auto flex w-full max-w-[calc(100vw-24px)] min-w-0 justify-center overflow-hidden sm:max-w-6xl"
-            >
-              <BlocoProjetoRevelaHome />
-            </div>
+   <div className="mt-6 flex w-full min-w-0 flex-col items-center gap-6">
+  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 overflow-hidden sm:max-w-6xl">
+    <TermometroImpacto />
+  </div>
+
+  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 overflow-hidden sm:max-w-6xl">
+    <TermometroRacao />
+  </div>
+
+  <div
+    id="projeto-revela"
+    className="mx-auto flex w-full max-w-[calc(100vw-24px)] min-w-0 justify-center overflow-hidden sm:max-w-6xl"
+  >
+    <BlocoProjetoRevelaHome />
+  </div>
+
+
 
             <section className="flex w-full min-w-0 justify-center pb-8">
               <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 overflow-hidden rounded-[1.75rem] border-4 border-red-600 bg-white text-center shadow-2xl sm:max-w-6xl sm:rounded-[2rem]">
@@ -1013,26 +1024,22 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
         </div>
       </section>
 
-      <section id="ingressos" className="scroll-mt-28 px-4 pb-8">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 lg:flex-row lg:items-start">
-          <div className="flex-1 space-y-8">
-            <SecaoIngressosEventos
-              kgDoados={kgAlimentosTermometro}
-              metaKg={META_DOACAO_KG}
-              ingressosVendidos={ingressosVendidosParaExibicao}
-            />
+      <div
+        id="ingressos"
+        className="mx-auto w-full max-w-6xl scroll-mt-28 space-y-8 px-4 pb-8"
+      >
+  <div className="mx-auto w-full max-w-6xl">
+    <SecaoIngressosEventos
+      kgDoados={kgAlimentosTermometro}
+      metaKg={META_DOACAO_KG}
+      ingressosVendidos={ingressosVendidosParaExibicao}
+    />
+  </div>
 
-            <SecaoIngressosColecionaveis />
-          </div>
-
-          <aside className="w-full shrink-0 lg:sticky lg:top-24 lg:w-80">
-            <div className="space-y-4 rounded-3xl bg-white p-5 shadow-xl">
-              <TermometroImpacto />
-              <TermometroRacao />
-            </div>
-          </aside>
-        </div>
-      </section>
+     <div className="mx-auto w-full max-w-6xl">
+    <SecaoIngressosColecionaveis />
+  </div>
+</div>
 
       <section id="livros" className="scroll-mt-28 px-4 pb-8">
         <div className="mx-auto w-full max-w-6xl min-w-0 overflow-hidden rounded-[2rem] border-4 border-red-600 bg-white p-5 shadow-2xl md:p-6">
