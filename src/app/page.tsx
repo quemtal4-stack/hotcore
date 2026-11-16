@@ -1032,11 +1032,11 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
         </div>
       </section>
 
- <div
+  <div
   id="ingressos"
-  className="mx-auto w-full max-w-6xl min-w-0 scroll-mt-28 space-y-8 overflow-hidden px-3 pb-8 sm:px-4"
+  className="mx-auto w-full max-w-6xl scroll-mt-28 space-y-8 px-4 pb-8"
 >
-  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 overflow-hidden sm:max-w-6xl">
+  <div className="mx-auto w-full max-w-6xl">
     <SecaoIngressosEventos
       kgDoados={kgAlimentosTermometro}
       metaKg={META_DOACAO_KG}
@@ -1044,7 +1044,7 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
     />
   </div>
 
-  <div className="mx-auto w-full max-w-[calc(100vw-24px)] min-w-0 overflow-hidden sm:max-w-6xl">
+     <div className="mx-auto w-full max-w-6xl">
     <SecaoIngressosColecionaveis />
   </div>
 </div>
@@ -1098,7 +1098,7 @@ const kgAlimentosSelecionados = KITS_ALIMENTOS.reduce((total, kit) => {
             </div>
           </div>
 
-         <div className="mx-auto mt-6 grid w-full max-w-[calc(100vw-24px)] grid-cols-2 justify-items-stretch gap-3 sm:max-w-6xl sm:gap-4 lg:grid-cols-3">
+        <div className="mx-auto mt-6 grid w-full gap-4 md:grid-cols-2 lg:grid-cols-3">
 
             <input type="checkbox" id="toggle-livros-mobile" className="peer hidden" />
 
