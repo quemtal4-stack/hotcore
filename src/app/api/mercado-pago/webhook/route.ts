@@ -40,7 +40,7 @@ const PLANOS_CLUBE = {
   },
   eternizado: {
     nome: "Eternizados",
-    valor: 499.90,
+    valor: 499.9,
     periodicidade: "anual",
     kgAlimentos: 14,
   },
@@ -395,7 +395,11 @@ function montarIngressosDaCompra(params: {
     updated_at: new Date().toISOString(),
   }));
 
-  if (params.sextoIngresso || quantidade >= 6 || params.nomeIngressoEternizado) {
+  if (
+    params.sextoIngresso ||
+    quantidade >= 6 ||
+    params.nomeIngressoEternizado
+  ) {
     const ingressoEternizado = ingressosColecao.find(
       (ingresso) => ingresso.especial,
     );
@@ -552,7 +556,9 @@ async function atualizarMembroClube(params: {
       .eq("external_reference", params.externalReference);
 
     if (error) {
-      throw new Error(`Erro ao atualizar membro por referência: ${error.message}`);
+      throw new Error(
+        `Erro ao atualizar membro por referência: ${error.message}`,
+      );
     }
   }
 
@@ -563,7 +569,9 @@ async function atualizarMembroClube(params: {
       .eq("mercado_pago_preapproval_id", params.preapprovalId);
 
     if (error) {
-      throw new Error(`Erro ao atualizar membro por preapproval: ${error.message}`);
+      throw new Error(
+        `Erro ao atualizar membro por preapproval: ${error.message}`,
+      );
     }
   }
 }
@@ -630,7 +638,9 @@ async function registrarPedidoClubeAprovado(params: {
     .maybeSingle();
 
   if (erroBuscaPedido) {
-    throw new Error(`Erro ao buscar pedido do clube: ${erroBuscaPedido.message}`);
+    throw new Error(
+      `Erro ao buscar pedido do clube: ${erroBuscaPedido.message}`,
+    );
   }
 
   if (pedidoExistente) {
@@ -661,7 +671,9 @@ async function registrarPedidoClubeAprovado(params: {
       .eq("id", pedidoExistente.id);
 
     if (erroUpdatePedido) {
-      throw new Error(`Erro ao atualizar pedido do clube: ${erroUpdatePedido.message}`);
+      throw new Error(
+        `Erro ao atualizar pedido do clube: ${erroUpdatePedido.message}`,
+      );
     }
 
     return {
@@ -670,34 +682,38 @@ async function registrarPedidoClubeAprovado(params: {
     };
   }
 
-  const { error: erroInsertPedido } = await supabaseAdmin.from("pedidos").insert({
-    external_reference: externalReferencePedido,
-    payment_id: params.paymentId,
+  const { error: erroInsertPedido } = await supabaseAdmin
+    .from("pedidos")
+    .insert({
+      external_reference: externalReferencePedido,
+      payment_id: params.paymentId,
 
-    status: params.statusPedido,
-    tipo: "clube_membro",
-    categoria: "clube",
-    produto: metadataPedido.produto,
-    plano: params.plano,
+      status: params.statusPedido,
+      tipo: "clube_membro",
+      categoria: "clube",
+      produto: metadataPedido.produto,
+      plano: params.plano,
 
-    nome_comprador: metadataPedido.nome,
-    email_comprador: metadataPedido.email,
-    whatsapp: params.telefone || null,
+      nome_comprador: metadataPedido.nome,
+      email_comprador: metadataPedido.email,
+      whatsapp: params.telefone || null,
 
-    quantidade: 1,
-    valor_unitario: valor,
-    valor_frete: 0,
-    total_produtos: valor,
-    total_pedido: valor,
+      quantidade: 1,
+      valor_unitario: valor,
+      valor_frete: 0,
+      total_produtos: valor,
+      total_pedido: valor,
 
-    mercado_pago_metadata: params.pagamentoJson,
-    metadata: metadataPedido,
-    created_at: agora,
-    updated_at: agora,
-  });
+      mercado_pago_metadata: params.pagamentoJson,
+      metadata: metadataPedido,
+      created_at: agora,
+      updated_at: agora,
+    });
 
   if (erroInsertPedido) {
-    throw new Error(`Erro ao inserir pedido do clube: ${erroInsertPedido.message}`);
+    throw new Error(
+      `Erro ao inserir pedido do clube: ${erroInsertPedido.message}`,
+    );
   }
 
   return {
@@ -743,6 +759,41 @@ async function processarPreApproval(params: {
     plano,
     assinatura: assinaturaJson,
   });
+}
+
+async function buscarPedidoPorReferenciaOuPaymentId(
+  externalReference: string,
+  notificationId: string,
+) {
+  if (externalReference) {
+    const { data, error } = await supabaseAdmin
+      .from("pedidos")
+      .select("id, external_reference, payment_id, mercado_pago_payment_id")
+      .eq("external_reference", externalReference)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Erro ao buscar pedido por external_reference: ${error.message}`);
+    }
+
+    if (data) {
+      return data;
+    }
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from("pedidos")
+    .select("id, external_reference, payment_id, mercado_pago_payment_id")
+    .or(
+      `payment_id.eq.${notificationId},mercado_pago_payment_id.eq.${notificationId}`,
+    )
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(`Erro ao buscar pedido por payment_id: ${error.message}`);
+  }
+
+  return data;
 }
 
 async function processarNotificacao(request: Request) {
@@ -860,7 +911,9 @@ async function processarNotificacao(request: Request) {
     const preapprovalId =
       textoSeguro(pagamentoJson.preapproval_id) ||
       textoSeguro(pagamentoJson.preapproval) ||
-      textoSeguro((pagamentoJson.preapproval as Record<string, unknown>)?.id);
+      textoSeguro(
+        (pagamentoJson.preapproval as Record<string, unknown>)?.id,
+      );
 
     const statusPedido = converterStatusMercadoPago(status);
 
@@ -882,18 +935,22 @@ async function processarNotificacao(request: Request) {
 
     let pedidoAtualizado = null;
 
-    if (externalReference) {
+    const pedidoEncontrado = await buscarPedidoPorReferenciaOuPaymentId(
+      externalReference,
+      notificationId,
+    );
+
+    if (pedidoEncontrado?.id) {
       const { data, error } = await supabaseAdmin
         .from("pedidos")
-.update({
-  payment_id: String(notificationId),
-  mercado_pago_payment_id: String(notificationId),
-  status: statusPedido,
-  mercado_pago_metadata: pagamentoJson,
-  updated_at: new Date().toISOString(),
-})
-
-        .eq("external_reference", externalReference)
+        .update({
+          payment_id: String(notificationId),
+          mercado_pago_payment_id: String(notificationId),
+          status: statusPedido,
+          mercado_pago_metadata: pagamentoJson,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", pedidoEncontrado.id)
         .select()
         .maybeSingle();
 
@@ -912,13 +969,11 @@ async function processarNotificacao(request: Request) {
       }
 
       pedidoAtualizado = data;
-
-      if (!pedidoAtualizado) {
-        console.log("Nenhum pedido encontrado com external_reference:", {
-          externalReference,
-          paymentId: notificationId,
-        });
-      }
+    } else {
+      console.log("Nenhum pedido encontrado para:", {
+        externalReference,
+        paymentId: notificationId,
+      });
     }
 
     let membroClube = null;
@@ -963,7 +1018,8 @@ async function processarNotificacao(request: Request) {
               textoSeguro(metadata.emailComprador) ||
               payerEmail,
             telefone:
-              textoSeguro(metadata.telefone) || textoSeguro(metadata.whatsapp),
+              textoSeguro(metadata.telefone) ||
+              textoSeguro(metadata.whatsapp),
             statusPedido,
             transactionAmount,
             pagamentoJson,
