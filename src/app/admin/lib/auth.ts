@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabaseServer";
 
-function parseAdminEmails() {
+export function parseAdminEmails(): string[] {
   const emails = process.env.ADMIN_EMAILS || "";
   return emails
     .split(",")
@@ -9,19 +9,18 @@ function parseAdminEmails() {
     .filter(Boolean);
 }
 
-export async function verificarAdmin(next = "/admin") {
+export async function verificarAdmin(redirectTo: string = "/admin/login") {
   const supabase = await createClient();
+  const { data } = await supabase.auth.getUser();
 
-  const { data, error } = await supabase.auth.getUser();
-
-  if (error || !data.user) {
-    redirect(`/admin/login?next=${encodeURIComponent(next)}`);
+  if (!data.user) {
+    redirect(`/admin/login?redirect=${encodeURIComponent(redirectTo)}`);
   }
 
   const adminEmails = parseAdminEmails();
-  const userEmail = data.user.email?.toLowerCase();
+  const userEmail = data.user.email?.toLowerCase() || "";
 
-  if (adminEmails.length > 0 && !adminEmails.includes(userEmail || "")) {
+  if (adminEmails.length > 0 && !adminEmails.includes(userEmail)) {
     redirect("/admin/login?erro=nao-autorizado");
   }
 
