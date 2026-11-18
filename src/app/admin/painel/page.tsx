@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabaseServer";
 import Link from "next/link";
 import AdminHeader from "../_components/AdminHeader";
-
+import { verificarAdmin } from "../lib/auth";
 
 const cards = [
   {
@@ -71,13 +70,7 @@ const indicadores = [
 ];
 
 export default async function AdminPainelPage() {
-  const supabase = await createClient();
-const { data } = await supabase.auth.getUser();
-
-if (!data.user) {
-  redirect("/admin/login");
-}
-
+  const usuario = await verificarAdmin("/admin/painel");
 
   return (
     <main className="min-h-screen bg-[#FFF8E7] px-4 py-8 text-gray-950 md:px-8">
@@ -85,6 +78,7 @@ if (!data.user) {
         <AdminHeader
           titulo="Painel Administrativo"
           descricao="Visão geral da Hot Dogueres: pedidos, produtos, impacto social, lives, clube de membros e programas mensais."
+          usuario={usuario}
         />
 
         <section className="mt-8 grid gap-4 md:grid-cols-4">

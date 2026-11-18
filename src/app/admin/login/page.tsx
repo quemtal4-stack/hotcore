@@ -2,11 +2,26 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabaseServer";
 import { LoginForm } from "./LoginForm";
 
+function parseAdminEmails() {
+  const emails = process.env.ADMIN_EMAILS || "";
+  return emails
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+}
+
 export default async function AdminLoginPage() {
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
 
   if (data.user) {
+    const adminEmails = parseAdminEmails();
+    const userEmail = data.user.email?.toLowerCase();
+
+    if (adminEmails.length > 0 && !adminEmails.includes(userEmail || "")) {
+      redirect("/admin/login?erro=nao-autorizado");
+    }
+
     redirect("/admin/painel");
   }
 

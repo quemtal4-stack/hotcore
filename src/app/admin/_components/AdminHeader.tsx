@@ -23,7 +23,7 @@ const links = [
   { href: "/admin/produtos", label: "Produtos" },
   { href: "/admin/impacto-social", label: "Impacto Social" },
   { href: "/admin/lives", label: "Lives" },
-  { href: "/admin/testes-compra", label: "Teste Compra" },
+  { href: "/admin/teste-compra", label: "Teste Compra" },
 ];
 
 export function AdminHeader({
