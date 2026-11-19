@@ -9,23 +9,42 @@ function parseAdminEmails(): string[] {
     .filter(Boolean);
 }
 
+const PUBLIC_ADMIN_ROUTES = [
+  "/admin/login",
+  "/admin/resetar-senha",
+  "/admin/resetar-senha/atualizar",
+];
+
 export default async function AdminLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params?: Promise<{ slug?: string[] }>;
 }) {
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getUser();
+  const pathname =
+    typeof window === "undefined"
+      ? `/admin/${(await params)?.slug?.join("/") || ""}`
+      : window.location.pathname;
 
-  if (!data.user) {
-    redirect("/admin/login");
-  }
+  const isPublicRoute = PUBLIC_ADMIN_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`),
+  );
 
-  const adminEmails = parseAdminEmails();
-  const userEmail = data.user.email?.toLowerCase() || "";
+  if (!isPublicRoute) {
+    const supabase = await createClient();
+    const { data } = await supabase.auth.getUser();
 
-  if (adminEmails.length > 0 && !adminEmails.includes(userEmail)) {
-    redirect("/admin/login?erro=nao-autorizado");
+    if (!data.user) {
+      redirect("/admin/login");
+    }
+
+    const adminEmails = parseAdminEmails();
+    const userEmail = data.user.email?.toLowerCase() || "";
+
+    if (adminEmails.length > 0 && !adminEmails.includes(userEmail)) {
+      redirect("/admin/login?erro=nao-autorizado");
+    }
   }
 
   return <>{children}</>;
