@@ -14,20 +14,62 @@ export default function AtualizarSenhaPage() {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    // O Supabase envia o token de recuperação na hash da URL
-    const hash = window.location.hash.substring(1);
-    const params = new URLSearchParams(hash);
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
 
-    const token = params.get("access_token");
-    const refresh = params.get("refresh_token");
+    async function validarSessaoRecuperacao() {
+      // O Supabase pode enviar o token na hash (#) ou na query string (?)
+      const hash = window.location.hash.substring(1);
+      const search = window.location.search.substring(1);
 
-    if (!token) {
-      setError("Link de recuperação inválido ou expirado.");
-      return;
+      const hashParams = new URLSearchParams(hash);
+      const searchParams = new URLSearchParams(search);
+
+      const token =
+        hashParams.get("access_token") || searchParams.get("access_token");
+      const refresh =
+        hashParams.get("refresh_token") || searchParams.get("refresh_token");
+      const type =
+        hashParams.get("type") || searchParams.get("type");
+
+      // Se já houver uma sessão ativa de recuperação, podemos usar ela diretamente
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (session) {
+        setAccessToken(session.access_token);
+        setRefreshToken(session.refresh_token);
+        return;
+      }
+
+      // Se não houver sessão, exige o token na URL
+      if (!token) {
+        setError("Link de recuperação inválido ou expirado.");
+        return;
+      }
+
+      // Tenta estabelecer a sessão a partir do token da URL
+      const { error: setSessionError } = await supabase.auth.setSession({
+        access_token: token,
+        refresh_token: refresh || "",
+      });
+
+      if (setSessionError) {
+        setError(
+          "Não foi possível validar o link de recuperação. Ele pode ter expirado."
+        );
+        return;
+      }
+
+      setAccessToken(token);
+      setRefreshToken(refresh);
     }
 
-    setAccessToken(token);
-    setRefreshToken(refresh);
+    validarSessaoRecuperacao();
   }, []);
 
   async function handleSubmit(event: React.FormEvent) {
@@ -45,11 +87,6 @@ export default function AtualizarSenhaPage() {
       return;
     }
 
-    if (!accessToken) {
-      setError("Token de recuperação não encontrado.");
-      return;
-    }
-
     setLoading(true);
 
     try {
@@ -58,15 +95,12 @@ export default function AtualizarSenhaPage() {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       );
 
-      // Define a sessão com o token de recuperação
-      const { error: sessionError } = await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken || "",
-      });
-
-      if (sessionError) {
-        setError(sessionError.message);
-        return;
+      // Se não houver sessão ativa, tenta estabelecer com o token salvo
+      if (accessToken) {
+        await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken || "",
+        });
       }
 
       // Atualiza a senha do usuário
@@ -81,7 +115,9 @@ export default function AtualizarSenhaPage() {
 
       setSuccess(true);
 
-      // Redireciona para o login do admin após alguns segundos
+      // Encerra a sessão temporária de recuperação e redireciona para o login
+      await supabase.auth.signOut();
+
       setTimeout(() => {
         window.location.href = "/admin/login";
       }, 3000);
@@ -163,7 +199,7 @@ export default function AtualizarSenhaPage() {
 
             <button
               type="submit"
-              disabled={loading || !accessToken}
+              disabled={loading || (!accessToken && !success)}
               className="w-full rounded-xl bg-red-700 px-4 py-3 font-black text-white transition hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? "Atualizando..." : "Atualizar senha"}
