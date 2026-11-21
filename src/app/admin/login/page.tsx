@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+﻿import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabaseServer";
 import { LoginForm } from "./LoginForm";
 
@@ -29,7 +29,7 @@ export default async function AdminLoginPage() {
     <main className="flex min-h-screen items-center justify-center bg-[#FFF8E7] p-4">
       <div className="w-full max-w-md rounded-[2rem] bg-white p-8 shadow-xl">
         <p className="text-center text-sm font-black uppercase tracking-[0.2em] text-red-700">
-          Área Restrita
+          Ãrea Restrita
         </p>
 
         <h1 className="mt-4 text-center text-3xl font-black text-gray-950">
@@ -45,3 +45,4 @@ export default async function AdminLoginPage() {
     </main>
   );
 }
+
