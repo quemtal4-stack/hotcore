@@ -142,7 +142,7 @@ function linkIngresso(nome: string, slug: string, colecionar = false) {
 
 export default function ProjetoRevelaPage() {
 const metaInicial = 60000;
-const metaMensalRecorrente = 20000;
+const metaMensalRecorrente = 25000;
 const custoPorAluno = 650;
 const alunosGratuitos = 30;
 const alunosPagantes = 60;
@@ -757,7 +757,7 @@ const receitaPagantes = alunosPagantes * valorAlunoPagante;
              O planejamento financeiro prevê uma primeira meta de implantação de
 R$ 60.000 para compra de equipamentos, materiais, uniformes, estrutura
 inicial e primeiros custos de funcionamento. Após essa etapa inicial, a
-meta mensal pública será de R$ 20.000 para manter transporte, professores,
+meta mensal pública será de R$ 25.000 para manter transporte, professores,
 alimentação, reposição de materiais, coordenação e acompanhamento das
 crianças.
             </p>

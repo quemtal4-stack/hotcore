@@ -102,7 +102,7 @@ export default function BlocoProjetoRevelaHome() {
                 </p>
 
                 <p className="mt-2 text-sm font-black leading-relaxed">
-                  A partir do segundo mês, a meta volta para R$ 20.000/mês para
+                  A partir do segundo mês, a meta volta para R$ 25.000/mês para
                   manter transporte, professores, alimentação, reposição de
                   materiais, coordenação e acompanhamento das crianças.
                 </p>
@@ -196,7 +196,7 @@ export default function BlocoProjetoRevelaHome() {
                   <p className="mt-2 text-sm font-bold leading-relaxed text-white/85">
                     A meta de R$ 60 mil é apenas a primeira etapa. Ela permite
                     comprar os materiais e iniciar as aulas. Depois, a
-                    manutenção mensal será de R$ 20 mil.
+                    manutenção mensal será de R$ 25 mil.
                   </p>
                 </div>
 
