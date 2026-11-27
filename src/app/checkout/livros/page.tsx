@@ -216,47 +216,95 @@ function CheckoutLivrosConteudo() {
     setErro("");
     setCarregando(true);
 
+    const cpfLimpo = limparNumeros(dados.cpf);
+    const telefoneLimpo = limparNumeros(dados.telefone);
+    const cepLimpo =
+      formaEntrega === "receber-casa" ? limparNumeros(dados.cep) : "";
+
+    const enderecoEntrega =
+      formaEntrega === "receber-casa"
+        ? {
+            cep: cepLimpo,
+            endereco: dados.endereco.trim(),
+            numero: dados.numero.trim(),
+            complemento: dados.complemento.trim(),
+            bairro: dados.bairro.trim(),
+            cidade: dados.cidade.trim(),
+            estado: dados.estado.trim().toUpperCase(),
+            observacoes: dados.observacoes.trim(),
+          }
+        : null;
+
+    const observacaoPedido = `Produto em pré-venda. Entrega conforme prazo informado na página do produto. Forma de entrega: ${formaEntregaTexto}. Frete: ${formatarMoeda(valorFrete)}.`;
+
     try {
-      const resposta = await fetch("/api/mercado-pago/checkout", {
+      const resposta = await fetch("/api/mercado-pago/preference", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          // Tipo e identificação do produto
           tipo: "livro-pre-venda",
           produto,
           titulo,
           quantidade: 1,
-          valor: valorTotal,
-          valorLivro: valor,
-          frete: valorFrete,
-          tipoPreco,
-          livro,
+
+          // Valores — a API espera no nível superior
+          valor: valor,
+          valorUnitario: valor,
+          valorFrete: valorFrete,
+          total: valorTotal,
+          totalPedido: valorTotal,
+
+          // Dados do comprador — a API espera no nível superior
+          nomeComprador: dados.nome.trim(),
+          emailComprador: dados.email.trim().toLowerCase(),
+          cpfComprador: cpfLimpo,
+          whatsappComprador: telefoneLimpo,
+
+          // Entrega
           entrega,
+          modalidadeEntrega: formaEntrega,
           formaEntrega,
           formaEntregaTexto,
+          retiradaNoLocal:
+            formaEntrega === "retirada-local" ||
+            formaEntrega === "retirada-evento",
+
+          // Metadados extras específicos do livro
+          metadataExtra: {
+            tipoPreco,
+            livro,
+            entrega,
+            formaEntrega,
+            formaEntregaTexto,
+            valorLivro: valor,
+            observacaoPedido,
+            enderecoEntrega,
+          },
+
+          // Mantém também o formato aninhado como fallback
           comprador: {
             nome: dados.nome.trim(),
-            cpf: limparNumeros(dados.cpf),
-            email: dados.email.trim(),
-            telefone: limparNumeros(dados.telefone),
+            cpf: cpfLimpo,
+            email: dados.email.trim().toLowerCase(),
+            telefone: telefoneLimpo,
           },
-          entregaEndereco:
-            formaEntrega === "receber-casa"
-              ? {
-                  cep: limparNumeros(dados.cep),
-                  endereco: dados.endereco.trim(),
-                  numero: dados.numero.trim(),
-                  complemento: dados.complemento.trim(),
-                  bairro: dados.bairro.trim(),
-                  cidade: dados.cidade.trim(),
-                  estado: dados.estado.trim().toUpperCase(),
-                  observacoes: dados.observacoes.trim(),
-                }
-              : null,
-          observacaoPedido: `Produto em pré-venda. Entrega conforme prazo informado na página do produto. Forma de entrega: ${formaEntregaTexto}. Frete: ${formatarMoeda(valorFrete)}.`,
+          entregaEndereco: enderecoEntrega,
         }),
       });
+
+      // Se a resposta não for JSON, mostra o erro de forma amigável
+      const contentType = resposta.headers.get("content-type") || "";
+
+      if (!contentType.includes("application/json")) {
+        const texto = await resposta.text();
+        console.error("Resposta não-JSON da API:", resposta.status, texto);
+        throw new Error(
+          `A API de pagamento retornou uma resposta inesperada (status ${resposta.status}). Verifique se a rota /api/mercado-pago/preference existe.`
+        );
+      }
 
       const resultado = await resposta.json();
 

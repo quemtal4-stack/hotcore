@@ -152,14 +152,21 @@ export async function POST(request: Request) {
 
     const categoria = textoSeguro(body.categoria) || null;
 
+    // Suporte a dados aninhados em `comprador` (fallback)
+    const comprador = objetoSeguro(body.comprador);
+
     const nomeComprador =
       textoSeguro(body.nomeComprador) ||
       textoSeguro(body.nome) ||
       textoSeguro(body.name) ||
+      textoSeguro(comprador.nome) ||
+      textoSeguro(comprador.name) ||
       "Comprador";
 
     const emailComprador = normalizarEmail(
-      textoSeguro(body.emailComprador) || textoSeguro(body.email),
+      textoSeguro(body.emailComprador) ||
+        textoSeguro(body.email) ||
+        textoSeguro(comprador.email),
     );
 
     if (!emailComprador) {
@@ -186,10 +193,15 @@ export async function POST(request: Request) {
       textoSeguro(body.whatsappComprador) ||
       textoSeguro(body.whatsapp) ||
       textoSeguro(body.telefone) ||
+      textoSeguro(comprador.telefone) ||
+      textoSeguro(comprador.whatsapp) ||
       null;
 
     const cpfComprador =
-      textoSeguro(body.cpfComprador) || textoSeguro(body.cpf) || "";
+      textoSeguro(body.cpfComprador) ||
+      textoSeguro(body.cpf) ||
+      textoSeguro(comprador.cpf) ||
+      "";
 
     const cpfLimpo = cpfComprador.replace(/\D/g, "");
 
@@ -256,6 +268,7 @@ export async function POST(request: Request) {
       textoSeguro(body.modalidadeEntrega) ||
       textoSeguro(body.entrega) ||
       textoSeguro(body.tipoEntrega) ||
+      textoSeguro(body.formaEntrega) ||
       textoSeguro(freteBody.modalidade) ||
       textoSeguro(freteBody.tipo) ||
       null;
@@ -263,7 +276,10 @@ export async function POST(request: Request) {
     const retiradaNoLocal =
       modalidadeEntrega === "retirada" ||
       modalidadeEntrega === "retirada_local" ||
-      modalidadeEntrega === "Retirada no local";
+      modalidadeEntrega === "retirada-local" ||
+      modalidadeEntrega === "retirada-evento" ||
+      modalidadeEntrega === "Retirada no local" ||
+      booleanoSeguro(body.retiradaNoLocal);
 
     const servicoFrete =
       textoSeguro(body.servicoFrete) ||
@@ -284,7 +300,9 @@ export async function POST(request: Request) {
         ? numeroSeguro(body.valorFrete, 0)
         : numeroSeguro(body.freteValor, -1) >= 0
           ? numeroSeguro(body.freteValor, 0)
-          : numeroSeguro(freteBody.valor, 0);
+          : numeroSeguro(body.frete, -1) >= 0
+            ? numeroSeguro(body.frete, 0)
+            : numeroSeguro(freteBody.valor, 0);
 
     if (retiradaNoLocal) {
       valorFrete = 0;
@@ -417,6 +435,9 @@ export async function POST(request: Request) {
       numeroSeguro(body.racao_kg) ||
       (ehRacao ? quantidade : 0);
 
+    // Captura metadados extras enviados pelo checkout do livro
+    const metadataExtra = objetoSeguro(body.metadataExtra);
+
     const metadataPedido = {
       origem: "hotdogueres",
 
@@ -499,6 +520,33 @@ export async function POST(request: Request) {
         valor: Number(valorFrete.toFixed(2)),
         prazo: prazoFrete,
       },
+
+      // Campos específicos do livro/pré-venda
+      ...(metadataExtra.tipoPreco
+        ? { tipo_preco: metadataExtra.tipoPreco }
+        : {}),
+      ...(metadataExtra.livro
+        ? { livro_numero: metadataExtra.livro }
+        : {}),
+      ...(metadataExtra.entrega
+        ? { data_entrega: metadataExtra.entrega }
+        : {}),
+      ...(metadataExtra.formaEntrega
+        ? { forma_entrega: metadataExtra.formaEntrega }
+        : {}),
+      ...(metadataExtra.formaEntregaTexto
+        ? { forma_entrega_texto: metadataExtra.formaEntregaTexto }
+        : {}),
+      ...(metadataExtra.valorLivro
+        ? { valor_livro: Number(numeroSeguro(metadataExtra.valorLivro, 0).toFixed(2)) }
+        : {}),
+      ...(metadataExtra.observacaoPedido
+        ? { observacao_pedido: metadataExtra.observacaoPedido }
+        : {}),
+      ...(metadataExtra.enderecoEntrega &&
+        typeof metadataExtra.enderecoEntrega === "object"
+        ? { endereco_entrega: metadataExtra.enderecoEntrega }
+        : {}),
     };
 
     const client = new MercadoPagoConfig({
@@ -587,8 +635,8 @@ export async function POST(request: Request) {
       external_reference: pedidoReferencia,
       mercado_pago_preference_id: result.id,
       mercado_pago_init_point: urlCheckout,
-cpf: cpfLimpo || null,
-cpf_comprador: cpfLimpo || null,
+      cpf: cpfLimpo || null,
+      cpf_comprador: cpfLimpo || null,
 
       tipo,
       categoria,
