@@ -10,7 +10,12 @@ const QUANTIDADE_PARA_LIBERAR_SEXTO = 5;
 const ANO_COLECAO_PADRAO = 2027;
 const ANOS_COLECAO_SUPORTADOS = [2027, 2028] as const;
 
-type TipoCompra = "ingresso-solidario-colecionavel" | "hot-dog-day";
+type TipoCompra =
+  | "ingresso-solidario-colecionavel"
+  | "hot-dog-day"
+  | "ingresso-projeto-revela"
+  | "cota-projeto-revela";
+
 type PerfilRanking = "pessoa-fisica" | "empresa";
 type ModoCadastro = "compra" | "ranking";
 
@@ -427,6 +432,10 @@ export default function CadastroPage() {
   const [modoAdminTeste, setModoAdminTeste] = useState(false);
   const [valorAdminTeste, setValorAdminTeste] = useState<number | null>(null);
 
+  const [valorUrl, setValorUrl] = useState<number | null>(null);
+  const [projetoUrl, setProjetoUrl] = useState<string | null>(null);
+  const [planoUrl, setPlanoUrl] = useState<string | null>(null);
+
   const mapaIngressosColecao = useMemo(() => {
     return criarMapaIngressosColecao(anoColecao);
   }, [anoColecao]);
@@ -454,9 +463,6 @@ export default function CadastroPage() {
       return;
     }
 
-    const produtoParam = params.get("produto");
-    const tituloParam = params.get("titulo");
-
     const adminAtivo =
       params.get("admin") === "true" || params.get("teste") === "true";
 
@@ -468,10 +474,33 @@ export default function CadastroPage() {
       setValorAdminTeste(valorParam);
     }
 
+    if (Number.isFinite(valorParam) && valorParam > 0) {
+      setValorUrl(valorParam);
+    }
+
+    setProjetoUrl(params.get("projeto"));
+    setPlanoUrl(params.get("plano"));
+
+    const ehCotaProjetoRevela = tipoParam === "cota-projeto-revela";
+    const ehIngressoProjetoRevela = tipoParam === "ingresso-projeto-revela";
+
+    if (ehCotaProjetoRevela || ehIngressoProjetoRevela) {
+      setTipoCompra(
+        ehCotaProjetoRevela
+          ? "cota-projeto-revela"
+          : "ingresso-projeto-revela",
+      );
+      setQuantidadeIngressos(1);
+      setIncluirSextoIngresso(false);
+      setIngressosSelecionadosParametro(null);
+      setCarregouParametros(true);
+      return;
+    }
+
     const ehHotDogDayParametro =
-      produtoParam === "hot-dog-day" ||
+      params.get("produto") === "hot-dog-day" ||
       tipoParam === "hot-dog-day" ||
-      tituloParam?.toLowerCase().includes("hot dog day");
+      params.get("titulo")?.toLowerCase().includes("hot dog day");
 
     if (ehHotDogDayParametro) {
       const quantidadeParam =
@@ -525,19 +554,27 @@ export default function CadastroPage() {
   }, []);
 
   const ehHotDogDay = tipoCompra === "hot-dog-day";
+  const ehProjetoRevela =
+    tipoCompra === "cota-projeto-revela" ||
+    tipoCompra === "ingresso-projeto-revela";
+  const ehCotaProjetoRevela = tipoCompra === "cota-projeto-revela";
 
   const quantidadeIngressosSegura =
     normalizarQuantidadeIngressos(quantidadeIngressos);
 
-  const quantidadeTotal = ehHotDogDay
-    ? quantidadeIngressosSegura
-    : quantidadeIngressosSegura + (incluirSextoIngresso ? 1 : 0);
+  const quantidadeTotal = ehProjetoRevela
+    ? 1
+    : ehHotDogDay
+      ? quantidadeIngressosSegura
+      : quantidadeIngressosSegura + (incluirSextoIngresso ? 1 : 0);
 
-  const kgAlimentos = calcularKgAlimentos(
-    ehHotDogDay,
-    quantidadeIngressosSegura,
-    incluirSextoIngresso,
-  );
+  const kgAlimentos = ehProjetoRevela
+    ? 0
+    : calcularKgAlimentos(
+        ehHotDogDay,
+        quantidadeIngressosSegura,
+        incluirSextoIngresso,
+      );
 
   const ingressosSelecionadosResumo = useMemo(() => {
     return obterResumoIngressosSelecionados(
@@ -552,6 +589,10 @@ export default function CadastroPage() {
   ]);
 
   const totalOriginal = useMemo(() => {
+    if (ehProjetoRevela) {
+      return valorUrl ?? 0;
+    }
+
     if (ehHotDogDay) {
       return quantidadeIngressosSegura * VALOR_HOT_DOG_DAY;
     }
@@ -561,13 +602,17 @@ export default function CadastroPage() {
       (incluirSextoIngresso ? VALOR_SEXTO_INGRESSO : 0)
     );
   }, [
+    ehProjetoRevela,
     ehHotDogDay,
     quantidadeIngressosSegura,
     incluirSextoIngresso,
+    valorUrl,
   ]);
 
   const total =
-    modoAdminTeste && valorAdminTeste !== null ? valorAdminTeste : totalOriginal;
+    modoAdminTeste && valorAdminTeste !== null
+      ? valorAdminTeste
+      : totalOriginal;
 
   function voltarParaInicio() {
     window.location.href = "/";
@@ -575,6 +620,10 @@ export default function CadastroPage() {
 
   function voltarParaRanking() {
     window.location.href = "/ranking-do-bem";
+  }
+
+  function voltarParaProjetoRevela() {
+    window.location.href = "/projeto-revela";
   }
 
   function salvarCadastroRanking(event: FormEvent<HTMLFormElement>) {
@@ -730,35 +779,63 @@ export default function CadastroPage() {
 
     if (
       !ehHotDogDay &&
+      !ehProjetoRevela &&
       incluirSextoIngresso &&
       quantidadeIngressosSegura < QUANTIDADE_PARA_LIBERAR_SEXTO
     ) {
-      setErro("O 6º ingresso especial só pode ser liberado com 5 ingressos comuns.");
+      setErro(
+        "O 6º ingresso especial só pode ser liberado com 5 ingressos comuns.",
+      );
       return;
     }
 
     const nomeParaIngressoEternizado =
-      !ehHotDogDay && incluirSextoIngresso
+      !ehHotDogDay && !ehProjetoRevela && incluirSextoIngresso
         ? nomeIngressoEternizado.trim() || nome.trim()
         : "";
+
+    const valorParaCheckout =
+      modoAdminTeste && valorAdminTeste !== null
+        ? valorAdminTeste
+        : valorUrl ?? totalOriginal;
+
+    const paramsOriginais = new URLSearchParams(window.location.search);
+
+    const produtoParametro =
+      paramsOriginais.get("produto") ||
+      (ehHotDogDay
+        ? "hot-dog-day"
+        : ehCotaProjetoRevela
+          ? paramsOriginais.get("plano") || "cota-projeto-revela"
+          : "ingresso-solidario-colecionavel");
+
+    const tituloParametro =
+      paramsOriginais.get("titulo") ||
+      (ehHotDogDay
+        ? "Ingresso Hot Dog Day"
+        : ehCotaProjetoRevela
+          ? `Cota mensal — ${paramsOriginais.get("plano") || "Projeto Revela"}`
+          : paramsOriginais.get("titulo") ||
+            `Ingresso Solidário Colecionável ${anoColecao}`);
 
     const dadosCadastro = {
       nome: nome.trim(),
       email: email.trim(),
       telefone,
       cpf,
-      ingressos: quantidadeIngressosSegura,
+      ingressos: ehProjetoRevela ? 1 : quantidadeIngressosSegura,
       ingressosSelecionados: ehHotDogDay ? null : ingressosSelecionadosParametro,
-      sextoIngresso: ehHotDogDay ? false : incluirSextoIngresso,
+      sextoIngresso: ehHotDogDay || ehProjetoRevela ? false : incluirSextoIngresso,
       quantidadeTotal,
       kgAlimentos,
-      total,
+      total: valorParaCheckout,
       tipo: tipoCompra,
-      colecaoAno: ehHotDogDay ? null : anoColecao,
-      anoColecao: ehHotDogDay ? null : anoColecao,
-      nomeProduto: ehHotDogDay
-        ? "Hot Dog Day"
-        : `Ingresso Solidário Colecionável ${anoColecao}`,
+      colecaoAno: ehHotDogDay || ehProjetoRevela ? null : anoColecao,
+      anoColecao: ehHotDogDay || ehProjetoRevela ? null : anoColecao,
+      nomeProduto: tituloParametro,
+      produtoId: produtoParametro,
+      projeto: projetoUrl,
+      plano: planoUrl,
       nomeIngressoEternizado: nomeParaIngressoEternizado,
     };
 
@@ -769,52 +846,38 @@ export default function CadastroPage() {
 
     const params = new URLSearchParams({
       tipo: tipoCompra,
-      ingressos: String(quantidadeIngressosSegura),
-      sextoIngresso: ehHotDogDay
-        ? "nao"
-        : incluirSextoIngresso
-          ? "sim"
-          : "nao",
+      ingressos: String(ehProjetoRevela ? 1 : quantidadeIngressosSegura),
+      sextoIngresso: "nao",
       quantidadeTotal: String(quantidadeTotal),
       kgAlimentos: String(kgAlimentos),
     });
-
-    const paramsOriginais = new URLSearchParams(window.location.search);
 
     const modoAdmin =
       paramsOriginais.get("admin") === "true" ||
       paramsOriginais.get("teste") === "true";
 
-    const valorParametro = Number(paramsOriginais.get("valor"));
-
-    const valorParaCheckout =
-      modoAdmin && Number.isFinite(valorParametro) && valorParametro > 0
-        ? valorParametro
-        : totalOriginal;
-
-    const produtoParametro =
-      paramsOriginais.get("produto") ||
-      (ehHotDogDay ? "hot-dog-day" : "ingresso-solidario-colecionavel");
-
-    const tituloParametro =
-      paramsOriginais.get("titulo") ||
-      (ehHotDogDay
-        ? "Ingresso Hot Dog Day"
-        : `Ingresso Solidário Colecionável ${anoColecao}`);
-
     const ingressosSelecionadosOriginal =
-      paramsOriginais.get("ingressosSelecionados") || ingressosSelecionadosParametro;
+      paramsOriginais.get("ingressosSelecionados") ||
+      ingressosSelecionadosParametro;
 
     params.set("produto", produtoParametro);
     params.set("titulo", tituloParametro);
     params.set("valor", String(valorParaCheckout));
 
-    if (!ehHotDogDay) {
+    if (paramsOriginais.get("projeto")) {
+      params.set("projeto", paramsOriginais.get("projeto")!);
+    }
+
+    if (paramsOriginais.get("plano")) {
+      params.set("plano", paramsOriginais.get("plano")!);
+    }
+
+    if (!ehHotDogDay && !ehProjetoRevela) {
       params.set("anoColecao", String(anoColecao));
       params.set("colecaoAno", String(anoColecao));
     }
 
-    if (!ehHotDogDay && ingressosSelecionadosOriginal) {
+    if (!ehHotDogDay && !ehProjetoRevela && ingressosSelecionadosOriginal) {
       params.set("ingressosSelecionados", ingressosSelecionadosOriginal);
     }
 
@@ -827,7 +890,7 @@ export default function CadastroPage() {
       params.set("teste", "true");
     }
 
-    if (!ehHotDogDay) {
+    if (!ehHotDogDay && !ehProjetoRevela) {
       salvarPastaColecionadorLocal({
         cpf,
         incluirSextoIngresso,
@@ -838,7 +901,7 @@ export default function CadastroPage() {
       });
     }
 
-    window.location.href = `/checkout/ingressos?${params.toString()}`;
+    window.location.href = `/checkout/ingresso?${params.toString()}`;
   }
 
   if (!carregouParametros) {
@@ -1102,7 +1165,9 @@ export default function CadastroPage() {
         <div className="rounded-[2rem] bg-white p-8 shadow-xl">
           <button
             type="button"
-            onClick={voltarParaInicio}
+            onClick={
+              ehProjetoRevela ? voltarParaProjetoRevela : voltarParaInicio
+            }
             className="rounded-full bg-gray-100 px-4 py-2 text-sm font-black text-gray-700 hover:bg-gray-200"
           >
             Voltar
@@ -1125,7 +1190,13 @@ export default function CadastroPage() {
           <p className="mt-4 max-w-2xl text-lg text-gray-700">
             Preencha as informações abaixo para continuar para o pagamento do{" "}
             <strong>
-              {ehHotDogDay ? "Hot Dog Day" : `Ingresso Solidário Colecionável ${anoColecao}`}
+              {ehCotaProjetoRevela
+                ? planoUrl || "Cota do Projeto Revela"
+                : ehProjetoRevela
+                  ? "Ingresso Projeto Hot Dogueres Revela"
+                  : ehHotDogDay
+                    ? "Hot Dog Day"
+                    : `Ingresso Solidário Colecionável ${anoColecao}`}
             </strong>
             .
           </p>
@@ -1188,7 +1259,7 @@ export default function CadastroPage() {
               </p>
             </div>
 
-            {!ehHotDogDay && incluirSextoIngresso && (
+            {!ehHotDogDay && !ehProjetoRevela && incluirSextoIngresso && (
               <div>
                 <label className="text-sm font-black uppercase tracking-wide text-gray-600">
                   Nome para o Ingresso Eternizado
@@ -1231,11 +1302,45 @@ export default function CadastroPage() {
           </p>
 
           <h2 className="mt-2 text-3xl font-black text-gray-900">
-            {ehHotDogDay ? "Seu pedido" : `Seus ingressos ${anoColecao}`}
+            {ehCotaProjetoRevela
+              ? planoUrl || "Cota mensal"
+              : ehProjetoRevela
+                ? "Ingresso comemorativo"
+                : ehHotDogDay
+                  ? "Seu pedido"
+                  : `Seus ingressos ${anoColecao}`}
           </h2>
 
           <div className="mt-8 space-y-4 rounded-3xl bg-gray-50 p-5">
-            {ehHotDogDay ? (
+            {ehProjetoRevela ? (
+              <>
+                <div className="flex justify-between text-gray-700">
+                  <span>Produto</span>
+                  <strong className="text-right">
+                    {ehCotaProjetoRevela
+                      ? `Cota ${planoUrl || "Projeto Revela"}`
+                      : "Ingresso Projeto Hot Dogueres Revela"}
+                  </strong>
+                </div>
+
+                <div className="flex justify-between text-gray-700">
+                  <span>Projeto</span>
+                  <strong className="text-right">
+                    {projetoUrl || "Hot Dogueres Revela"}
+                  </strong>
+                </div>
+
+                <div className="flex justify-between text-gray-700">
+                  <span>Quantidade</span>
+                  <strong>1</strong>
+                </div>
+
+                <div className="flex justify-between text-gray-700">
+                  <span>Valor</span>
+                  <strong>{formatarMoeda(valorUrl ?? 0)}</strong>
+                </div>
+              </>
+            ) : ehHotDogDay ? (
               <>
                 <div className="flex justify-between text-gray-700">
                   <span>Produto</span>
@@ -1306,12 +1411,12 @@ export default function CadastroPage() {
 
             <div className="flex justify-between border-t border-gray-200 pt-4 text-gray-700">
               <span>
-                {ehHotDogDay ? "Quantidade total" : "Total de ingressos"}
+                {ehHotDogDay ? "Quantidade total" : "Total de itens"}
               </span>
               <strong>{quantidadeTotal}</strong>
             </div>
 
-            {!ehHotDogDay && (
+            {!ehHotDogDay && !ehProjetoRevela && (
               <div className="flex justify-between text-gray-700">
                 <span>Doação abatida</span>
                 <strong>{kgAlimentos} kg</strong>
@@ -1339,9 +1444,9 @@ export default function CadastroPage() {
             </p>
 
             <p className="mt-2 text-sm text-gray-700">
-              Nesta etapa fazemos a validação básica do CPF. Depois, quando
-              ligarmos o banco de dados, a regra completa vai verificar as
-              compras anteriores desse CPF.
+              {ehProjetoRevela
+                ? "O valor arrecadado será destinado ao Projeto Hot Dogueres Revela, separado das metas de alimentos e proteção animal."
+                : "Nesta etapa fazemos a validação básica do CPF. Depois, quando ligarmos o banco de dados, a regra completa vai verificar as compras anteriores desse CPF."}
             </p>
           </div>
         </aside>

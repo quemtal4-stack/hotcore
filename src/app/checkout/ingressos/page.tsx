@@ -21,6 +21,8 @@ type DadosCadastro = {
   nomeIngressoEternizado?: string;
   colecionarIngresso: boolean | null;
   modoAdminTeste?: boolean;
+  plano?: string;
+  projeto?: string;
 };
 
 function formatarMoeda(valor: number) {
@@ -97,6 +99,45 @@ function validarEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+function normalizarTexto(valor: string) {
+  return valor
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function ehProjetoRevela(tipo: string) {
+  return normalizarTexto(tipo).includes("projeto-revela");
+}
+
+function ehCotaProjetoRevela(tipo: string) {
+  return normalizarTexto(tipo).includes("cota-projeto-revela");
+}
+
+function ehIngressoProjetoRevela(tipo: string) {
+  return normalizarTexto(tipo).includes("ingresso-projeto-revela");
+}
+
+function valorPadraoProjetoRevela(tipo: string, plano?: string): number {
+  if (ehCotaProjetoRevela(tipo)) {
+    const planoNormalizado = normalizarTexto(plano || "");
+
+    if (planoNormalizado.includes("semente")) return 100;
+    if (planoNormalizado.includes("incentivador")) return 200;
+    if (planoNormalizado.includes("desenvolvedor")) return 325;
+    if (planoNormalizado.includes("adotante") || planoNormalizado.includes("integral"))
+      return 650;
+
+    return 0;
+  }
+
+  if (ehIngressoProjetoRevela(tipo)) {
+    return 100;
+  }
+
+  return 0;
+}
+
 export default function CheckoutIngressosPage() {
   const [dadosCadastro, setDadosCadastro] = useState<DadosCadastro | null>(null);
   const [erro, setErro] = useState("");
@@ -115,14 +156,32 @@ export default function CheckoutIngressosPage() {
         obterParametroBooleanoOpcional(params, "colecionar") ??
         obterParametroBooleanoOpcional(params, "colecionarIngresso");
 
+      const tipoParam =
+        params.get("tipo") || "ingresso-solidario-colecionavel";
+
+      const valorUrl = obterNumeroParametro(params, "valor", 0);
+      const valorUnitarioUrl = obterNumeroParametro(params, "valorUnitario", 0);
+
+      const planoUrl = params.get("plano") || "";
+      const projetoUrl = params.get("projeto") || "";
+
+      // Se não veio valor na URL e for projeto revela, usa o padrão conhecido
+      const valorFallbackProjetoRevela =
+        valorUrl > 0
+          ? valorUrl
+          : valorPadraoProjetoRevela(tipoParam, planoUrl);
+
+      // Valor final: prioriza URL, depois fallback do projeto, depois dados salvos
+      const resolverValor = (valorSalvo: number) => {
+        if (valorUrl > 0) return valorUrl;
+        if (valorUnitarioUrl > 0) return valorUnitarioUrl;
+        if (valorFallbackProjetoRevela > 0) return valorFallbackProjetoRevela;
+        if (valorSalvo > 0) return valorSalvo;
+        return 20; // fallback genérico anterior
+      };
+
       if (dadosSalvos) {
         const dados = JSON.parse(dadosSalvos) as DadosCadastro;
-
-        const valorParametro = obterNumeroParametro(
-          params,
-          "valor",
-          dados.total,
-        );
 
         const quantidadeTotalParametro = obterNumeroParametro(
           params,
@@ -154,9 +213,11 @@ export default function CheckoutIngressosPage() {
           dados.nomeProduto ||
           "Ingresso Solidário";
 
+        const valorFinal = resolverValor(dados.total);
+
         setDadosCadastro({
           ...dados,
-          total: valorParametro > 0 ? valorParametro : dados.total,
+          total: valorFinal,
           quantidadeTotal:
             quantidadeTotalParametro > 0
               ? quantidadeTotalParametro
@@ -186,6 +247,8 @@ export default function CheckoutIngressosPage() {
               ? colecionarParametro
               : dados.colecionarIngresso ?? null,
           modoAdminTeste,
+          plano: planoUrl || dados.plano || "",
+          projeto: projetoUrl || dados.projeto || "",
         });
 
         return;
@@ -202,13 +265,17 @@ export default function CheckoutIngressosPage() {
       const titulo =
         params.get("titulo") ||
         params.get("nomeProduto") ||
-        (eventoId
-          ? "Ingresso Hot Dogueres City Quest"
-          : tipo === "hot-dog-day"
-            ? "Hot Dog Day"
-            : "Ingresso Solidário Colecionável");
+        (ehCotaProjetoRevela(tipo)
+          ? `Cota Projeto Revela — ${planoUrl}`
+          : ehIngressoProjetoRevela(tipo)
+            ? "Ingresso Projeto Hot Dogueres Revela"
+            : eventoId
+              ? "Ingresso Hot Dogueres City Quest"
+              : tipo === "hot-dog-day"
+                ? "Hot Dog Day"
+                : "Ingresso Solidário Colecionável");
 
-      const valor = obterNumeroParametro(params, "valor", 20);
+      const valor = resolverValor(0);
       const ingressos = obterNumeroParametro(params, "ingressos", 1);
       const quantidadeTotal = obterNumeroParametro(
         params,
@@ -236,6 +303,8 @@ export default function CheckoutIngressosPage() {
         nomeIngressoEternizado: params.get("nomeIngressoEternizado") || "",
         colecionarIngresso: colecionarParametro,
         modoAdminTeste,
+        plano: planoUrl,
+        projeto: projetoUrl,
       });
     } catch {
       setErro("Não foi possível carregar os dados do checkout.");
@@ -245,10 +314,24 @@ export default function CheckoutIngressosPage() {
   }, []);
 
   const ehHotDogDay = dadosCadastro?.tipo === "hot-dog-day";
+  const ehCotaRevela = dadosCadastro
+    ? ehCotaProjetoRevela(dadosCadastro.tipo)
+    : false;
+  const ehIngressoRevela = dadosCadastro
+    ? ehIngressoProjetoRevela(dadosCadastro.tipo)
+    : false;
 
   const resumoProduto = useMemo(() => {
     if (!dadosCadastro) {
       return "";
+    }
+
+    if (ehCotaRevela) {
+      return `Cota mensal — ${dadosCadastro.plano || "Projeto Revela"}`;
+    }
+
+    if (ehIngressoRevela) {
+      return dadosCadastro.nomeProduto || "Ingresso Projeto Hot Dogueres Revela";
     }
 
     if (ehHotDogDay) {
@@ -262,7 +345,7 @@ export default function CheckoutIngressosPage() {
     return dadosCadastro.sextoIngresso
       ? "Ingresso Solidário Colecionável + 6º Especial"
       : "Ingresso Solidário Colecionável";
-  }, [dadosCadastro, ehHotDogDay]);
+  }, [dadosCadastro, ehHotDogDay, ehCotaRevela, ehIngressoRevela]);
 
   function voltarParaCadastro() {
     window.history.back();
@@ -310,7 +393,11 @@ export default function CheckoutIngressosPage() {
       return "Valor inválido para gerar o pagamento.";
     }
 
-    if (dadosCadastro.colecionarIngresso === null) {
+    if (
+      !ehCotaRevela &&
+      !ehHotDogDay &&
+      dadosCadastro.colecionarIngresso === null
+    ) {
       return "Escolha se você deseja colecionar este ingresso.";
     }
 
@@ -363,8 +450,21 @@ export default function CheckoutIngressosPage() {
           permitirResgateColecaoDepois: true,
           admin: dadosCadastro.modoAdminTeste ? "true" : "false",
           teste: dadosCadastro.modoAdminTeste ? "true" : "false",
+          plano: dadosCadastro.plano || "",
+          projeto: dadosCadastro.projeto || "",
+          rankingPontos: ehIngressoRevela ? 100 : 0,
         }),
       });
+
+      const contentType = resposta.headers.get("content-type") || "";
+
+      if (!contentType.includes("application/json")) {
+        const texto = await resposta.text();
+        console.error("Resposta não-JSON da API:", resposta.status, texto);
+        throw new Error(
+          `A API de pagamento retornou uma resposta inesperada (status ${resposta.status}). Verifique se a rota /api/checkout/ingressos existe.`,
+        );
+      }
 
       const resultado = await resposta.json();
 
@@ -541,67 +641,69 @@ export default function CheckoutIngressosPage() {
             </div>
           </div>
 
-          <div className="mt-8 rounded-3xl border-2 border-yellow-300 bg-yellow-50 p-6">
-            <p className="inline-flex rounded-full bg-yellow-400 px-4 py-2 text-xs font-black uppercase tracking-wide text-gray-950">
-              Colecionador
-            </p>
+          {!ehCotaRevela && (
+            <div className="mt-8 rounded-3xl border-2 border-yellow-300 bg-yellow-50 p-6">
+              <p className="inline-flex rounded-full bg-yellow-400 px-4 py-2 text-xs font-black uppercase tracking-wide text-gray-950">
+                Colecionador
+              </p>
 
-            <h2 className="mt-4 text-2xl font-black text-gray-950">
-              Quer colecionar este ingresso?
-            </h2>
+              <h2 className="mt-4 text-2xl font-black text-gray-950">
+                Quer colecionar este ingresso?
+              </h2>
 
-            <p className="mt-3 text-sm font-bold leading-relaxed text-gray-700">
-              Se escolher sim, após o pagamento aprovado este ingresso será
-              enviado para a sua área do colecionador. Se escolher não, ele
-              continuará contando normalmente para as metas de ingressos e de
-              alimentos, mas não será colocado automaticamente na coleção.
-            </p>
+              <p className="mt-3 text-sm font-bold leading-relaxed text-gray-700">
+                Se escolher sim, após o pagamento aprovado este ingresso será
+                enviado para a sua área do colecionador. Se escolher não, ele
+                continuará contando normalmente para as metas de ingressos e de
+                alimentos, mas não será colocado automaticamente na coleção.
+              </p>
 
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <button
-                type="button"
-                onClick={() => atualizarColecionarIngresso(true)}
-                className={`rounded-3xl border-2 p-5 text-left transition ${
-                  dadosCadastro.colecionarIngresso === true
-                    ? "border-green-600 bg-green-50 shadow-lg"
-                    : "border-gray-200 bg-white hover:border-green-300"
-                }`}
-              >
-                <span className="text-lg font-black text-green-700">
-                  Sim, quero colecionar
-                </span>
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => atualizarColecionarIngresso(true)}
+                  className={`rounded-3xl border-2 p-5 text-left transition ${
+                    dadosCadastro.colecionarIngresso === true
+                      ? "border-green-600 bg-green-50 shadow-lg"
+                      : "border-gray-200 bg-white hover:border-green-300"
+                  }`}
+                >
+                  <span className="text-lg font-black text-green-700">
+                    Sim, quero colecionar
+                  </span>
 
-                <span className="mt-2 block text-sm font-bold leading-relaxed text-gray-600">
-                  O ingresso será liberado na área do colecionador após a
-                  confirmação do pagamento.
-                </span>
-              </button>
+                  <span className="mt-2 block text-sm font-bold leading-relaxed text-gray-600">
+                    O ingresso será liberado na área do colecionador após a
+                    confirmação do pagamento.
+                  </span>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => atualizarColecionarIngresso(false)}
-                className={`rounded-3xl border-2 p-5 text-left transition ${
-                  dadosCadastro.colecionarIngresso === false
-                    ? "border-red-600 bg-red-50 shadow-lg"
-                    : "border-gray-200 bg-white hover:border-red-300"
-                }`}
-              >
-                <span className="text-lg font-black text-red-700">
-                  Não, só quero ajudar
-                </span>
+                <button
+                  type="button"
+                  onClick={() => atualizarColecionarIngresso(false)}
+                  className={`rounded-3xl border-2 p-5 text-left transition ${
+                    dadosCadastro.colecionarIngresso === false
+                      ? "border-red-600 bg-red-50 shadow-lg"
+                      : "border-gray-200 bg-white hover:border-red-300"
+                  }`}
+                >
+                  <span className="text-lg font-black text-red-700">
+                    Não, só quero ajudar
+                  </span>
 
-                <span className="mt-2 block text-sm font-bold leading-relaxed text-gray-600">
-                  Sua compra continuará ajudando as metas, mas o ingresso não
-                  entrará automaticamente na coleção.
-                </span>
-              </button>
+                  <span className="mt-2 block text-sm font-bold leading-relaxed text-gray-600">
+                    Sua compra continuará ajudando as metas, mas o ingresso não
+                    entrará automaticamente na coleção.
+                  </span>
+                </button>
+              </div>
+
+              <div className="mt-5 rounded-2xl bg-white p-4 text-sm font-bold leading-relaxed text-gray-700 shadow-sm">
+                Se depois você se arrepender, poderemos criar a opção de resgate
+                pela área do colecionador usando o CPF/e-mail da compra aprovada.
+              </div>
             </div>
-
-            <div className="mt-5 rounded-2xl bg-white p-4 text-sm font-bold leading-relaxed text-gray-700 shadow-sm">
-              Se depois você se arrepender, poderemos criar a opção de resgate
-              pela área do colecionador usando o CPF/e-mail da compra aprovada.
-            </div>
-          </div>
+          )}
 
           {erro && (
             <div className="mt-6 rounded-2xl bg-red-50 p-4 text-sm font-bold text-red-600">
@@ -631,7 +733,7 @@ export default function CheckoutIngressosPage() {
           </p>
 
           <h2 className="mt-2 text-3xl font-black text-gray-900">
-            {ehHotDogDay ? "Hot Dog Day" : "Ingresso Solidário"}
+            {ehHotDogDay ? "Hot Dog Day" : ehCotaRevela ? "Cota Mensal" : "Ingresso Solidário"}
           </h2>
 
           <div className="mt-8 space-y-4 rounded-3xl bg-gray-50 p-5">
@@ -652,7 +754,7 @@ export default function CheckoutIngressosPage() {
               <strong>{dadosCadastro.quantidadeTotal}</strong>
             </div>
 
-            {!ehHotDogDay && (
+            {!ehHotDogDay && !ehCotaRevela && (
               <>
                 <div className="flex justify-between gap-4 text-gray-700">
                   <span>Ingressos normais</span>
