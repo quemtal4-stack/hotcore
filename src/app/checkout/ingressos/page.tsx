@@ -125,7 +125,10 @@ function valorPadraoProjetoRevela(tipo: string, plano?: string): number {
     if (planoNormalizado.includes("semente")) return 100;
     if (planoNormalizado.includes("incentivador")) return 200;
     if (planoNormalizado.includes("desenvolvedor")) return 325;
-    if (planoNormalizado.includes("adotante") || planoNormalizado.includes("integral"))
+    if (
+      planoNormalizado.includes("adotante") ||
+      planoNormalizado.includes("integral")
+    )
       return 650;
 
     return 0;
@@ -156,76 +159,59 @@ export default function CheckoutIngressosPage() {
         obterParametroBooleanoOpcional(params, "colecionar") ??
         obterParametroBooleanoOpcional(params, "colecionarIngresso");
 
-      const tipoParam =
-        params.get("tipo") || "ingresso-solidario-colecionavel";
+      const tipo =
+        params.get("tipo") ||
+        (params.get("evento") || params.get("eventoId")
+          ? "ingresso-evento"
+          : "ingresso-solidario-colecionavel");
 
-      const valorUrl = obterNumeroParametro(params, "valor", 0);
-      const valorUnitarioUrl = obterNumeroParametro(params, "valorUnitario", 0);
+      const planoParam = params.get("plano") || "";
+      const projetoParam = params.get("projeto") || "";
 
-      const planoUrl = params.get("plano") || "";
-      const projetoUrl = params.get("projeto") || "";
+      const ehRevela = ehProjetoRevela(tipo) || projetoParam === "hot-dogueres-revela";
+      const ehCotaRevelaUrl = ehCotaProjetoRevela(tipo);
+      const ehIngressoRevelaUrl = ehIngressoProjetoRevela(tipo);
 
-      // Se não veio valor na URL e for projeto revela, usa o padrão conhecido
-      const valorFallbackProjetoRevela =
-        valorUrl > 0
-          ? valorUrl
-          : valorPadraoProjetoRevela(tipoParam, planoUrl);
+      const produtoId =
+        params.get("produto") ||
+        params.get("produtoId") ||
+        params.get("evento") ||
+        params.get("eventoId") ||
+        "";
 
-      // Valor final: prioriza URL, depois fallback do projeto, depois dados salvos
-      const resolverValor = (valorSalvo: number) => {
-        if (valorUrl > 0) return valorUrl;
-        if (valorUnitarioUrl > 0) return valorUnitarioUrl;
-        if (valorFallbackProjetoRevela > 0) return valorFallbackProjetoRevela;
-        if (valorSalvo > 0) return valorSalvo;
-        return 20; // fallback genérico anterior
-      };
+      const tituloParametro =
+        params.get("titulo") ||
+        (tipo === "cota-projeto-revela"
+          ? `Cota mensal — ${planoParam || "Projeto Hot Dogueres Revela"}`
+          : tipo === "ingresso-projeto-revela"
+            ? "Ingresso comemorativo — Projeto Hot Dogueres Revela"
+            : "Ingresso Solidário");
+
+      // Valor da URL é a fonte da verdade, mas tem fallback por plano se falhar
+      let valorDaUrl = obterNumeroParametro(params, "valor", 0);
+
+      if (valorDaUrl <= 0 && ehRevela) {
+        valorDaUrl = valorPadraoProjetoRevela(tipo, planoParam);
+      }
+
+      const quantidadeUrl = ehRevela
+        ? 1
+        : obterNumeroParametro(params, "quantidadeTotal", 1);
 
       if (dadosSalvos) {
         const dados = JSON.parse(dadosSalvos) as DadosCadastro;
 
-        const quantidadeTotalParametro = obterNumeroParametro(
-          params,
-          "quantidadeTotal",
-          dados.quantidadeTotal,
-        );
-
-        const kgAlimentosParametro = obterNumeroParametro(
-          params,
-          "kgAlimentos",
-          dados.kgAlimentos,
-        );
-
-        const eventoId =
-          params.get("evento") ||
-          params.get("eventoId") ||
-          dados.eventoId ||
-          "";
-
-        const produtoId =
-          params.get("produto") ||
-          params.get("produtoId") ||
-          dados.produtoId ||
-          eventoId ||
-          "";
-
-        const tituloParametro =
-          params.get("titulo") ||
-          dados.nomeProduto ||
-          "Ingresso Solidário";
-
-        const valorFinal = resolverValor(dados.total);
+        const valorFinal =
+          valorDaUrl > 0 ? valorDaUrl : dados.total > 0 ? dados.total : 20;
 
         setDadosCadastro({
           ...dados,
           total: valorFinal,
           quantidadeTotal:
-            quantidadeTotalParametro > 0
-              ? quantidadeTotalParametro
-              : dados.quantidadeTotal,
-          kgAlimentos:
-            kgAlimentosParametro >= 0
-              ? kgAlimentosParametro
-              : dados.kgAlimentos,
+            quantidadeUrl > 0 ? quantidadeUrl : dados.quantidadeTotal || 1,
+          kgAlimentos: ehRevela
+            ? 0
+            : obterNumeroParametro(params, "kgAlimentos", dados.kgAlimentos),
           ingressosSelecionados:
             params.get("ingressosSelecionados") ||
             dados.ingressosSelecionados ||
@@ -234,55 +220,33 @@ export default function CheckoutIngressosPage() {
             dados.nomeIngressoEternizado ||
             params.get("nomeIngressoEternizado") ||
             "",
-          tipo:
-            params.get("tipo") ||
-            dados.tipo ||
-            "ingresso-solidario-colecionavel",
+          tipo,
           nomeProduto: tituloParametro,
           produtoId,
-          eventoId,
+          eventoId:
+            params.get("evento") ||
+            params.get("eventoId") ||
+            dados.eventoId ||
+            "",
           municipio: params.get("municipio") || dados.municipio || "",
           colecionarIngresso:
             colecionarParametro !== null
               ? colecionarParametro
               : dados.colecionarIngresso ?? null,
           modoAdminTeste,
-          plano: planoUrl || dados.plano || "",
-          projeto: projetoUrl || dados.projeto || "",
+          plano: planoParam || dados.plano || "",
+          projeto: projetoParam || dados.projeto || "",
         });
 
         return;
       }
 
-      const eventoId = params.get("evento") || params.get("eventoId") || "";
-      const produtoId =
-        params.get("produto") || params.get("produtoId") || eventoId || "";
+      // Sem dados salvos: usa URL
+      const ingressos = ehRevela
+        ? 1
+        : obterNumeroParametro(params, "ingressos", 1);
 
-      const tipo =
-        params.get("tipo") ||
-        (eventoId ? "ingresso-evento" : "ingresso-solidario-colecionavel");
-
-      const titulo =
-        params.get("titulo") ||
-        params.get("nomeProduto") ||
-        (ehCotaProjetoRevela(tipo)
-          ? `Cota Projeto Revela — ${planoUrl}`
-          : ehIngressoProjetoRevela(tipo)
-            ? "Ingresso Projeto Hot Dogueres Revela"
-            : eventoId
-              ? "Ingresso Hot Dogueres City Quest"
-              : tipo === "hot-dog-day"
-                ? "Hot Dog Day"
-                : "Ingresso Solidário Colecionável");
-
-      const valor = resolverValor(0);
-      const ingressos = obterNumeroParametro(params, "ingressos", 1);
-      const quantidadeTotal = obterNumeroParametro(
-        params,
-        "quantidadeTotal",
-        ingressos,
-      );
-      const kgAlimentos = obterNumeroParametro(params, "kgAlimentos", 0);
+      const valorFinal = valorDaUrl > 0 ? valorDaUrl : 20;
 
       setDadosCadastro({
         nome: "",
@@ -291,20 +255,22 @@ export default function CheckoutIngressosPage() {
         cpf: "",
         ingressos,
         ingressosSelecionados: params.get("ingressosSelecionados"),
-        sextoIngresso: params.get("sextoIngresso") === "sim",
-        quantidadeTotal,
-        kgAlimentos,
-        total: valor,
+        sextoIngresso: false,
+        quantidadeTotal: quantidadeUrl > 0 ? quantidadeUrl : 1,
+        kgAlimentos: ehRevela
+          ? 0
+          : obterNumeroParametro(params, "kgAlimentos", 0),
+        total: valorFinal,
         tipo,
-        nomeProduto: titulo,
+        nomeProduto: tituloParametro,
         produtoId,
-        eventoId,
+        eventoId: params.get("evento") || params.get("eventoId") || "",
         municipio: params.get("municipio") || "",
         nomeIngressoEternizado: params.get("nomeIngressoEternizado") || "",
         colecionarIngresso: colecionarParametro,
         modoAdminTeste,
-        plano: planoUrl,
-        projeto: projetoUrl,
+        plano: planoParam,
+        projeto: projetoParam,
       });
     } catch {
       setErro("Não foi possível carregar os dados do checkout.");
@@ -322,30 +288,30 @@ export default function CheckoutIngressosPage() {
     : false;
 
   const resumoProduto = useMemo(() => {
-    if (!dadosCadastro) {
-      return "";
+    if (!dadosCadastro) return "";
+
+    if (dadosCadastro.tipo === "cota-projeto-revela") {
+      return (
+        dadosCadastro.nomeProduto ||
+        `Cota mensal — ${dadosCadastro.plano || "Projeto Hot Dogueres Revela"}`
+      );
     }
 
-    if (ehCotaRevela) {
-      return `Cota mensal — ${dadosCadastro.plano || "Projeto Revela"}`;
+    if (dadosCadastro.tipo === "ingresso-projeto-revela") {
+      return (
+        dadosCadastro.nomeProduto ||
+        "Ingresso comemorativo — Projeto Hot Dogueres Revela"
+      );
     }
 
-    if (ehIngressoRevela) {
-      return dadosCadastro.nomeProduto || "Ingresso Projeto Hot Dogueres Revela";
-    }
-
-    if (ehHotDogDay) {
-      return "Ingresso Hot Dog Day";
-    }
-
+    if (ehHotDogDay) return "Ingresso Hot Dog Day";
     if (dadosCadastro.eventoId || dadosCadastro.tipo === "ingresso-evento") {
       return dadosCadastro.nomeProduto || "Ingresso de Evento Hot Dogueres";
     }
-
     return dadosCadastro.sextoIngresso
       ? "Ingresso Solidário Colecionável + 6º Especial"
       : "Ingresso Solidário Colecionável";
-  }, [dadosCadastro, ehHotDogDay, ehCotaRevela, ehIngressoRevela]);
+  }, [dadosCadastro, ehHotDogDay]);
 
   function voltarParaCadastro() {
     window.history.back();
@@ -441,7 +407,7 @@ export default function CheckoutIngressosPage() {
           ingressos: dadosCadastro.ingressos,
           ingressosSelecionados: dadosCadastro.ingressosSelecionados || "",
           sextoIngresso: dadosCadastro.sextoIngresso,
-          kgAlimentos: dadosCadastro.kgAlimentos,
+          kgAlimentos: ehCotaRevela ? 0 : dadosCadastro.kgAlimentos,
           valor: dadosCadastro.total,
           total: dadosCadastro.total,
           nomeIngressoEternizado: dadosCadastro.nomeIngressoEternizado || "",
@@ -507,7 +473,7 @@ export default function CheckoutIngressosPage() {
         ingressos: dadosCadastro.ingressos,
         ingressosSelecionados: dadosCadastro.ingressosSelecionados || "",
         sextoIngresso: dadosCadastro.sextoIngresso,
-        kgAlimentos: dadosCadastro.kgAlimentos,
+        kgAlimentos: ehCotaRevela ? 0 : dadosCadastro.kgAlimentos,
         valor: dadosCadastro.total,
         nomeIngressoEternizado: dadosCadastro.nomeIngressoEternizado || "",
         colecionarIngresso: dadosCadastro.colecionarIngresso === true,
@@ -733,7 +699,11 @@ export default function CheckoutIngressosPage() {
           </p>
 
           <h2 className="mt-2 text-3xl font-black text-gray-900">
-            {ehHotDogDay ? "Hot Dog Day" : ehCotaRevela ? "Cota Mensal" : "Ingresso Solidário"}
+            {ehHotDogDay
+              ? "Hot Dog Day"
+              : ehCotaRevela
+                ? "Cota Mensal"
+                : "Ingresso Solidário"}
           </h2>
 
           <div className="mt-8 space-y-4 rounded-3xl bg-gray-50 p-5">
@@ -745,7 +715,9 @@ export default function CheckoutIngressosPage() {
             {dadosCadastro.municipio && (
               <div className="flex justify-between gap-4 text-gray-700">
                 <span>Município</span>
-                <strong className="text-right">{dadosCadastro.municipio}</strong>
+                <strong className="text-right">
+                  {dadosCadastro.municipio}
+                </strong>
               </div>
             )}
 
