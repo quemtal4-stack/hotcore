@@ -901,7 +901,7 @@ export default function CadastroPage() {
       });
     }
 
-    window.location.href = `/checkout/ingresso?${params.toString()}`;
+    window.location.href = `/checkout/ingressos?${params.toString()}`;
   }
 
   if (!carregouParametros) {
