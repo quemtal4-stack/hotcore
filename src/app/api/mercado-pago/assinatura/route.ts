@@ -130,6 +130,27 @@ function extrairDetalheErro(error: unknown) {
   }
 }
 
+function normalizarBaseUrl(url: string | undefined): string {
+  const padrao = "http://localhost:3000";
+
+  if (!url || typeof url !== "string") {
+    return padrao;
+  }
+
+  const limpa = url.trim().replace(/\/+$/, "");
+
+  if (!limpa) {
+    return padrao;
+  }
+
+  // Garante que tenha protocolo
+  if (!/^https?:\/\//i.test(limpa)) {
+    return `https://${limpa}`;
+  }
+
+  return limpa;
+}
+
 export async function POST(request: Request) {
   try {
     console.log("API ASSINATURA: início");
@@ -171,8 +192,7 @@ export async function POST(request: Request) {
 
     const plano = PLANOS_CLUBE[planoNormalizado];
 
-    // 🆕 Valor de teste admin: só é usado se vier explicitamente no body.
-    // Fluxo normal do público nunca envia "valor", então sempre cai no valor fixo do plano.
+    // Valor de teste admin: só é usado se vier explicitamente no body.
     const valorBody = Number(body.valor);
     const valorFinal =
       Number.isFinite(valorBody) && valorBody > 0 ? valorBody : plano.valor;
@@ -190,27 +210,38 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
-// 🧪 Temporariamente desativado para testes com usuário de teste do Mercado Pago
-// if (
-//   emailNormalizado.includes("test_user") ||
-//   emailNormalizado.includes("testuser")
-// ) {
-//   return NextResponse.json(
-//     {
-//       error: "E-mail de teste não permitido em produção.",
-//       detalhe:
-//         "Você está usando token APP_USR de produção. Use um e-mail real de comprador.",
-//     },
-//     { status: 400 },
-//   );
-// }
-
 
     const externalReference = `clube-${planoNormalizado}-${Date.now()}`;
 
-    const baseUrl =
-      process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, "") ||
-      "http://localhost:3000";
+    const baseUrl = normalizarBaseUrl(process.env.NEXT_PUBLIC_SITE_URL);
+
+    const backUrl = `${baseUrl}/clube-de-membros/sucesso`;
+    const notificationUrl = `${baseUrl}/api/mercado-pago/webhook`;
+
+    console.log("BASE URL:", baseUrl);
+    console.log("BACK URL:", backUrl);
+    console.log("NOTIFICATION URL:", notificationUrl);
+
+    // Validação extra de segurança
+    if (!backUrl.startsWith("https://") && !backUrl.startsWith("http://")) {
+      return NextResponse.json(
+        {
+          error: "URL de retorno inválida.",
+          detalhe: `A URL gerada não possui protocolo válido: ${backUrl}`,
+        },
+        { status: 500 },
+      );
+    }
+
+    if (backUrl.includes("localhost") && !backUrl.startsWith("http://localhost")) {
+      return NextResponse.json(
+        {
+          error: "URL de retorno inválida.",
+          detalhe: "localhost só é permitido com http://",
+        },
+        { status: 500 },
+      );
+    }
 
     console.log("Salvando pessoa no Supabase...");
 
@@ -289,8 +320,8 @@ export async function POST(request: Request) {
       body: {
         reason: `Clube de Membros Hot Dogueres - Plano ${plano.nome}`,
         payer_email: emailNormalizado,
-        back_url: `${baseUrl}/clube-de-membros/sucesso`,
-        notification_url: `${baseUrl}/api/mercado-pago/webhook`, // 🆕 adicionar esta linha
+        back_url: backUrl,
+        notification_url: notificationUrl,
         auto_recurring: {
           frequency: plano.frequency,
           frequency_type: plano.frequency_type,
@@ -299,7 +330,7 @@ export async function POST(request: Request) {
         },
         status: "pending",
         external_reference: externalReference,
-      } as any, // 🆕 "as any" necessário pois o SDK não tipa notification_url, mas a API aceita
+      } as any,
     });
 
     console.log("ASSINATURA MERCADO PAGO:", result);
