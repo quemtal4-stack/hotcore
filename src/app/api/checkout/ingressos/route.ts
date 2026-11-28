@@ -13,7 +13,9 @@ type TipoCompra =
   | "ingresso-solidario-colecionavel"
   | "ingresso-evento"
   | "ingresso_evento"
-  | "hot-dog-day";
+  | "hot-dog-day"
+  | "cota-projeto-revela"
+  | "ingresso-projeto-revela";
 
 type DadosCheckoutIngressos = {
   tipo?: unknown;
@@ -64,8 +66,13 @@ type DadosCheckoutIngressos = {
   colecionar_ingresso?: unknown;
   enviarParaColecao?: unknown;
   enviar_para_colecao?: unknown;
+
   permitirResgateColecaoDepois?: unknown;
   permitir_resgate_colecao_depois?: unknown;
+
+  plano?: unknown;
+  projeto?: unknown;
+  rankingPontos?: unknown;
 
   admin?: unknown;
   teste?: unknown;
@@ -135,6 +142,12 @@ function normalizarTexto(valor: unknown) {
     .trim();
 }
 
+function normalizarTipoCompra(valor: unknown): string {
+  return normalizarTexto(valor)
+    .replace(/\s+/g, "-")
+    .replace(/_/g, "-");
+}
+
 function booleanoSeguro(valor: unknown) {
   if (typeof valor === "boolean") {
     return valor;
@@ -158,8 +171,15 @@ function criarExternalReference(tipo: string) {
   return `${tipo}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+function ehProjetoRevela(tipoNormalizado: string) {
+  return (
+    tipoNormalizado === "cota-projeto-revela" ||
+    tipoNormalizado === "ingresso-projeto-revela"
+  );
+}
+
 function obterTipoCompra(dados: DadosCheckoutIngressos): TipoCompra {
-  const tipoRecebido = normalizarTexto(dados.tipo);
+  const tipoRecebido = normalizarTipoCompra(dados.tipo);
 
   const eventoId =
     textoSeguro(dados.eventoId) ||
@@ -178,6 +198,14 @@ function obterTipoCompra(dados: DadosCheckoutIngressos): TipoCompra {
     return "ingresso_evento";
   }
 
+  if (tipoRecebido === "cota-projeto-revela") {
+    return "cota-projeto-revela";
+  }
+
+  if (tipoRecebido === "ingresso-projeto-revela") {
+    return "ingresso-projeto-revela";
+  }
+
   return "ingresso-solidario-colecionavel";
 }
 
@@ -185,6 +213,7 @@ function obterQuantidadeIngressos(params: {
   dados: DadosCheckoutIngressos;
   ehHotDogDay: boolean;
   ehIngressoEvento: boolean;
+  ehProjetoRevela: boolean;
 }) {
   const quantidadeRecebida =
     numeroSeguro(params.dados.ingressos) ||
@@ -194,7 +223,7 @@ function obterQuantidadeIngressos(params: {
 
   const quantidade = Math.max(1, Math.floor(quantidadeRecebida));
 
-  if (params.ehHotDogDay || params.ehIngressoEvento) {
+  if (params.ehHotDogDay || params.ehIngressoEvento || params.ehProjetoRevela) {
     return quantidade;
   }
 
@@ -207,6 +236,7 @@ function obterQuantidadeTotal(params: {
   sextoIngresso: boolean;
   ehHotDogDay: boolean;
   ehIngressoEvento: boolean;
+  ehProjetoRevela: boolean;
 }) {
   const quantidadeTotalRecebida = numeroSeguro(params.dados.quantidadeTotal);
 
@@ -214,7 +244,7 @@ function obterQuantidadeTotal(params: {
     return Math.max(1, Math.floor(quantidadeTotalRecebida));
   }
 
-  if (params.ehHotDogDay || params.ehIngressoEvento) {
+  if (params.ehHotDogDay || params.ehIngressoEvento || params.ehProjetoRevela) {
     return params.ingressos;
   }
 
@@ -226,6 +256,7 @@ function obterKgAlimentos(params: {
   ingressos: number;
   sextoIngresso: boolean;
   ehHotDogDay: boolean;
+  ehProjetoRevela: boolean;
 }) {
   const kgRecebido =
     numeroSeguro(params.dados.kgAlimentos) ||
@@ -235,7 +266,7 @@ function obterKgAlimentos(params: {
     return kgRecebido;
   }
 
-  if (params.ehHotDogDay) {
+  if (params.ehHotDogDay || params.ehProjetoRevela) {
     return 0;
   }
 
@@ -249,6 +280,7 @@ function obterTotal(params: {
   quantidadeTotal: number;
   ehHotDogDay: boolean;
   ehIngressoEvento: boolean;
+  ehProjetoRevela: boolean;
 }) {
   const valorRecebido =
     numeroSeguro(params.dados.valor) || numeroSeguro(params.dados.total);
@@ -257,12 +289,18 @@ function obterTotal(params: {
     return Number(valorRecebido.toFixed(2));
   }
 
+  if (params.ehProjetoRevela) {
+    return 0;
+  }
+
   if (params.ehHotDogDay) {
     return Number((params.ingressos * VALOR_HOT_DOG_DAY).toFixed(2));
   }
 
   if (params.ehIngressoEvento) {
-    return Number((params.quantidadeTotal * VALOR_INGRESSO_COLECIONAVEL).toFixed(2));
+    return Number(
+      (params.quantidadeTotal * VALOR_INGRESSO_COLECIONAVEL).toFixed(2),
+    );
   }
 
   return Number(
@@ -284,11 +322,13 @@ function obterItemsMercadoPago(params: {
   modoAdmin: boolean;
   ehHotDogDay: boolean;
   ehIngressoEvento: boolean;
+  ehProjetoRevela: boolean;
 }) {
   const usarItemUnico =
     params.modoAdmin ||
     params.ehIngressoEvento ||
     params.ehHotDogDay ||
+    params.ehProjetoRevela ||
     params.total <= 0;
 
   if (usarItemUnico) {
@@ -344,6 +384,8 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
   const tipo = obterTipoCompra(dados);
   const ehHotDogDay = tipo === "hot-dog-day";
   const ehIngressoEvento = tipo === "ingresso_evento";
+  const ehProjetoRevela =
+    tipo === "cota-projeto-revela" || tipo === "ingresso-projeto-revela";
 
   const nome =
     textoSeguro(dados.nome) ||
@@ -410,7 +452,9 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
       ? "hot-dog-day"
       : ehIngressoEvento
         ? "ingresso-evento"
-        : "ingresso-solidario-colecionavel");
+        : ehProjetoRevela
+          ? textoSeguro(dados.plano) || "projeto-revela"
+          : "ingresso-solidario-colecionavel");
 
   const titulo =
     textoSeguro(dados.titulo) ||
@@ -418,17 +462,25 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
       ? "Ingresso Hot Dog Day"
       : ehIngressoEvento
         ? "Ingresso de Evento Hot Dogueres"
-        : "Ingresso Solidário Colecionável");
+        : ehProjetoRevela
+          ? `Projeto Hot Dogueres Revela — ${textoSeguro(dados.plano) || "Contribuição"}`
+          : "Ingresso Solidário Colecionável");
+
+  const plano = textoSeguro(dados.plano);
+  const projeto = textoSeguro(dados.projeto);
+  const rankingPontos = numeroSeguro(dados.rankingPontos, 0);
 
   const ingressos = obterQuantidadeIngressos({
     dados,
     ehHotDogDay,
     ehIngressoEvento,
+    ehProjetoRevela,
   });
 
   const sextoIngresso =
     !ehHotDogDay &&
     !ehIngressoEvento &&
+    !ehProjetoRevela &&
     ingressos >= 5 &&
     (booleanoSeguro(dados.sextoIngresso) ||
       booleanoSeguro(dados.sexto_ingresso));
@@ -439,6 +491,7 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
     sextoIngresso,
     ehHotDogDay,
     ehIngressoEvento,
+    ehProjetoRevela,
   });
 
   const kgAlimentos = obterKgAlimentos({
@@ -446,6 +499,7 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
     ingressos,
     sextoIngresso,
     ehHotDogDay,
+    ehProjetoRevela,
   });
 
   const total = obterTotal({
@@ -455,6 +509,7 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
     quantidadeTotal,
     ehHotDogDay,
     ehIngressoEvento,
+    ehProjetoRevela,
   });
 
   if (!total || total <= 0) {
@@ -471,6 +526,7 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
 
   const colecionarIngresso =
     !ehHotDogDay &&
+    !ehProjetoRevela &&
     (booleanoSeguro(dados.colecionarIngresso) ||
       booleanoSeguro(dados.colecionar_ingresso) ||
       booleanoSeguro(dados.enviarParaColecao) ||
@@ -523,6 +579,14 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
     paramsSucesso.set("nomeIngressoEternizado", nomeIngressoEternizado);
   }
 
+  if (plano) {
+    paramsSucesso.set("plano", plano);
+  }
+
+  if (projeto) {
+    paramsSucesso.set("projeto", projeto);
+  }
+
   const metadata = {
     origem: "checkout-ingressos",
 
@@ -537,6 +601,10 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
     produtoId: produto,
 
     titulo,
+
+    plano: plano || null,
+    projeto: projeto || null,
+    ranking_pontos: rankingPontos,
 
     evento_id: eventoId || null,
     eventoId: eventoId || null,
@@ -591,13 +659,6 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
     permitir_resgate_colecao_depois: permitirResgateColecaoDepois,
     permitirResgateColecaoDepois,
 
-    /*
-      Este campo controla somente se o webhook deve criar/atualizar
-      automaticamente a Área do Colecionador.
-
-      Mesmo quando false, a compra continua contando nos termômetros,
-      porque tipo, quantidade, kg_alimentos e status pago ficam salvos no pedido.
-    */
     eh_ingresso_colecionavel: colecionarIngresso,
 
     modo_admin: modoAdmin,
@@ -615,6 +676,7 @@ async function criarCheckoutIngressos(dados: DadosCheckoutIngressos) {
     modoAdmin,
     ehHotDogDay,
     ehIngressoEvento,
+    ehProjetoRevela,
   });
 
   const client = new MercadoPagoConfig({
